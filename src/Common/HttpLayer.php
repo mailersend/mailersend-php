@@ -43,18 +43,50 @@ class HttpLayer
     }
 
     /**
-     * @param  string  $uri
-     * @param  array  $body
-     * @param  array  $headers
      * @throws JsonException
      * @throws ClientExceptionInterface
      */
-    public function post(string $uri, array $body, array $headers = []): ResponseInterface
+    public function post(string $uri, array $body): array
     {
         $request = $this->requestFactory->createRequest('POST', $uri)
             ->withBody($this->buildBody($body));
 
-        return $this->httpClient->sendRequest($request);
+        return $this->buildResponse($this->httpClient->sendRequest($request));
+    }
+
+
+    /**
+     * @param  array|string  $body
+     * @throws JsonException
+     */
+    protected function buildBody($body): StreamInterface
+    {
+        $stringBody = is_array($body) ? json_encode($body, JSON_THROW_ON_ERROR) : $body;
+
+        return $this->streamFactory->createStream($stringBody);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    protected function buildResponse(ResponseInterface $response): array
+    {
+        $contentType = $response->hasHeader('Content-Type') && $contentTypes = $response->getHeader('Content-Type') ?
+                reset($contentType) : null;
+
+        switch ($contentType) {
+            case 'application/json':
+                $body = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+                break;
+            default:
+                $body = $response->getBody();
+        }
+
+        return [
+            'status_code' => $response->getStatusCode(),
+            'headers' => $response->getHeaders(),
+            'body' => $body,
+        ];
     }
 
     protected function buildPlugins(): array
@@ -73,16 +105,5 @@ class HttpLayer
             $contentTypePlugin,
             $headerDefaultsPlugin,
         ];
-    }
-
-    /**
-     * @param  array|string  $body
-     * @throws JsonException
-     */
-    protected function buildBody($body): StreamInterface
-    {
-        $stringBody = is_array($body) ? json_encode($body, JSON_THROW_ON_ERROR) : $body;
-
-        return $this->streamFactory->createStream($stringBody);
     }
 }
