@@ -10,9 +10,13 @@ use Http\Client\HttpClient;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Message\Authentication\Bearer;
+use JsonException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\StreamInterface;
 
 class HttpLayer
 {
@@ -26,7 +30,6 @@ class HttpLayer
         ?ClientInterface $httpClient = null,
         ?RequestFactoryInterface $requestFactory = null,
         ?StreamFactoryInterface $streamFactory = null,
-        array $plugins = [],
         array $options = []
     ) {
         $this->options = $options;
@@ -35,7 +38,7 @@ class HttpLayer
         $this->streamFactory = $streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
         $this->httpClient = new PluginClient(
             $httpClient ?: Psr18ClientDiscovery::find(),
-            $plugins ?: $this->buildPlugins()
+            $this->buildPlugins()
         );
     }
 
@@ -43,18 +46,13 @@ class HttpLayer
      * @param  string  $uri
      * @param  array  $body
      * @param  array  $headers
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws JsonException
+     * @throws ClientExceptionInterface
      */
-    public function post(string $uri, array $body, array $headers = []): \Psr\Http\Message\ResponseInterface
+    public function post(string $uri, array $body, array $headers = []): ResponseInterface
     {
-        $stringBody = json_encode($body, JSON_THROW_ON_ERROR);
-
         $request = $this->requestFactory->createRequest('POST', $uri)
-            ->withBody(
-                $this->streamFactory->createStream($stringBody)
-            );
+            ->withBody($this->buildBody($body));
 
         return $this->httpClient->sendRequest($request);
     }
@@ -75,5 +73,16 @@ class HttpLayer
             $contentTypePlugin,
             $headerDefaultsPlugin,
         ];
+    }
+
+    /**
+     * @param  array|string  $body
+     * @throws JsonException
+     */
+    protected function buildBody($body): StreamInterface
+    {
+        $stringBody = is_array($body) ? json_encode($body, JSON_THROW_ON_ERROR) : $body;
+
+        return $this->streamFactory->createStream($stringBody);
     }
 }
