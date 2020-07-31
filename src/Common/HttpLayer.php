@@ -7,6 +7,7 @@ use Http\Client\Common\Plugin\ContentTypePlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
 use Http\Client\Common\PluginClient;
 use Http\Client\HttpClient;
+use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Message\Authentication\Bearer;
@@ -27,19 +28,19 @@ class HttpLayer
     protected array $options;
 
     public function __construct(
+        array $options = [],
         ?ClientInterface $httpClient = null,
         ?RequestFactoryInterface $requestFactory = null,
-        ?StreamFactoryInterface $streamFactory = null,
-        array $options = []
+        ?StreamFactoryInterface $streamFactory = null
     ) {
         $this->options = $options;
 
-        $this->requestFactory = $requestFactory ?: Psr17FactoryDiscovery::findRequestFactory();
-        $this->streamFactory = $streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
         $this->httpClient = new PluginClient(
             $httpClient ?: Psr18ClientDiscovery::find(),
             $this->buildPlugins()
         );
+        $this->requestFactory = $requestFactory ?: Psr17FactoryDiscovery::findRequestFactory();
+        $this->streamFactory = $streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
     }
 
     /**
@@ -53,7 +54,6 @@ class HttpLayer
 
         return $this->buildResponse($this->httpClient->sendRequest($request));
     }
-
 
     /**
      * @param  array|string  $body
@@ -86,6 +86,7 @@ class HttpLayer
             'status_code' => $response->getStatusCode(),
             'headers' => $response->getHeaders(),
             'body' => $body,
+            'response' => $response,
         ];
     }
 

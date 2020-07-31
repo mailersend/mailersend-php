@@ -14,7 +14,7 @@ class Email extends AbstractEndpoint
         string $html = null,
         string $text = null
     ): array {
-        return $this->httpLayer->post($this->buildUri(), [
+        return $this->httpLayer->post($this->buildUri($this->endpoint), [
             'from' => [
                 'email' => $from,
                 'name' => $from_name

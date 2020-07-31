@@ -8,7 +8,6 @@ abstract class AbstractEndpoint
 {
     protected HttpLayer $httpLayer;
     protected array $options;
-    protected string $endpoint = '';
 
     public function __construct(HttpLayer $httpLayer, array $options)
     {
@@ -16,10 +15,24 @@ abstract class AbstractEndpoint
         $this->options = $options;
     }
 
-    protected function buildUri(string $path = ''): string
+    protected function buildUri(string $path, array $params = []): string
     {
-        $base = $this->options['protocol'].'://'.$this->options['host'].'/'.$this->options['version'].'/'.$this->endpoint;
+        $paramsArray = [];
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
 
-        return $path ? $base.'/'.$path : $base;
+            $paramsArray[] = $key.'='.$value;
+        }
+
+        $paramsString = implode('&', $paramsArray);
+
+        return $this->options['protocol'].'://'.
+            $this->options['host'].
+            ($this->options['port'] ? ':'.$this->options ['port'] : '').
+            '/api/'.$this->options['version'].'/'.
+            $path.
+            ($paramsString ? '?'.$paramsString : '');
     }
 }
