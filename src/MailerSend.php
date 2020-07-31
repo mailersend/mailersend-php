@@ -34,23 +34,21 @@ class MailerSend
     public function __construct(array $options = [], ?HttpLayer $httpLayer = null)
     {
         $this->setOptions($options);
-        $this->setEndpoints();
         $this->setHttpLayer($httpLayer);
+        $this->setEndpoints();
     }
 
     protected function setEndpoints(): void
     {
-        $this->email = new Email();
+        $this->email = new Email($this->httpLayer, $this->options);
     }
 
-    public function setHttpLayer(?HttpLayer $httpLayer = null): MailerSend
+    protected function setHttpLayer(?HttpLayer $httpLayer = null): void
     {
         $this->httpLayer = $httpLayer ?: new HttpLayer();
-
-        return $this;
     }
 
-    public function setOptions(?array $options): MailerSend
+    protected function setOptions(?array $options): void
     {
         $this->options = self::$defaultOptions;
 
@@ -61,7 +59,5 @@ class MailerSend
         }
 
         // TODO: Check if api_key is not empty
-
-        return $this;
     }
 }
