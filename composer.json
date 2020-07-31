@@ -1,13 +1,43 @@
 {
-    "name": "mailersend/mailersend-php",
-    "description": "MailerSend PHP SDK",
-    "type": "library",
-    "license": "MIT",
-    "keywords": [
-        "MailerSend",
-        "mailersend",
-        "email",
-        "transactional"
-    ],
-    "require": {}
+  "name": "mailersend/mailersend-php",
+  "description": "MailerSend PHP SDK",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "MailerSend",
+    "mailersend",
+    "email",
+    "transactional"
+  ],
+  "authors": [
+    {
+      "name": "Tautvydas Tijūnaitis",
+      "email": "tautvydas@mailersend.com",
+      "homepage": "https://mailersend.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.4",
+    "php-http/httplug": "^1.0 || ^2.0",
+    "php-http/client-implementation": "^1.0",
+    "php-http/message-factory": "^1.0",
+    "php-http/discovery": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9",
+    "php-http/mock-client": "^1.0",
+    "php-http/message": "^1.0",
+    "guzzlehttp/psr7": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "MailerSend\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  }
 }
