@@ -7,11 +7,11 @@ use Http\Client\Common\Plugin\ContentTypePlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
 use Http\Client\Common\PluginClient;
 use Http\Client\HttpClient;
-use Http\Discovery\HttpClientDiscovery;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Http\Message\Authentication\Bearer;
 use JsonException;
+use MailerSend\Helpers\HttpErrorHelper;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -51,6 +51,18 @@ class HttpLayer
     {
         $request = $this->requestFactory->createRequest('POST', $uri)
             ->withBody($this->buildBody($body));
+
+        return $this->buildResponse($this->httpClient->sendRequest($request));
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ClientExceptionInterface
+     */
+    public function request(string $method, string $uri, string $body): array
+    {
+        $request = $this->requestFactory->createRequest($method, $uri)
+            ->withBody($this->streamFactory->createStream($body));
 
         return $this->buildResponse($this->httpClient->sendRequest($request));
     }
@@ -101,10 +113,13 @@ class HttpLayer
             'User-Agent' => 'mailersend-php/'.Constants::SDK_VERSION
         ]);
 
+        $httpErrorPlugin = new HttpErrorHelper();
+
         return [
             $authenticationPlugin,
             $contentTypePlugin,
             $headerDefaultsPlugin,
+            $httpErrorPlugin
         ];
     }
 }

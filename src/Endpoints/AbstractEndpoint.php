@@ -31,8 +31,8 @@ abstract class AbstractEndpoint
         return $this->options['protocol'].'://'.
             $this->options['host'].
             ($this->options['port'] ? ':'.$this->options ['port'] : '').
-            '/api/'.$this->options['version'].'/'.
-            $path.
+            '/'.$this->options['version'].
+            '/'.$path.
             ($paramsString ? '?'.$paramsString : '');
     }
 }
