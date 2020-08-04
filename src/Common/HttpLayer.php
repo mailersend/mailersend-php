@@ -21,7 +21,7 @@ use Psr\Http\Message\StreamInterface;
 
 class HttpLayer
 {
-    protected ?HttpClient $httpClient;
+    protected ?HttpClient $pluginClient;
     protected ?RequestFactoryInterface $requestFactory;
     protected ?StreamFactoryInterface $streamFactory;
 
@@ -35,10 +35,9 @@ class HttpLayer
     ) {
         $this->options = $options;
 
-        $this->httpClient = new PluginClient(
-            $httpClient ?: Psr18ClientDiscovery::find(),
-            $this->buildPlugins()
-        );
+        $httpClient = $httpClient ?: Psr18ClientDiscovery::find();
+        $this->pluginClient = new PluginClient($httpClient, $this->buildPlugins());
+
         $this->requestFactory = $requestFactory ?: Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory = $streamFactory ?: Psr17FactoryDiscovery::findStreamFactory();
     }
@@ -52,7 +51,7 @@ class HttpLayer
         $request = $this->requestFactory->createRequest('POST', $uri)
             ->withBody($this->buildBody($body));
 
-        return $this->buildResponse($this->httpClient->sendRequest($request));
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
     }
 
     /**
@@ -67,7 +66,7 @@ class HttpLayer
             $request = $request->withBody($this->streamFactory->createStream($body));
         }
 
-        return $this->buildResponse($this->httpClient->sendRequest($request));
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
     }
 
     /**

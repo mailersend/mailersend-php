@@ -26,6 +26,11 @@ class MailerSendHttpException extends MailerSendException implements RequestExce
         parent::__construct($message, $response->getStatusCode());
     }
 
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
     public function getRequest(): RequestInterface
     {
         return $this->request;

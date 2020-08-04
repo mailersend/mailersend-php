@@ -22,4 +22,14 @@ class MailerSendValidationException extends MailerSendException
         $this->request = $request;
         $this->response = $response;
     }
+
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
+    public function getRequest(): RequestInterface
+    {
+        return $this->request;
+    }
 }

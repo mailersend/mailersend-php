@@ -57,7 +57,7 @@ class Email extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            [
+            array_filter([
                 'from' => [
                     'email' => $from,
                     'name' => $from_name
@@ -70,7 +70,7 @@ class Email extends AbstractEndpoint
                 'tags' => $tags,
                 'attachments' => $attachments_mapped,
                 'variables' => $variables_mapped
-            ]
+            ], fn($v) => $v !== null)
         );
     }
 }
