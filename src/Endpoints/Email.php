@@ -6,6 +6,7 @@ use Assert\Assertion;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\GeneralHelpers;
 
 class Email extends AbstractEndpoint
 {
@@ -39,19 +40,18 @@ class Email extends AbstractEndpoint
         array $variables = [],
         array $attachments = []
     ): array {
-        Assertion::email($from);
-        Assertion::minCount($recipients, 1);
-        Assertion::minLength($from_name, 1);
-        Assertion::minLength($subject, 1);
-        Assertion::notEmpty(array_filter([$template_id, $html, $text], fn($v) => $v !== null),
-            'One of template_id, html or text must be supplied');
+        GeneralHelpers::assert(fn() => Assertion::email($from) &&
+            Assertion::minCount($recipients, 1) &&
+            Assertion::minLength($from_name, 1) &&
+            Assertion::minLength($subject, 1) &&
+            Assertion::notEmpty(array_filter([$template_id, $html, $text], fn($v) => $v !== null),
+                'One of template_id, html or text must be supplied')
+        );
 
         $recipients_mapped = collect($recipients)->map(fn($v) => is_object($v) && is_a($v,
             Recipient::class) ? $v->toArray() : $v)->toArray();
-
         $attachments_mapped = collect($attachments)->map(fn($v) => is_object($v) && is_a($v,
             Attachment::class) ? $v->toArray() : $v)->toArray();
-
         $variables_mapped = collect($variables)->map(fn($v) => is_object($v) && is_a($v,
             Variable::class) ? $v->toArray() : $v)->toArray();
 
