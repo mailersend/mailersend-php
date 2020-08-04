@@ -2,6 +2,10 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
+use Assert\AssertionFailedException;
+use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\GeneralHelpers;
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
 class Variable implements Arrayable
@@ -9,22 +13,39 @@ class Variable implements Arrayable
     protected string $email;
     protected array $substitutions;
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function __construct(string $email, array $substitutions)
     {
         $this->setEmail($email);
         $this->setSubstitutions($substitutions);
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setEmail(string $email): void
     {
+        GeneralHelpers::assert(static function () use ($email) {
+            Assertion::email($email);
+        });
+
         $this->email = $email;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setSubstitutions(array $substitutions): void
     {
+        GeneralHelpers::assert(static function () use ($substitutions) {
+            Assertion::minCount($substitutions, 1);
+        });
+
         $mapped = [];
-        foreach ($substitutions as $substitution){
-            foreach ($substitution as $var => $value){
+        foreach ($substitutions as $substitution) {
+            foreach ($substitution as $var => $value) {
                 $mapped[] = [
                     'var' => $var,
                     'value' => $value,

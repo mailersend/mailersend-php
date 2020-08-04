@@ -48,7 +48,7 @@ class MailerSend
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
     {
-        $this->httpLayer = $httpLayer ?: new HttpLayer();
+        $this->httpLayer = $httpLayer ?: new HttpLayer($this->options);
     }
 
     /**

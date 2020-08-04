@@ -83,15 +83,20 @@ class HttpLayer
      */
     protected function buildResponse(ResponseInterface $response): array
     {
-        $contentType = $response->hasHeader('Content-Type') && $contentTypes = $response->getHeader('Content-Type') ?
-                reset($contentType) : null;
+        $contentTypes = $response->getHeader('Content-Type');
+        $contentType = $response->hasHeader('Content-Type') ?
+                reset($contentTypes) : null;
 
-        switch ($contentType) {
-            case 'application/json':
-                $body = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
-                break;
-            default:
-                $body = $response->getBody();
+        $body = '';
+
+        if ($response->getBody()) {
+            switch ($contentType) {
+                case 'application/json':
+                    $body = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                    break;
+                default:
+                    $body = $response->getBody()->getContents();
+            }
         }
 
         return [
