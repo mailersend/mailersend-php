@@ -59,10 +59,13 @@ class HttpLayer
      * @throws JsonException
      * @throws ClientExceptionInterface
      */
-    public function request(string $method, string $uri, string $body): array
+    public function request(string $method, string $uri, string $body = ''): array
     {
-        $request = $this->requestFactory->createRequest($method, $uri)
-            ->withBody($this->streamFactory->createStream($body));
+        $request = $this->requestFactory->createRequest($method, $uri);
+
+        if (!empty($body)) {
+            $request = $request->withBody($this->streamFactory->createStream($body));
+        }
 
         return $this->buildResponse($this->httpClient->sendRequest($request));
     }
@@ -85,7 +88,7 @@ class HttpLayer
     {
         $contentTypes = $response->getHeader('Content-Type');
         $contentType = $response->hasHeader('Content-Type') ?
-                reset($contentTypes) : null;
+            reset($contentTypes) : null;
 
         $body = '';
 

@@ -2,8 +2,7 @@
 
 namespace MailerSend\Tests\Common;
 
-use Http\Discovery\HttpClientDiscovery;
-use Http\Discovery\Strategy\MockClientStrategy;
+use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -16,11 +15,44 @@ class HttpLayerTest extends TestCase
 
     protected function setUp(): void
     {
-        HttpClientDiscovery::prependStrategy(MockClientStrategy::class);
+        $this->client = new Client();
 
         $this->httpLayer = new HttpLayer([
             'api_key' => 'test'
-        ]);
+        ], $this->client);
+    }
+
+    public function test_call_post(): void
+    {
+        $this->httpLayer->post('endpoint', ['test' => 'body']);
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('POST', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('{"test":"body"}', $lastRequest->getBody());
+    }
+
+    public function test_call_request_without_body(): void
+    {
+        $this->httpLayer->request('GET','endpoint');
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('', $lastRequest->getBody());
+    }
+
+    public function test_call_request_with_body(): void
+    {
+        $this->httpLayer->request('PATCH','endpoint', 'body');
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('PATCH', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('body', $lastRequest->getBody());
     }
 
     /**
