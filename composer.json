@@ -1,5 +1,5 @@
 {
-  "name": "mailersend/mailersend-php",
+  "name": "mailersend/mailersend",
   "description": "MailerSend PHP SDK",
   "type": "library",
   "license": "MIT",
@@ -24,7 +24,6 @@
     "php-http/discovery": "^1.9",
     "php-http/httplug": "^2.1",
     "psr/http-client-implementation": "^1.0",
-    "psr/http-factory-implementation": "^1.0",
     "psr/http-message": "^1.0",
     "tightenco/collect": "^7.19",
     "beberlei/assert": "^3.2"
