@@ -38,8 +38,40 @@ composer require mailersend/mailersend
 <a name="usage"></a>
 # Usage
 
+If you want to send a basic email.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$mailersend->email->send(
+    'your@domain.com',
+    'Your Name',
+    $recipients,
+    'Subject',
+    'This is the HTML content',
+    'This is the text content'
+);
+```
+
+To see more expanded usage info, see [guide](GUIDE.md).
+
 <a name="support-and-feedback"></a>
 # Support and Feedback
+
+In case you find any bugs, submit an issue directly here in GitHub.
+
+You are welcome to create SDK for any other programming language.
+
+If you have any troubles using our API or SDK free to contact our support by email [info@mailerlite.com](mailto:info@mailersend.com)
+
+Official documentation is at [https://developers.mailersend.com](https://developers.mailersend.com)
 
 <a name="license"></a>
 # License
