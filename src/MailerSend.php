@@ -20,7 +20,6 @@ class MailerSend
         'host' => 'api.mailersend.com',
         'protocol' => 'https',
         'api_path' => 'v1',
-        'port' => 443,
         'api_key' => '',
         'debug' => false,
     ];
