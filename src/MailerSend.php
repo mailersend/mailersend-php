@@ -4,6 +4,8 @@ namespace MailerSend;
 
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
+use MailerSend\Exceptions\MailerSendException;
+use Tightenco\Collect\Support\Arr;
 
 /**
  * This is the PHP SDK for MailerSend
@@ -17,7 +19,7 @@ class MailerSend
     protected static array $defaultOptions = [
         'host' => 'api.mailersend.com',
         'protocol' => 'https',
-        'version' => 'v1',
+        'api_path' => 'v1',
         'port' => 443,
         'api_key' => '',
         'debug' => false,
@@ -30,6 +32,7 @@ class MailerSend
     /**
      * @param  array  $options  Additional options for the SDK
      * @param  HttpLayer  $httpLayer
+     * @throws MailerSendException
      */
     public function __construct(array $options = [], ?HttpLayer $httpLayer = null)
     {
@@ -48,6 +51,9 @@ class MailerSend
         $this->httpLayer = $httpLayer ?: new HttpLayer();
     }
 
+    /**
+     * @throws MailerSendException
+     */
     protected function setOptions(?array $options): void
     {
         $this->options = self::$defaultOptions;
@@ -58,6 +64,8 @@ class MailerSend
             }
         }
 
-        // TODO: Check if api_key is not empty
+        if (empty(Arr::get($this->options, 'api_key'))) {
+            throw new MailerSendException('Please set "api_key" in SDK options.');
+        }
     }
 }

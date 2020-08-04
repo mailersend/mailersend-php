@@ -11,8 +11,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public const OPTIONS = [
         'host' => 'api.mailersend.com',
         'protocol' => 'https',
-        'version' => 'v1',
-        'port' => 443,
+        'api_path' => 'v1',
         'api_key' => 'api-key'
     ];
 

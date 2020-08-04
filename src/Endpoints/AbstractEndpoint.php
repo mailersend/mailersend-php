@@ -3,6 +3,7 @@
 namespace MailerSend\Endpoints;
 
 use MailerSend\Common\HttpLayer;
+use MailerSend\Helpers\BuildUri;
 
 abstract class AbstractEndpoint
 {
@@ -17,22 +18,6 @@ abstract class AbstractEndpoint
 
     protected function buildUri(string $path, array $params = []): string
     {
-        $paramsArray = [];
-        foreach ($params as $key => $value) {
-            if (is_array($value)) {
-                $value = implode(',', $value);
-            }
-
-            $paramsArray[] = $key.'='.$value;
-        }
-
-        $paramsString = implode('&', $paramsArray);
-
-        return $this->options['protocol'].'://'.
-            $this->options['host'].
-            ($this->options['port'] ? ':'.$this->options ['port'] : '').
-            '/'.$this->options['version'].
-            '/'.$path.
-            ($paramsString ? '?'.$paramsString : '');
+        return (new BuildUri($this->options))->execute($path, $params);
     }
 }
