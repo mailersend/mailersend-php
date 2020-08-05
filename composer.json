@@ -3,6 +3,7 @@
   "description": "MailerSend PHP SDK",
   "type": "library",
   "license": "MIT",
+  "homepage": "https://github.com/mailersend/laravel-driver-driver",
   "keywords": [
     "MailerSend",
     "mailersend",
