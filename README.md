@@ -69,7 +69,7 @@ In case you find any bugs, submit an issue directly here in GitHub.
 
 You are welcome to create SDK for any other programming language.
 
-If you have any troubles using our API or SDK free to contact our support by email [info@mailerlite.com](mailto:info@mailersend.com)
+If you have any troubles using our API or SDK free to contact our support by email [info@mailersend.com](mailto:info@mailersend.com)
 
 Official documentation is at [https://developers.mailersend.com](https://developers.mailersend.com)
 
