@@ -62,6 +62,12 @@ $mailersend->email->send(
 
 To see more expanded usage info, see [guide](GUIDE.md).
 
+## Testing
+
+``` bash
+composer test
+```
+
 <a name="support-and-feedback"></a>
 # Support and Feedback
 
