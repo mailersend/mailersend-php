@@ -7,7 +7,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\GeneralHelpers;
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class Recipient implements Arrayable
+class Recipient implements Arrayable, \JsonSerializable
 {
     protected ?string $name;
     protected string $email;
@@ -44,5 +44,10 @@ class Recipient implements Arrayable
             'name' => $this->name,
             'email' => $this->email,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

@@ -3,12 +3,11 @@
 namespace MailerSend\Helpers\Builder;
 
 use Assert\Assertion;
-use Assert\AssertionFailedException;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\GeneralHelpers;
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class Variable implements Arrayable
+class Variable implements Arrayable, \JsonSerializable
 {
     protected string $email;
     protected array $substitutions;
@@ -62,5 +61,10 @@ class Variable implements Arrayable
             'email' => $this->email,
             'substitutions' => $this->substitutions,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }

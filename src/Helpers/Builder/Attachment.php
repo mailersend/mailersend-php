@@ -4,7 +4,7 @@ namespace MailerSend\Helpers\Builder;
 
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class Attachment implements Arrayable
+class Attachment implements Arrayable, \JsonSerializable
 {
     protected string $content;
     protected string $filename;
@@ -40,6 +40,11 @@ class Attachment implements Arrayable
             'content' => $this->content,
             'filename' => $this->filename,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     protected function isBase64($string): bool
