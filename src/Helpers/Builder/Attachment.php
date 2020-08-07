@@ -8,15 +8,29 @@ class Attachment implements Arrayable, \JsonSerializable
 {
     protected string $content;
     protected string $filename;
+    protected ?string $disposition = null;
+    protected ?string $id = null;
 
-    public function __construct(string $content = null, string $filename = null)
-    {
+    public function __construct(
+        string $content = null,
+        string $filename = null,
+        string $disposition = null,
+        string $id = null
+    ) {
         if ($content) {
             $this->setContent($content);
         }
 
         if ($filename) {
             $this->setFilename($filename);
+        }
+
+        if ($disposition) {
+            $this->setDisposition($disposition);
+        }
+
+        if ($id) {
+            $this->setId($id);
         }
     }
 
@@ -34,11 +48,23 @@ class Attachment implements Arrayable, \JsonSerializable
         $this->filename = $filename;
     }
 
+    public function setDisposition(?string $disposition): void
+    {
+        $this->disposition = $disposition;
+    }
+
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
+    }
+
     public function toArray(): array
     {
         return [
             'content' => $this->content,
             'filename' => $this->filename,
+            'disposition' => $this->disposition,
+            'id' => $this->id,
         ];
     }
 
