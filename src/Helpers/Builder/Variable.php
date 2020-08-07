@@ -43,13 +43,12 @@ class Variable implements Arrayable, \JsonSerializable
         });
 
         $mapped = [];
-        foreach ($substitutions as $substitution) {
-            foreach ($substitution as $var => $value) {
-                $mapped[] = [
-                    'var' => $var,
-                    'value' => $value,
-                ];
-            }
+
+        foreach ($substitutions as $var => $value) {
+            $mapped[] = [
+                'var' => $var,
+                'value' => $value,
+            ];
         }
 
         $this->substitutions = $mapped;

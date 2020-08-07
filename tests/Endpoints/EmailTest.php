@@ -136,9 +136,7 @@ class EmailTest extends TestCase
         $this->client->addResponse($this->defaultResponse);
 
         $vars = [
-            new Variable('recipient@mailersend.com', [
-                ['var' => 'value'],
-            ])
+            new Variable('recipient@mailersend.com', ['var' => 'value'])
         ];
 
         $response = $this->email->send(
