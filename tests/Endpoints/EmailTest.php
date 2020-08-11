@@ -7,6 +7,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\Attachment;
+use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Tests\TestCase;
@@ -38,23 +39,25 @@ class EmailTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $response = $this->email->send(
-            'test@mailersend.com',
-            'Sender',
-            [
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setReplyTo('reply-to@mailersend.com')
+            ->setReplyToName('Reply To')
+            ->setRecipients([
                 [
                     'name' => 'Recipient',
                     'email' => 'recipient@mailersend.com',
                 ]
-            ],
-            'Subject',
-            'HTML',
-            'Text',
-            null,
-            [
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML')
+            ->setText('Text')
+            ->setTags([
                 'tag'
-            ]
-        );
+            ]);
+
+        $response = $this->email->send($emailParams);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
@@ -65,6 +68,8 @@ class EmailTest extends TestCase
 
         self::assertEquals('test@mailersend.com', Arr::get($request_body, 'from.email'));
         self::assertEquals('Sender', Arr::get($request_body, 'from.name'));
+        self::assertEquals('reply-to@mailersend.com', Arr::get($request_body, 'reply_to.email'));
+        self::assertEquals('Reply To', Arr::get($request_body, 'reply_to.name'));
         self::assertEquals('Recipient', Arr::get($request_body, 'to.0.name'));
         self::assertEquals('recipient@mailersend.com', Arr::get($request_body, 'to.0.email'));
         self::assertEquals('Subject', Arr::get($request_body, 'subject'));
@@ -81,13 +86,14 @@ class EmailTest extends TestCase
             new Recipient('recipient@mailersend.com', 'Recipient')
         ];
 
-        $response = $this->email->send(
-            'test@mailersend.com',
-            'Sender',
-            $recipients,
-            'Subject',
-            'HTML'
-        );
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients($recipients)
+            ->setSubject('Subject')
+            ->setHtml('HTML');
+
+        $response = $this->email->send($emailParams);
 
         self::assertEquals(200, $response['status_code']);
 
@@ -105,23 +111,21 @@ class EmailTest extends TestCase
             new Attachment('attachment', 'file.jpg'),
         ];
 
-        $response = $this->email->send(
-            'test@mailersend.com',
-            'Sender',
-            [
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([
                 [
                     'name' => 'Recipient',
                     'email' => 'recipient@mailersend.com',
                 ]
-            ],
-            'Subject',
-            'HTML',
-            'Text',
-            null,
-            [],
-            [],
-            $attachments
-        );
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML')
+            ->setText('Text')
+            ->setAttachments($attachments);
+
+        $response = $this->email->send($emailParams);
 
         self::assertEquals(200, $response['status_code']);
 
@@ -139,23 +143,21 @@ class EmailTest extends TestCase
             new Variable('recipient@mailersend.com', ['var' => 'value'])
         ];
 
-        $response = $this->email->send(
-            'test@mailersend.com',
-            'Sender',
-            [
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([
                 [
                     'name' => 'Recipient',
                     'email' => 'recipient@mailersend.com',
                 ]
-            ],
-            'Subject',
-            'HTML',
-            'Text',
-            null,
-            [],
-            $vars,
-            []
-        );
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML')
+            ->setText('Text')
+            ->setVariables($vars);
+
+        $response = $this->email->send($emailParams);
 
         self::assertEquals(200, $response['status_code']);
 
@@ -179,17 +181,17 @@ class EmailTest extends TestCase
         $validationErrorResponse->method('getBody')->willReturn($responseBody);
         $this->client->addResponse($validationErrorResponse);
 
-        $this->email->send(
-            'test@mailersend.com',
-            'Sender',
-            [
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([
                 [
                     'wrong recipient'
                 ]
-            ],
-            'Subject',
-            'HTML',
-            'Text'
-        );
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML');
+
+        $this->email->send($emailParams);
     }
 }

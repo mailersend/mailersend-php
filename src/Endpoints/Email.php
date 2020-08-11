@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Helpers\Builder\Attachment;
+use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
@@ -13,64 +14,48 @@ class Email extends AbstractEndpoint
     protected string $endpoint = 'email';
 
     /**
-     * @param  string  $from
-     * @param  string  $from_name
-     * @param  array  $recipients  Either an array of format [ name => email ] or [ email ] of recipients
-     * @param  string  $subject
-     * @param  string|null  $html
-     * @param  string|null  $text
-     * @param  string|null  $template_id
-     * @param  array  $tags  array of strings
-     * @param  array  $variables  array of arrays or \MailerSend\Helpers\Variables helper instances
-     * @param  array  $attachments  array of arrays or \MailerSend\Helpers\Attachment helper instances
-     * @return array
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \Assert\AssertionFailedException
      */
-    public function send(
-        string $from,
-        string $from_name,
-        array $recipients,
-        string $subject,
-        ?string $html = null,
-        ?string $text = null,
-        ?string $template_id = null,
-        array $tags = [],
-        array $variables = [],
-        array $attachments = []
-    ): array {
-        GeneralHelpers::assert(fn() => Assertion::email($from) &&
-            Assertion::minCount($recipients, 1) &&
-            Assertion::minLength($from_name, 1) &&
-            Assertion::minLength($subject, 1) &&
-            Assertion::notEmpty(array_filter([$template_id, $html, $text], fn($v) => $v !== null),
+    public function send(EmailParams $params): array
+    {
+        GeneralHelpers::assert(fn() => Assertion::email($params->getFrom()) &&
+            Assertion::minLength($params->getFromName(), 1) &&
+            Assertion::minCount($params->getRecipients(), 1) &&
+            Assertion::minLength($params->getSubject(), 1) &&
+            Assertion::notEmpty(array_filter([$params->getTemplateId(), $params->getHtml(), $params->getText()],
+                fn($v) => $v !== null),
                 'One of template_id, html or text must be supplied')
         );
 
-        $recipients_mapped = collect($recipients)->map(fn($v) => is_object($v) && is_a($v,
+        $recipients_mapped = collect($params->getRecipients())->map(fn($v) => is_object($v) && is_a($v,
             Recipient::class) ? $v->toArray() : $v)->toArray();
-        $attachments_mapped = collect($attachments)->map(fn($v) => is_object($v) && is_a($v,
+        $attachments_mapped = collect($params->getAttachments())->map(fn($v) => is_object($v) && is_a($v,
             Attachment::class) ? $v->toArray() : $v)->toArray();
-        $variables_mapped = collect($variables)->map(fn($v) => is_object($v) && is_a($v,
+        $variables_mapped = collect($params->getVariables())->map(fn($v) => is_object($v) && is_a($v,
             Variable::class) ? $v->toArray() : $v)->toArray();
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             array_filter([
                 'from' => [
-                    'email' => $from,
-                    'name' => $from_name
+                    'email' => $params->getFrom(),
+                    'name' => $params->getFromName(),
+                ],
+                'reply_to' => [
+                    'email' => $params->getReplyTo(),
+                    'name' => $params->getReplyToName(),
                 ],
                 'to' => $recipients_mapped,
-                'subject' => $subject,
-                'template_id' => $template_id,
-                'text' => $text,
-                'html' => $html,
-                'tags' => $tags,
+                'subject' => $params->getSubject(),
+                'template_id' => $params->getTemplateId(),
+                'text' => $params->getText(),
+                'html' => $params->getHtml(),
+                'tags' => $params->getTags(),
                 'attachments' => $attachments_mapped,
                 'variables' => $variables_mapped
-            ], fn($v) => $v !== null)
-        );
+            ], fn($v) => is_array($v) ? array_filter($v, fn($v) => $v !== null) : $v !== null
+            ));
     }
 }
