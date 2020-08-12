@@ -9,15 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- HTTP Layer (PSR-7 and PSR-18 compatible)
-- Email Endpoint
-- Helpers to build Recipients, Variables & Attachments
-- Tests
-- Readme
-- Changelog
-- License
-
 ### Changed
 
 ### Removed
 
+## [0.1.0]
+
+### Added
+
+- PSR-7 and PSR-18 based HTTP adapter
+- `POST email/send` endpoint support
+- Helpers for recipients, variables & attachments
+- PHPUnit tests
+- Documentation

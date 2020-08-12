@@ -29,20 +29,22 @@ This library is built atop of [PSR-7](https://www.php-fig.org/psr/psr-7/) and
 composer require php-http/guzzle6-adapter nyholm/psr7
 ```
 
-After that you can install the SDK
+After that you can install the SDK.
 
 ```bash
 composer require mailersend/mailersend
 ```
 
+
 <a name="usage"></a>
 # Usage
 
-If you want to send a basic email.
+Sending a basic email.
 
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
@@ -50,17 +52,27 @@ $recipients = [
     new Recipient('your@client.com', 'Your Client'),
 ];
 
-$mailersend->email->send(
-    'your@domain.com',
-    'Your Name',
-    $recipients,
-    'Subject',
-    'This is the HTML content',
-    'This is the text content'
-);
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$mailersend->email->send($emailParams);
 ```
 
-To see more expanded usage info, see [guide](GUIDE.md).
+For more expanded usage info, see [guide](GUIDE.md).
+
+<a name="endpoints"></a>
+# Available endpoints
+
+| Feature group | Endpoint    | Available |
+| ------------- | ----------- | --------- |
+| Email         | `POST send` | ✅         |
+
+*If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
 ## Testing
 
@@ -77,7 +89,7 @@ You are welcome to create SDK for any other programming language.
 
 If you have any troubles using our API or SDK free to contact our support by email [info@mailersend.com](mailto:info@mailersend.com)
 
-Official documentation is at [https://developers.mailersend.com](https://developers.mailersend.com)
+The official documentation is at [https://developers.mailersend.com](https://developers.mailersend.com)
 
 <a name="license"></a>
 # License
