@@ -21,14 +21,19 @@ class Email extends AbstractEndpoint
      */
     public function send(EmailParams $params): array
     {
-        GeneralHelpers::assert(fn() => Assertion::email($params->getFrom()) &&
-            Assertion::minLength($params->getFromName(), 1) &&
-            Assertion::minCount($params->getRecipients(), 1) &&
-            Assertion::minLength($params->getSubject(), 1) &&
-            Assertion::notEmpty(array_filter([$params->getTemplateId(), $params->getHtml(), $params->getText()],
-                fn($v) => $v !== null),
-                'One of template_id, html or text must be supplied')
-        );
+        GeneralHelpers::assert(fn() => Assertion::notEmpty(array_filter([
+            $params->getTemplateId(), $params->getHtml(), $params->getText()
+        ], fn($v) => $v !== null), 'One of template_id, html or text must be supplied'));
+
+        if (!$params->getTemplateId()) {
+            GeneralHelpers::assert(fn() => Assertion::email($params->getFrom()) &&
+                Assertion::minLength($params->getFromName(), 1) &&
+                Assertion::minLength($params->getSubject(), 1) &&
+                Assertion::minCount($params->getRecipients(), 1)
+            );
+        } else {
+            GeneralHelpers::assert(fn() => Assertion::minCount($params->getRecipients(), 1));
+        }
 
         $recipients_mapped = (new Collection($params->getRecipients()))->map(fn($v) => is_object($v) && is_a($v,
             Recipient::class) ? $v->toArray() : $v)->toArray();
