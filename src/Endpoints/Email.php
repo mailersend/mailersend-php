@@ -8,6 +8,7 @@ use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
+use Tightenco\Collect\Support\Collection;
 
 class Email extends AbstractEndpoint
 {
@@ -29,11 +30,11 @@ class Email extends AbstractEndpoint
                 'One of template_id, html or text must be supplied')
         );
 
-        $recipients_mapped = collect($params->getRecipients())->map(fn($v) => is_object($v) && is_a($v,
+        $recipients_mapped = (new Collection($params->getRecipients()))->map(fn($v) => is_object($v) && is_a($v,
             Recipient::class) ? $v->toArray() : $v)->toArray();
-        $attachments_mapped = collect($params->getAttachments())->map(fn($v) => is_object($v) && is_a($v,
+        $attachments_mapped = (new Collection($params->getAttachments()))->map(fn($v) => is_object($v) && is_a($v,
             Attachment::class) ? $v->toArray() : $v)->toArray();
-        $variables_mapped = collect($params->getVariables())->map(fn($v) => is_object($v) && is_a($v,
+        $variables_mapped = (new Collection($params->getVariables()))->map(fn($v) => is_object($v) && is_a($v,
             Variable::class) ? $v->toArray() : $v)->toArray();
 
         return $this->httpLayer->post(
