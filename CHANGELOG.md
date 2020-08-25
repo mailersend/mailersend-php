@@ -26,5 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPUnit tests
 - Documentation
 
-[Unreleased]: https://github.com/mailerlite/mailersend-php/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/mailerlite/mailersend-php/releases/tag/v0.1.0
+[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.1.0
