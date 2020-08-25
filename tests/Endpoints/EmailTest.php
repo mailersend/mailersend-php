@@ -5,6 +5,7 @@ namespace MailerSend\Tests\Endpoints;
 use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
@@ -193,5 +194,52 @@ class EmailTest extends TestCase
             ->setHtml('HTML');
 
         $this->email->send($emailParams);
+    }
+
+    public function test_template_id_doesnt_require_params(): void
+    {
+        $recipients = [
+            new Recipient('recipient@mailersend.com', 'Recipient')
+        ];
+
+        $emailParams = (new EmailParams())
+            ->setRecipients($recipients)
+            ->setTemplateId('templateId');
+
+        $httpLayer = $this->createMock(HttpLayer::class);
+        $httpLayer->method('post')
+            ->with('https://api.mailersend.com/v1/email', [
+                'to' => [
+                    $recipients[0]->toArray()
+                ],
+                'template_id' => 'templateId'
+            ])
+            ->willReturn([]);
+
+        $response = (new Email($httpLayer, self::OPTIONS))->send($emailParams);
+
+        // It passes without assertion errors
+        self::assertEquals([], $response);
+    }
+
+    public function test_without_template_id_requires_params(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $recipients = [
+            new Recipient('recipient@mailersend.com', 'Recipient')
+        ];
+
+        $emailParams = (new EmailParams())
+            ->setRecipients($recipients)
+            ->setHtml('HTML')
+            ->setText('Text');
+
+        $httpLayer = $this->createMock(HttpLayer::class);
+        $httpLayer->method('post')
+            ->withAnyParameters()
+            ->willReturn([]);
+
+        (new Email($httpLayer, self::OPTIONS))->send($emailParams);
     }
 }
