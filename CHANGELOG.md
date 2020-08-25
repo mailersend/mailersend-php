@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `collect` helper changed to `Collection` class
+
 ### Removed
 
 ## [0.1.0]
