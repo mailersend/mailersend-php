@@ -11,10 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `collect` helper changed to `Collection` class
-- `from` and `subject` are not mandatory if `template_id` is set
+### Fixed
 
 ### Removed
+
+## [0.1.1] - 2020 09 01
+
+### Changed
+
+- `collect` helper changed to `Collection` class
+- `from` and `subject` are not mandatory if `template_id` is set
 
 ## [0.1.0]
 
@@ -26,5 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPUnit tests
 - Documentation
 
-[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.1.1
 [0.1.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.1.0
