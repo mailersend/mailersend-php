@@ -91,7 +91,7 @@ class HttpLayer
 
         $body = '';
 
-        if ($response->getBody()) {
+        if ($response->getBody()->isReadable()) {
             switch ($contentType) {
                 case 'application/json':
                     $body = json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
