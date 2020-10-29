@@ -61,7 +61,7 @@ class Email extends AbstractEndpoint
                 'tags' => $params->getTags(),
                 'attachments' => $attachments_mapped,
                 'variables' => $variables_mapped
-            ], fn($v) => is_array($v) ? array_filter($v, fn($v) => $v !== null) : $v !== null
+            ], fn($v) => is_array($v) ? array_filter($v) : $v !== null
             ));
     }
 }
