@@ -29,7 +29,7 @@ class HttpLayerTest extends TestCase
         $lastRequest = $this->client->getLastRequest();
 
         self::assertEquals('POST', $lastRequest->getMethod());
-        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertSame('endpoint', (string)$lastRequest->getUri());
         self::assertEquals('{"test":"body"}', $lastRequest->getBody());
     }
 
@@ -40,7 +40,7 @@ class HttpLayerTest extends TestCase
         $lastRequest = $this->client->getLastRequest();
 
         self::assertEquals('GET', $lastRequest->getMethod());
-        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertSame('endpoint', (string)$lastRequest->getUri());
         self::assertEquals('', $lastRequest->getBody());
     }
 
@@ -51,7 +51,7 @@ class HttpLayerTest extends TestCase
         $lastRequest = $this->client->getLastRequest();
 
         self::assertEquals('PATCH', $lastRequest->getMethod());
-        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertSame('endpoint', (string)$lastRequest->getUri());
         self::assertEquals('body', $lastRequest->getBody());
     }
 

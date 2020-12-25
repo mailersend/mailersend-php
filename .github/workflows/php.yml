@@ -7,12 +7,24 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  run:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['7.4']
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v1
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: mbstring, pdo, pdo_mysql, intl, zip
+        coverage: none
 
     - name: Cache Composer packages
       id: composer-cache
