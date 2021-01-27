@@ -26,7 +26,7 @@ This library is built atop of [PSR-7](https://www.php-fig.org/psr/psr-7/) and
 [PSR-18](https://www.php-fig.org/psr/psr-18/). You will need to install some implementations for those interfaces.
 
 ```bash
-composer require php-http/guzzle6-adapter nyholm/psr7
+composer require php-http/guzzle7-adapter nyholm/psr7
 ```
 
 After that you can install the SDK.
@@ -34,7 +34,6 @@ After that you can install the SDK.
 ```bash
 composer require mailersend/mailersend
 ```
-
 
 <a name="usage"></a>
 # Usage
