@@ -9,7 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- PHP 8 support
+- Github Actions testing for multiple versions of PHP
+
 ### Changed
+
+- Guzzle 6 to Guzzle 7 in `require-dev`.
+- `tightenco/collect` version constraint update.
+- Suggest `php-http/guzzle7-adapter` instead of `php-http/guzzle6-adapter` for install instructions.
 
 ### Fixed
 
