@@ -51,7 +51,7 @@ $recipients = [
 ];
 
 $variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
+    new Variable('your@client.com', ['var' => 'value'])
 ];
 
 $tags = ['tag'];
@@ -84,7 +84,7 @@ $recipients = [
 ];
 
 $variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
+    new Variable('your@client.com', ['var' => 'value'])
 ];
 
 $tags = ['tag'];
