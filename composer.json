@@ -3,7 +3,7 @@
   "description": "MailerSend PHP SDK",
   "type": "library",
   "license": "MIT",
-  "homepage": "https://github.com/mailersend/laravel-driver-driver",
+  "homepage": "https://github.com/mailersend/mailersend-php",
   "keywords": [
     "MailerSend",
     "mailersend",
@@ -36,7 +36,8 @@
     "mockery/mockery": "^0.9.4",
     "guzzlehttp/psr7": "^1.5.2",
     "http-interop/http-factory-guzzle": "^1.0",
-    "php-http/guzzle7-adapter": "^0.1"
+    "php-http/guzzle7-adapter": "^0.1",
+    "friendsofphp/php-cs-fixer": "^2.18"
   },
   "autoload": {
     "psr-4": {
@@ -51,6 +52,9 @@
   "scripts": {
     "test": [
       "@php vendor/bin/phpunit tests/"
-    ]
+    ],
+      "phpcs": [
+          "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run"
+      ]
   }
 }
