@@ -54,7 +54,7 @@
       "@php vendor/bin/phpunit tests/"
     ],
     "phpcs": [
-        "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run"
+        "vendor/bin/php-cs-fixer fix --verbose --diff"
     ]
   }
 }
