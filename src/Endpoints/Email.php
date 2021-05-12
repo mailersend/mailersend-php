@@ -41,6 +41,8 @@ class Email extends AbstractEndpoint
             Attachment::class) ? $v->toArray() : $v)->toArray();
         $variables_mapped = (new Collection($params->getVariables()))->map(fn($v) => is_object($v) && is_a($v,
             Variable::class) ? $v->toArray() : $v)->toArray();
+        $persinalizations_mapped = (new Collection($params->getPersonalizations()))->map(fn($v) => is_object($v) && is_a($v,
+            \MailerSend\Helpers\Builder\Personalization::class) ? $v->toArray() : $v)->toArray();
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
@@ -60,7 +62,8 @@ class Email extends AbstractEndpoint
                 'html' => $params->getHtml(),
                 'tags' => $params->getTags(),
                 'attachments' => $attachments_mapped,
-                'variables' => $variables_mapped
+                'variables' => $variables_mapped,
+                'personalization' => $persinalizations_mapped,
             ], fn($v) => is_array($v) ? array_filter($v, fn($v) => $v !== null) : $v !== null
             ));
     }
