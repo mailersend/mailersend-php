@@ -148,5 +148,4 @@ class EmailParams
         $this->attachments = $attachments;
         return $this;
     }
-
 }
