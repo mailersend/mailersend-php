@@ -36,7 +36,43 @@ class Email extends AbstractEndpoint
             GeneralHelpers::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
         }
 
+        if (count($params->getCc()) > 0) {
+            GeneralHelpers::assert(fn () => Assertion::maxCount($params->getCc(), 10));
+            foreach ($params->getCc() as $key => $cc) {
+                $cc = ! is_array($cc) ? $cc->toArray() : $cc;
+                GeneralHelpers::assert(
+                    fn () => Assertion::keyExists($cc, 'email', "The element with index $key in CC array does not contain the email parameter.")
+                );
+                if (isset($cc['name'])) {
+                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(';', $cc['name']))));
+                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(',', $cc['name']))));
+                }
+            }
+        }
+
+        if (count($params->getBcc()) > 0) {
+            GeneralHelpers::assert(fn () => Assertion::maxCount($params->getBcc(), 10));
+            foreach ($params->getBcc() as $key => $bcc) {
+                $bcc = ! is_array($bcc) ? $bcc->toArray() : $bcc;
+                GeneralHelpers::assert(
+                    fn () => Assertion::keyExists($bcc, 'email', "The element with index $key in BCC array does not contain the email parameter.")
+                );
+                if (isset($bcc['name'])) {
+                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(';', $bcc['name']))));
+                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(',', $bcc['name']))));
+                }
+            }
+        }
+
         $recipients_mapped = (new Collection($params->getRecipients()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            Recipient::class
+        ) ? $v->toArray() : $v)->toArray();
+        $cc_mapped = (new Collection($params->getCc()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            Recipient::class
+        ) ? $v->toArray() : $v)->toArray();
+        $bcc_mapped = (new Collection($params->getBcc()))->map(fn ($v) => is_object($v) && is_a(
             $v,
             Recipient::class
         ) ? $v->toArray() : $v)->toArray();
@@ -62,6 +98,8 @@ class Email extends AbstractEndpoint
                     'name' => $params->getReplyToName(),
                 ],
                 'to' => $recipients_mapped,
+                'cc' => $cc_mapped,
+                'bcc' => $bcc_mapped,
                 'subject' => $params->getSubject(),
                 'template_id' => $params->getTemplateId(),
                 'text' => $params->getText(),
