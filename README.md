@@ -3,9 +3,8 @@
 MailerSend PHP SDK
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
-![build badge](https://github.com/mailersend/mailersend-php/actions/workflows/static-analysis.yml/badge.svg)
-
-
+![build badge](https://github.com/mailersend/mailersend-php/actions/workflows/php.yml/badge.svg)
+![analysis badge](https://github.com/mailersend/mailersend-php/actions/workflows/static-analysis.yml/badge.svg)
 
 # Table of Contents
 
