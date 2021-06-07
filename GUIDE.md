@@ -7,6 +7,7 @@ Some more advanced usages of our SDK.
 # Table of Contents
 
 * [Available Helpers](#helpers)
+* [Sending and email with CC and BCC](#cc_and_bcc)
 * [Sending an email with variables (personalisation)](#variables)
 * [Sending a templated email](#templated)
 * [Sending an email with attachment](#attachments)
@@ -34,6 +35,43 @@ $variables = [
 $attachments = [
     new Attachment(file_get_contents('attachment.jpg'), 'attachment.jpg')
 ];
+```
+
+<a name="cc_and_bcc"></a>
+# Sending an email with CC and BCC
+
+Send an email with CC and BCC.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$cc = [
+    new Recipient('cc@mail.com', 'CC'),
+];
+
+$bcc = [
+    new Recipient('bcc@mail.com', 'BCC'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setCc($cc)
+    ->setBcc($bcc)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$mailersend->email->send($emailParams);
 ```
 
 <a name="variables"></a>
