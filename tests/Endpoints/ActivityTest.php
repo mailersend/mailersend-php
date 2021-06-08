@@ -52,10 +52,10 @@ class ActivityTest extends TestCase
         self::assertEquals(200, $response['status_code']);
 
         self::assertEquals($activityParams->getPage(), Arr::get($query, 'page'));
-        self::assertEquals($activityParams->getLimit(), Arr::get($query,'limit'));
-        self::assertEquals($activityParams->getDateFrom(), Arr::get($query,'date_from'));
-        self::assertEquals($activityParams->getDateTo(), Arr::get($query,'date_to'));
-        self::assertEquals(implode(',', $activityParams->getEvent()), Arr::get($query,'event'));
+        self::assertEquals($activityParams->getLimit(), Arr::get($query, 'limit'));
+        self::assertEquals($activityParams->getDateFrom(), Arr::get($query, 'date_from'));
+        self::assertEquals($activityParams->getDateTo(), Arr::get($query, 'date_to'));
+        self::assertEquals(implode(',', $activityParams->getEvent()), Arr::get($query, 'event'));
     }
 
     /**
@@ -77,7 +77,7 @@ class ActivityTest extends TestCase
         (new Activity($httpLayer, self::OPTIONS))->activityList($domainId, $activityParams);
     }
 
-    public function validActivityParamsProvider()
+    public function validActivityParamsProvider(): array
     {
         return [
             'no params' => [
@@ -111,7 +111,7 @@ class ActivityTest extends TestCase
         ];
     }
 
-    public function invalidActivityParamsProvider()
+    public function invalidActivityParamsProvider(): array
     {
         return [
             'limit under 10' => [

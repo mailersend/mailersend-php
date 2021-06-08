@@ -13,7 +13,7 @@ class Activity extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function activityList(string $domainId, ActivityParams $activityParams)
+    public function activityList(string $domainId, ActivityParams $activityParams): array
     {
         if ($activityParams->getLimit()) {
             GeneralHelpers::assert(
