@@ -56,7 +56,25 @@ class EmailTest extends TestCase
             ->setText('Text')
             ->setTags([
                 'tag'
-            ]);
+            ])
+            ->setPersonalizations([
+                [
+                    'var' => 'variable',
+                    'number' => 123,
+                    'object' => [
+                        'key' => 'object-value'
+                    ],
+                    'objectCollection' => [
+                        [
+                            'name' => 'John'
+                        ],
+                        [
+                            'name' => 'Patrick'
+                        ]
+                    ],
+                ]
+            ])
+        ;
 
         $response = $this->email->send($emailParams);
 
@@ -77,6 +95,11 @@ class EmailTest extends TestCase
         self::assertEquals('HTML', Arr::get($request_body, 'html'));
         self::assertEquals('Text', Arr::get($request_body, 'text'));
         self::assertEquals('tag', Arr::get($request_body, 'tags.0'));
+        self::assertEquals('variable', Arr::get($request_body, 'personalization.0.var'));
+        self::assertEquals(123, Arr::get($request_body, 'personalization.0.number'));
+        self::assertEquals('object-value', Arr::get($request_body, 'personalization.0.object.key'));
+        self::assertEquals('John', Arr::get($request_body, 'personalization.0.objectCollection.0.name'));
+        self::assertEquals('Patrick', Arr::get($request_body, 'personalization.0.objectCollection.1.name'));
     }
 
     public function test_send_request_recipients_helper(): void

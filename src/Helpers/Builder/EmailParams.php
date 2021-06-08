@@ -16,6 +16,7 @@ class EmailParams
     protected array $tags = [];
     protected array $variables = [];
     protected array $attachments = [];
+    protected array $personalizations = [];
 
     public function getFrom(): ?string
     {
@@ -146,6 +147,17 @@ class EmailParams
     public function setAttachments(array $attachments): EmailParams
     {
         $this->attachments = $attachments;
+        return $this;
+    }
+
+    public function getPersonalizations(): array
+    {
+        return $this->personalizations;
+    }
+
+    public function setPersonalizations(array $personalizations): EmailParams
+    {
+        $this->personalizations = $personalizations;
         return $this;
     }
 
