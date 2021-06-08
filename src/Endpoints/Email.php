@@ -48,7 +48,7 @@ class Email extends AbstractEndpoint
             $v,
             Variable::class
         ) ? $v->toArray() : $v)->toArray();
-        $persinalizations_mapped = (new Collection($params->getPersonalizations()))->map(fn ($v) => is_object($v) && is_a(
+        $personalization_mapped = (new Collection($params->getPersonalization()))->map(fn ($v) => is_object($v) && is_a(
             $v,
             \MailerSend\Helpers\Builder\Personalization::class
         ) ? $v->toArray() : $v)->toArray();
@@ -73,8 +73,7 @@ class Email extends AbstractEndpoint
                   'tags' => $params->getTags(),
                   'attachments' => $attachments_mapped,
                   'variables' => $variables_mapped,
-                  'personalization' => $persinalizations_mapped,
-                  'variables' => $variables_mapped
+                  'personalization' => $personalization_mapped
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             )

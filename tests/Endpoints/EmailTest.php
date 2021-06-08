@@ -57,7 +57,7 @@ class EmailTest extends TestCase
             ->setTags([
                 'tag'
             ])
-            ->setPersonalizations([
+            ->setPersonalization([
                 [
                     'var' => 'variable',
                     'number' => 123,
