@@ -9,6 +9,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Tests\TestCase;
@@ -56,25 +57,7 @@ class EmailTest extends TestCase
             ->setText('Text')
             ->setTags([
                 'tag'
-            ])
-            ->setPersonalization([
-                [
-                    'var' => 'variable',
-                    'number' => 123,
-                    'object' => [
-                        'key' => 'object-value'
-                    ],
-                    'objectCollection' => [
-                        [
-                            'name' => 'John'
-                        ],
-                        [
-                            'name' => 'Patrick'
-                        ]
-                    ],
-                ]
-            ])
-        ;
+            ]);
 
         $response = $this->email->send($emailParams);
 
@@ -95,11 +78,6 @@ class EmailTest extends TestCase
         self::assertEquals('HTML', Arr::get($request_body, 'html'));
         self::assertEquals('Text', Arr::get($request_body, 'text'));
         self::assertEquals('tag', Arr::get($request_body, 'tags.0'));
-        self::assertEquals('variable', Arr::get($request_body, 'personalization.0.var'));
-        self::assertEquals(123, Arr::get($request_body, 'personalization.0.number'));
-        self::assertEquals('object-value', Arr::get($request_body, 'personalization.0.object.key'));
-        self::assertEquals('John', Arr::get($request_body, 'personalization.0.objectCollection.0.name'));
-        self::assertEquals('Patrick', Arr::get($request_body, 'personalization.0.objectCollection.1.name'));
     }
 
     public function test_send_request_recipients_helper(): void
@@ -190,6 +168,56 @@ class EmailTest extends TestCase
         self::assertEquals('recipient@mailersend.com', Arr::get($variable, 'email'));
         self::assertEquals('var', Arr::get($variable, 'substitutions.0.var'));
         self::assertEquals('value', Arr::get($variable, 'substitutions.0.value'));
+    }
+
+    public function test_send_request_personalization_helper(): void
+    {
+        $this->client->addResponse($this->defaultResponse);
+
+        $personalization = [
+            new Personalization('recipient@mailersend.com', [
+                'var' => 'variable',
+                'number' => 123,
+                'object' => [
+                    'key' => 'object-value'
+                ],
+                'objectCollection' => [
+                    [
+                        'name' => 'John'
+                    ],
+                    [
+                        'name' => 'Patrick'
+                    ]
+                ],
+            ])
+        ];
+
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([
+                [
+                    'name' => 'Recipient',
+                    'email' => 'recipient@mailersend.com',
+                ]
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML')
+            ->setText('Text')
+            ->setPersonalization($personalization);
+
+        $response = $this->email->send($emailParams);
+
+        self::assertEquals(200, $response['status_code']);
+
+        $personalizationResult = Arr::get($this->lastRequestBody(), 'personalization.0');
+
+        self::assertEquals('recipient@mailersend.com', Arr::get($personalizationResult, 'email'));
+        self::assertEquals('variable', Arr::get($personalizationResult, 'data.var'));
+        self::assertEquals(123, Arr::get($personalizationResult, 'data.number'));
+        self::assertEquals('object-value', Arr::get($personalizationResult, 'data.object.key'));
+        self::assertEquals('John', Arr::get($personalizationResult, 'data.objectCollection.0.name'));
+        self::assertEquals('Patrick', Arr::get($personalizationResult, 'data.objectCollection.1.name'));
     }
 
     public function test_send_request_validation_error(): void
