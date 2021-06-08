@@ -2,6 +2,6 @@
 
 namespace MailerSend\Exceptions;
 
-class MailerSendException extends \ErrorException{
-
+class MailerSendException extends \ErrorException
+{
 }

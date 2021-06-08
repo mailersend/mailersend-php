@@ -21,18 +21,19 @@ class Email extends AbstractEndpoint
      */
     public function send(EmailParams $params): array
     {
-        GeneralHelpers::assert(fn() => Assertion::notEmpty(array_filter([
+        GeneralHelpers::assert(fn () => Assertion::notEmpty(array_filter([
             $params->getTemplateId(), $params->getHtml(), $params->getText()
-        ], fn($v) => $v !== null), 'One of template_id, html or text must be supplied'));
+        ], fn ($v) => $v !== null), 'One of template_id, html or text must be supplied'));
 
         if (!$params->getTemplateId()) {
-            GeneralHelpers::assert(fn() => Assertion::email($params->getFrom()) &&
+            GeneralHelpers::assert(
+                fn () => Assertion::email($params->getFrom()) &&
                 Assertion::minLength($params->getFromName(), 1) &&
                 Assertion::minLength($params->getSubject(), 1) &&
                 Assertion::minCount($params->getRecipients(), 1)
             );
         } else {
-            GeneralHelpers::assert(fn() => Assertion::minCount($params->getRecipients(), 1));
+            GeneralHelpers::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
         }
 
         $recipients_mapped = (new Collection($params->getRecipients()))->map(fn($v) => is_object($v) && is_a($v,
@@ -46,25 +47,29 @@ class Email extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter([
-                'from' => [
-                    'email' => $params->getFrom(),
-                    'name' => $params->getFromName(),
+            array_filter(
+                [
+                  'from' => [
+                      'email' => $params->getFrom(),
+                      'name' => $params->getFromName(),
+                  ],
+                  'reply_to' => [
+                      'email' => $params->getReplyTo(),
+                      'name' => $params->getReplyToName(),
+                  ],
+                  'to' => $recipients_mapped,
+                  'subject' => $params->getSubject(),
+                  'template_id' => $params->getTemplateId(),
+                  'text' => $params->getText(),
+                  'html' => $params->getHtml(),
+                  'tags' => $params->getTags(),
+                  'attachments' => $attachments_mapped,
+                  'variables' => $variables_mapped,
+                  'personalization' => $persinalizations_mapped,
+                  'variables' => $variables_mapped
                 ],
-                'reply_to' => [
-                    'email' => $params->getReplyTo(),
-                    'name' => $params->getReplyToName(),
-                ],
-                'to' => $recipients_mapped,
-                'subject' => $params->getSubject(),
-                'template_id' => $params->getTemplateId(),
-                'text' => $params->getText(),
-                'html' => $params->getHtml(),
-                'tags' => $params->getTags(),
-                'attachments' => $attachments_mapped,
-                'variables' => $variables_mapped,
-                'personalization' => $persinalizations_mapped,
-            ], fn($v) => is_array($v) ? array_filter($v, fn($v) => $v !== null) : $v !== null
-            ));
+                fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
+            )
+        );
     }
 }

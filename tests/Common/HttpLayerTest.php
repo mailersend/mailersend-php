@@ -35,7 +35,7 @@ class HttpLayerTest extends TestCase
 
     public function test_call_request_without_body(): void
     {
-        $this->httpLayer->request('GET','endpoint');
+        $this->httpLayer->request('GET', 'endpoint');
 
         $lastRequest = $this->client->getLastRequest();
 
@@ -46,7 +46,7 @@ class HttpLayerTest extends TestCase
 
     public function test_call_request_with_body(): void
     {
-        $this->httpLayer->request('PATCH','endpoint', 'body');
+        $this->httpLayer->request('PATCH', 'endpoint', 'body');
 
         $lastRequest = $this->client->getLastRequest();
 
