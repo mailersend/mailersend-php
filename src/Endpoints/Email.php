@@ -36,14 +36,22 @@ class Email extends AbstractEndpoint
             GeneralHelpers::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
         }
 
-        $recipients_mapped = (new Collection($params->getRecipients()))->map(fn($v) => is_object($v) && is_a($v,
-            Recipient::class) ? $v->toArray() : $v)->toArray();
-        $attachments_mapped = (new Collection($params->getAttachments()))->map(fn($v) => is_object($v) && is_a($v,
-            Attachment::class) ? $v->toArray() : $v)->toArray();
-        $variables_mapped = (new Collection($params->getVariables()))->map(fn($v) => is_object($v) && is_a($v,
-            Variable::class) ? $v->toArray() : $v)->toArray();
-        $persinalizations_mapped = (new Collection($params->getPersonalizations()))->map(fn($v) => is_object($v) && is_a($v,
-            \MailerSend\Helpers\Builder\Personalization::class) ? $v->toArray() : $v)->toArray();
+        $recipients_mapped = (new Collection($params->getRecipients()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            Recipient::class
+        ) ? $v->toArray() : $v)->toArray();
+        $attachments_mapped = (new Collection($params->getAttachments()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            Attachment::class
+        ) ? $v->toArray() : $v)->toArray();
+        $variables_mapped = (new Collection($params->getVariables()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            Variable::class
+        ) ? $v->toArray() : $v)->toArray();
+        $persinalizations_mapped = (new Collection($params->getPersonalizations()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            \MailerSend\Helpers\Builder\Personalization::class
+        ) ? $v->toArray() : $v)->toArray();
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),

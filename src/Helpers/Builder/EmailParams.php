@@ -160,5 +160,4 @@ class EmailParams
         $this->personalizations = $personalizations;
         return $this;
     }
-
 }

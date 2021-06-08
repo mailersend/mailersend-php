@@ -49,6 +49,5 @@ class PersonalizationTest extends TestCase
         self::assertEquals('object-value', Arr::get($var, 'data.0.object.key'));
         self::assertEquals('John', Arr::get($var, 'data.0.objectCollection.0.name'));
         self::assertEquals('Patrick', Arr::get($var, 'data.0.objectCollection.1.name'));
-
     }
 }
