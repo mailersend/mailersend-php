@@ -7,7 +7,8 @@ Some more advanced usages of our SDK.
 # Table of Contents
 
 * [Available Helpers](#helpers)
-* [Sending an email with variables (personalisation)](#variables)
+* [Sending an email with variables (simple personalisation)](#variables)
+* [Sending an email with personalization (advanced personalisation)](#personalization)
 * [Sending a templated email](#templated)
 * [Sending an email with attachment](#attachments)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -67,6 +68,7 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+<a name="personalization"></a>
 # Sending an email with personalization (advanced personalization)
 
 ```php
