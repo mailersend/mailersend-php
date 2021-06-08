@@ -9,6 +9,8 @@ class EmailParams
     protected ?string $reply_to = null;
     protected ?string $reply_to_name = null;
     protected ?array $recipients;
+    protected ?array $cc;
+    protected ?array $bcc;
     protected ?string $subject = null;
     protected ?string $html = null;
     protected ?string $text = null;
@@ -70,6 +72,28 @@ class EmailParams
     public function setRecipients(array $recipients): EmailParams
     {
         $this->recipients = $recipients;
+        return $this;
+    }
+
+    public function getCc(): ?array
+    {
+        return $this->cc ?? [];
+    }
+
+    public function setCc(array $cc): EmailParams
+    {
+        $this->cc = $cc;
+        return $this;
+    }
+
+    public function getBcc(): ?array
+    {
+        return $this->bcc ?? [];
+    }
+
+    public function setBcc(array $bcc): EmailParams
+    {
+        $this->bcc = $bcc;
         return $this;
     }
 
