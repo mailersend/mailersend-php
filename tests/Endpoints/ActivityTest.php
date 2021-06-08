@@ -9,6 +9,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\ActivityParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Tightenco\Collect\Support\Arr;
 
 class ActivityTest extends TestCase
 {
@@ -50,11 +51,11 @@ class ActivityTest extends TestCase
         self::assertEquals('/v1/activity/domainId', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals($activityParams->getPage(), $query['page']);
-        self::assertEquals($activityParams->getLimit(), $query['limit']);
-        self::assertEquals($activityParams->getDateFrom(), $query['date_from']);
-        self::assertEquals($activityParams->getDateTo(), $query['date_to']);
-        self::assertEquals(implode(',', $activityParams->getEvent()), $query['event']);
+        self::assertEquals($activityParams->getPage(), Arr::get($query, 'page'));
+        self::assertEquals($activityParams->getLimit(), Arr::get($query,'limit'));
+        self::assertEquals($activityParams->getDateFrom(), Arr::get($query,'date_from'));
+        self::assertEquals($activityParams->getDateTo(), Arr::get($query,'date_to'));
+        self::assertEquals(implode(',', $activityParams->getEvent()), Arr::get($query,'event'));
     }
 
     /**
