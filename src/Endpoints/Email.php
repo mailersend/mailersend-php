@@ -48,28 +48,33 @@ class Email extends AbstractEndpoint
             $v,
             Variable::class
         ) ? $v->toArray() : $v)->toArray();
+        $personalization_mapped = (new Collection($params->getPersonalization()))->map(fn ($v) => is_object($v) && is_a(
+            $v,
+            \MailerSend\Helpers\Builder\Personalization::class
+        ) ? $v->toArray() : $v)->toArray();
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             array_filter(
                 [
-                'from' => [
-                    'email' => $params->getFrom(),
-                    'name' => $params->getFromName(),
+                  'from' => [
+                      'email' => $params->getFrom(),
+                      'name' => $params->getFromName(),
+                  ],
+                  'reply_to' => [
+                      'email' => $params->getReplyTo(),
+                      'name' => $params->getReplyToName(),
+                  ],
+                  'to' => $recipients_mapped,
+                  'subject' => $params->getSubject(),
+                  'template_id' => $params->getTemplateId(),
+                  'text' => $params->getText(),
+                  'html' => $params->getHtml(),
+                  'tags' => $params->getTags(),
+                  'attachments' => $attachments_mapped,
+                  'variables' => $variables_mapped,
+                  'personalization' => $personalization_mapped
                 ],
-                'reply_to' => [
-                    'email' => $params->getReplyTo(),
-                    'name' => $params->getReplyToName(),
-                ],
-                'to' => $recipients_mapped,
-                'subject' => $params->getSubject(),
-                'template_id' => $params->getTemplateId(),
-                'text' => $params->getText(),
-                'html' => $params->getHtml(),
-                'tags' => $params->getTags(),
-                'attachments' => $attachments_mapped,
-                'variables' => $variables_mapped
-            ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             )
         );
