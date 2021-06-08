@@ -8,7 +8,8 @@ Some more advanced usages of our SDK.
 
 * [Available Helpers](#helpers)
 * [Sending and email with CC and BCC](#cc_and_bcc)
-* [Sending an email with variables (personalisation)](#variables)
+* [Sending an email with variables (simple personalisation)](#variables)
+* [Sending an email with personalization (advanced personalisation)](#personalization)
 * [Sending a templated email](#templated)
 * [Sending an email with attachment](#attachments)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -75,7 +76,7 @@ $mailersend->email->send($emailParams);
 ```
 
 <a name="variables"></a>
-# Sending an email with variables (personalisation)
+# Sending an email with variables (simple personalization)
 
 ```php
 use MailerSend\MailerSend;
@@ -101,6 +102,51 @@ $emailParams = (new EmailParams())
     ->setHtml('This is the html version with a {$var}.')
     ->setText('This is the text versions with a {$var}.')
     ->setVariables($variables);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="personalization"></a>
+# Sending an email with personalization (advanced personalization)
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Personalization;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$personalization = [
+    new Personalization('your@client.com', [
+        'var' => 'variable',
+        'number' => 123,
+        'object' => [
+            'key' => 'object-value'
+        ],
+        'objectCollection' => [
+            [
+                'name' => 'John'
+            ],
+            [
+                'name' => 'Patrick'
+            ]
+        ],
+    ])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setPersonalization($personalization);
 
 $mailersend->email->send($emailParams);
 ```

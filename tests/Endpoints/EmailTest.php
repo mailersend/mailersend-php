@@ -9,6 +9,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Tests\TestCase;
@@ -156,6 +157,15 @@ class EmailTest extends TestCase
             self::assertEquals($attachment['disposition'], Arr::get($request_body, "attachments.$key.disposition"));
             self::assertEquals($attachment['id'], Arr::get($request_body, "attachments.$key.id"));
         }
+
+        self::assertCount(count($emailParams->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
+        foreach ($emailParams->getPersonalization() as $key => $personalization) {
+            $personalization = ! is_array($personalization) ? $personalization->toArray() : $personalization;
+            self::assertEquals($personalization['email'], Arr::get($request_body, "personalization.$key.email"));
+            foreach ($personalization['data'] as $variableKey => $variableValue) {
+                self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));
+            }
+        }
     }
 
     /**
@@ -241,6 +251,37 @@ class EmailTest extends TestCase
                     ->setText('Text')
                     ->setVariables([
                         new Variable('recipient@mailersend.com', ['var' => 'value'])
+                    ]),
+            ],
+            'using personalization helper' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setPersonalization([
+                        new Personalization('recipient@mailersend.com', [
+                            'var' => 'variable',
+                            'number' => 123,
+                            'object' => [
+                                'key' => 'object-value'
+                            ],
+                            'objectCollection' => [
+                                [
+                                    'name' => 'John'
+                                ],
+                                [
+                                    'name' => 'Patrick'
+                                ]
+                            ],
+                        ])
                     ]),
             ],
             'with cc' => [
