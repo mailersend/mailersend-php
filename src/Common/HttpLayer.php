@@ -91,6 +91,17 @@ class HttpLayer
     }
 
     /**
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     */
+    public function delete(string $uri): array
+    {
+        $request = $this->requestFactory->createRequest('DELETE', $uri);
+
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
+    }
+
+    /**
      * @throws JsonException
      * @throws ClientExceptionInterface
      */
