@@ -13,8 +13,8 @@ class ActivityAnalyticsParams
 
     public function __construct(int $date_from, int $date_to)
     {
-        $this->date_from = $date_from;
-        $this->date_to = $date_to;
+        $this->setDateFrom($date_from);
+        $this->setDateTo($date_to);
     }
 
     public function getDomainId(): ?string
@@ -33,10 +33,9 @@ class ActivityAnalyticsParams
         return $this->date_from;
     }
 
-    public function setDateFrom(int $date_from): ActivityAnalyticsParams
+    protected function setDateFrom(int $date_from): void
     {
         $this->date_from = $date_from;
-        return $this;
     }
 
     public function getDateTo(): int
@@ -44,10 +43,9 @@ class ActivityAnalyticsParams
         return $this->date_to;
     }
 
-    public function setDateTo(int $date_to): ActivityAnalyticsParams
+    protected function setDateTo(int $date_to): void
     {
         $this->date_to = $date_to;
-        return $this;
     }
 
     public function getGroupBy(): ?string
@@ -83,7 +81,7 @@ class ActivityAnalyticsParams
         return $this;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'domain_id' => $this->getDomainId(),
