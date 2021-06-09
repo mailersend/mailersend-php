@@ -3,6 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 use MailerSend\Tests\TestCase;
 use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
@@ -52,6 +53,7 @@ class AnalyticsTest extends TestCase
         self::assertEquals($activityAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
         self::assertEquals($activityAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
         self::assertEquals($activityAnalyticsParams->getGroupBy(), Arr::get($query, 'group_by'));
+        self::assertEquals(implode(',', $activityAnalyticsParams->getTags()), Arr::get($query, 'tags'));
         self::assertEquals(implode(',', $activityAnalyticsParams->getEvent()), Arr::get($query, 'event'));
     }
 
@@ -70,9 +72,13 @@ class AnalyticsTest extends TestCase
         (new Analytics($httpLayer, self::OPTIONS))->activityDataByDate($activityAnalyticsParams);
     }
 
-    public function validActivityAnalyticsProvider()
+    public function validActivityAnalyticsProvider(): array
     {
         return [
+            'basic request' => [
+                (new ActivityAnalyticsParams(100, 101))
+                    ->setEvent(['processed', 'sent']),
+            ],
             'complete request' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
@@ -98,12 +104,112 @@ class AnalyticsTest extends TestCase
         ];
     }
 
-    public function invalidActivityAnalyticsProvider()
+    public function invalidActivityAnalyticsProvider(): array
     {
         return [
             'event array is empty' => [
                 (new ActivityAnalyticsParams(100, 101)),
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider validOpensAnalyticsProvider
+     */
+    public function test_opens_by_country(OpensAnalyticsParams $opensAnalyticsParams)
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->analytics->opensByCountry($opensAnalyticsParams);
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/analytics/country', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
+        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
+        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
+        self::assertEquals(implode(',', $opensAnalyticsParams->getTags()), Arr::get($query, 'tags'));
+    }
+
+    /**
+     * @dataProvider validOpensAnalyticsProvider
+     */
+    public function test_opens_by_user_agent(OpensAnalyticsParams $opensAnalyticsParams)
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->analytics->opensByUserAgentName($opensAnalyticsParams);
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/analytics/ua-name', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
+        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
+        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
+        self::assertEquals(implode(',', $opensAnalyticsParams->getTags()), Arr::get($query, 'tags'));
+    }
+
+    /**
+     * @dataProvider validOpensAnalyticsProvider
+     */
+    public function test_opens_by_reading_environment(OpensAnalyticsParams $opensAnalyticsParams)
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->analytics->opensByReadingEnvironment($opensAnalyticsParams);
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/analytics/ua-type', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
+        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
+        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
+        self::assertEquals(implode(',', $opensAnalyticsParams->getTags()), Arr::get($query, 'tags'));
+    }
+
+    public function validOpensAnalyticsProvider(): array
+    {
+        return [
+            'basic request' => [
+                new OpensAnalyticsParams(100, 101)
+            ],
+            'complete request' => [
+                (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']),
+            ],
+            'with domain id' => [
+                (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id'),
+            ],
+            'with tag' => [
+                (new OpensAnalyticsParams(100, 101))
+                    ->setTags(['tag']),
+            ]
         ];
     }
 }
