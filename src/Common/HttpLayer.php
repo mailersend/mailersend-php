@@ -43,6 +43,17 @@ class HttpLayer
     }
 
     /**
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     */
+    public function get(string $uri): array
+    {
+        $request = $this->requestFactory->createRequest('GET', $uri);
+
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
+    }
+
+    /**
      * @throws JsonException
      * @throws ClientExceptionInterface
      */
@@ -50,6 +61,17 @@ class HttpLayer
     {
         $request = $this->requestFactory->createRequest('POST', $uri)
             ->withBody($this->buildBody($body));
+
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
+    }
+
+    /**
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     */
+    public function delete(string $uri): array
+    {
+        $request = $this->requestFactory->createRequest('DELETE', $uri);
 
         return $this->buildResponse($this->pluginClient->sendRequest($request));
     }
