@@ -4,6 +4,7 @@ namespace MailerSend;
 
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
+use MailerSend\Endpoints\Webhook;
 use MailerSend\Exceptions\MailerSendException;
 use Tightenco\Collect\Support\Arr;
 
@@ -27,6 +28,7 @@ class MailerSend
     protected ?HttpLayer $httpLayer;
 
     public Email $email;
+    public Webhook $webhooks;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -43,6 +45,7 @@ class MailerSend
     protected function setEndpoints(): void
     {
         $this->email = new Email($this->httpLayer, $this->options);
+        $this->webhooks = new Webhook($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
