@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MailerSend\Endpoints;
-
 
 use Assert\Assertion;
 use JsonException;
@@ -26,7 +24,7 @@ class Token extends AbstractEndpoint
     public function create(TokenParams $tokenParams): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($tokenParams->getName(), 1,  'Token name is required.') &&
+            fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.') &&
                 Assertion::minLength($tokenParams->getDomainId(), 1, 'Token domain id is required.') &&
                 Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );

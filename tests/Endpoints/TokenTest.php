@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MailerSend\Tests\Endpoints;
-
 
 use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
@@ -93,7 +91,8 @@ class TokenTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->token->update(
-            'random_id', TokenParams::STATUS_PAUSE
+            'random_id',
+            TokenParams::STATUS_PAUSE
         );
 
         $request = $this->client->getLastRequest();
@@ -113,7 +112,8 @@ class TokenTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->token->update(
-            'random_id', TokenParams::STATUS_UNPAUSE
+            'random_id',
+            TokenParams::STATUS_UNPAUSE
         );
 
         $request = $this->client->getLastRequest();

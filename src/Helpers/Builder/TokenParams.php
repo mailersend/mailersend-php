@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MailerSend\Helpers\Builder;
-
 
 use Assert\Assertion;
 use JsonSerializable;
@@ -12,7 +10,9 @@ use Tightenco\Collect\Contracts\Support\Arrayable;
 
 class TokenParams implements Arrayable, JsonSerializable
 {
-    private string $name, $domainId, $token;
+    private string $name;
+    private string $domainId;
+    private string $token;
     private array $scopes;
 
     public const EMAIL_FULL = 'email_full';
