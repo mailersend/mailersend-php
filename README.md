@@ -155,7 +155,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->delete('webhook_id');
-### Managing Tokens
+
+```
+
+###Managing Tokens
 
 **Create a new token**
 
@@ -349,33 +352,76 @@ $domainSettingsParam = (new DomainSettingsParams())
 
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
+### Recipients
+
+**List recipients**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->recipients->get(null, $limit = 100, $page = 3);
+```
+
+**List recipients in a specific domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->recipients->get('domain_id', $limit = 100, $page = 3);
+```
+
+**Find a specific recipient**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->recipients->find('recipient_id');
+```
+
+**Delete a recipient**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->recipients->delete('recipient_id');
+```
+
+For more expanded usage info, see [guide](GUIDE.md).
 
 <a name="endpoints"></a>
 # Available endpoints
 
-| Feature group         | Endpoint                      | Available |
-| -------------         | -----------                   | --------- |
-| Email                 | `POST send`                   | ✅        |
-| Messages : list       | `GET messages`                | ✅        |
-| Messages : find       | `GET messages/{message_id}`     | ✅        |
-| Webhook : list            | `GET webhooks`                | ✅         |
-| Webhook : find            | `GET webhooks/{webhook_id}`   | ✅         |
-| Webhook : create          | `POST webhooks`               | ✅         |
-| Webhook : update          | `PUT webhooks/{webhook_id}`   | ✅         |
-| Webhook : delete          | `DELETE webhooks/{webhook_id}`| ✅         |
-| Token : Create    | `POST token`                      | ✅        |
-| Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
-| Token : Delete    | `DELETE token/{token_id}`         | ✅        |
-| Activity          | `GET getAll`                      | ✅        |
-| Analytics         | `GET activityDataByDate`          | ✅        |
-| Analytics         | `GET opensByCountry`              | ✅        |
-| Analytics         | `GET opensByUserAgentName`        | ✅        |
-| Analytics         | `GET opensByReadingEnvironment`   | ✅        |
-| Domain            | `GET getAll`                      | ✅        |
-| Domain            | `GET find`                        | ✅        |
-| Domain            | `DELETE delete`                   | ✅        |
-| Domain            | `GET recipients`                  | ✅        |
-| Domain            | `PUT domainSettings`              | ✅        |
+| Feature group             | Endpoint                          | Available |
+| -------------             | -----------                       | --------- |
+| Email                     | `POST send`                       | ✅        |
+| Webhook : list            | `GET webhooks`                    | ✅        |
+| Webhook : find            | `GET webhooks/{webhook_id}`       | ✅        |
+| Webhook : create          | `POST webhooks`                   | ✅        |
+| Webhook : update          | `PUT webhooks/{webhook_id}`       | ✅        |
+| Webhook : delete          | `DELETE webhooks/{webhook_id}`    | ✅        |
+| Token : Create            | `POST token`                      | ✅        |
+| Token : Update            | `PUT token/{token_id}/settings`   | ✅        |
+| Token : Delete            | `DELETE token/{token_id}`         | ✅        |
+| Analytics                 | `GET activityDataByDate`          | ✅        |
+| Analytics                 | `GET opensByCountry`              | ✅        |
+| Analytics                 | `GET opensByUserAgentName`        | ✅        |
+| Analytics                 | `GET opensByReadingEnvironment`   | ✅        |
+| Domain                    | `GET getAll`                      | ✅        |
+| Domain                    | `GET find`                        | ✅        |
+| Domain                    | `DELETE delete`                   | ✅        |
+| Domain                    | `GET recipients`                  | ✅        |
+| Domain                    | `PUT domainSettings`              | ✅        |
+| Recipients : list         | `GET messages`                    | ✅        |
+| Recipients : find         | `GET messages/{token_id}`         | ✅        |
+| Recipients : delete       | `DELETE messages/{token_id}`      | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
