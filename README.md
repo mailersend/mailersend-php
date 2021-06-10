@@ -64,14 +64,30 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+### Messages
+
+**List messages**
+
+```php
+$mailersend->messages->get($limit = 100, $page = 3);
+```
+
+**Find a specific message**
+
+```php
+$mailersend->messages->find('message_id');
+```
+
 For more expanded usage info, see [guide](GUIDE.md).
 
 <a name="endpoints"></a>
 # Available endpoints
 
-| Feature group | Endpoint    | Available |
-| ------------- | ----------- | --------- |
-| Email         | `POST send` | ✅         |
+| Feature group         | Endpoint                      | Available |
+| -------------         | -----------                   | --------- |
+| Email                 | `POST send`                   | ✅        |
+| Messages : list       | `GET messages`                | ✅        |
+| Messages : find       | `GET messages/{token_id}`     | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
