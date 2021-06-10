@@ -43,12 +43,12 @@ class Message extends AbstractEndpoint
 
 
     /**
-     * @param int $id
+     * @param string $id
      * @return array
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function find(int $id): array
+    public function find(string $id): array
     {
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint . '/' . $id),
