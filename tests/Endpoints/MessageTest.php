@@ -57,4 +57,19 @@ class MessageTest extends TestCase
         self::assertSame(30, Arr::get($request_body, 'limit'));
         self::assertSame(2, Arr::get($request_body, 'page'));
     }
+
+    public function test_find_message()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->messages->find('random_id');
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/messages/random_id', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+    }
 }
