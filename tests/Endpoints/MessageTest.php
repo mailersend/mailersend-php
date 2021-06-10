@@ -39,7 +39,7 @@ class MessageTest extends TestCase
         $this->messages->get(101);
     }
 
-    public function test_get_messages_rand_limit_is_validated()
+    public function test_get_messages()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
