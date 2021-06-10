@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Activity API: list all activities endpoint.
 - Analytics API: activities data by date, opens by country, opens by user-agent name and opens by reading environment.
 - Domain API: list domains, get a single domain, delete domain, get recipients for a domain and update domain settings.
+- Recipients endpoint, List, Find, and Delete.
 
 ### Changed
 
