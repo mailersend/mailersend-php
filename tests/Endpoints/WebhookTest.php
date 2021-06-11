@@ -295,7 +295,7 @@ class WebhookTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
-        $response = $this->webhooks->update('random_id', 'https://link.com/webhook', 'Webhook name', [WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], true);
+        $response = $this->webhooks->update('random_id', 'https://link.com/webhook', 'Webhook name', [WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], false);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
@@ -307,6 +307,6 @@ class WebhookTest extends TestCase
         self::assertSame('https://link.com/webhook', Arr::get($request_body, 'url'));
         self::assertSame('Webhook name', Arr::get($request_body, 'name'));
         self::assertSame([WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], Arr::get($request_body, 'events'));
-        self::assertEquals(true, Arr::get($request_body, 'enabled'));
+        self::assertEquals(false, Arr::get($request_body, 'enabled'));
     }
 }
