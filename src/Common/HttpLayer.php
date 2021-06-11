@@ -94,6 +94,18 @@ class HttpLayer
      * @throws JsonException
      * @throws ClientExceptionInterface
      */
+    public function put(string $uri, array $body): array
+    {
+        $request = $this->requestFactory->createRequest('PUT', $uri)
+            ->withBody($this->buildBody($body));
+
+        return $this->buildResponse($this->pluginClient->sendRequest($request));
+    }
+
+    /**
+     * @throws JsonException
+     * @throws ClientExceptionInterface
+     */
     public function get(string $uri, array $body): array
     {
         $request = $this->requestFactory->createRequest('GET', $uri)
