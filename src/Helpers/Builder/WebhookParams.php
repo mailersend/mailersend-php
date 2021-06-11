@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MailerSend\Helpers\Builder;
-
 
 use Assert\Assertion;
 use MailerSend\Exceptions\MailerSendAssertException;
