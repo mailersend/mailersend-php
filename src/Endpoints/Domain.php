@@ -100,6 +100,20 @@ class Domain extends AbstractEndpoint
         );
     }
 
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function domainSettings(string $domainId, DomainSettingsParams $domainSettingsParams): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        return $this->httpLayer->put(
+            $this->buildUri("$this->endpoint/$domainId/settings"),
+            $domainSettingsParams->toArray()
         );
     }
 }
