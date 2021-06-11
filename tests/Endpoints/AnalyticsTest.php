@@ -32,7 +32,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider validActivityAnalyticsProvider
      */
-    public function test_get_activity_by_date(ActivityAnalyticsParams $activityAnalyticsParams)
+    public function test_get_activity_by_date(ActivityAnalyticsParams $activityAnalyticsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -60,7 +60,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider invalidActivityAnalyticsProvider
      */
-    public function test_get_activities_by_date_with_errors(ActivityAnalyticsParams $activityAnalyticsParams)
+    public function test_get_activities_by_date_with_errors(ActivityAnalyticsParams $activityAnalyticsParams): void
     {
         $this->expectException(MailerSendAssertException::class);
 
