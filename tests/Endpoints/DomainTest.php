@@ -6,7 +6,7 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\Builder\DomainParams;
+use MailerSend\Helpers\Builder\DomainSettingsParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Tightenco\Collect\Support\Arr;
@@ -29,19 +29,23 @@ class DomainTest extends TestCase
     }
 
     /**
-     * @dataProvider validDomainParamsProvider
+     * @dataProvider validDomainListDataProvider
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_list(DomainParams $domainParams)
+    public function test_domain_list(array $domainParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
 
-        $response = $this->domain->domainList($domainParams);
+        $response = $this->domain->domainList(
+            $domainParams['page'] ?? null,
+            $domainParams['limit'] ?? null,
+            $domainParams['verified'] ?? null
+        );
 
         $request = $this->client->getLastRequest();
 
@@ -51,36 +55,49 @@ class DomainTest extends TestCase
         self::assertEquals('/v1/domains', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals($domainParams->getPage(), Arr::get($query, 'page'));
-        self::assertEquals($domainParams->getLimit(), Arr::get($query, 'limit'));
-        self::assertEquals($domainParams->getVerified(), Arr::get($query, 'verified'));
+        self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
+        self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'verified'), Arr::get($query, 'verified'));
     }
 
     /**
-     * @dataProvider invalidDomainParamsProvider
+     * @dataProvider invalidDomainListDataProvider
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_list_with_errors(DomainParams $domainParams)
+    public function test_domain_list_with_errors(array $domainParams): void
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $httpLayer = $this->createMock(HttpLayer::class);
-        $httpLayer->method('post')
-            ->withAnyParameters()
-            ->willReturn([]);
+        $this->domain->domainList(
+            $domainParams['page'] ?? null,
+            $domainParams['limit'] ?? null,
+            $domainParams['verified'] ?? null
+        );
+    }
 
-        (new Domain($httpLayer, self::OPTIONS))->domainList($domainParams);
+    public function test_get_domain_requires_domain_id()
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->domain('');
+    }
+
+    public function test_delete_domain_requires_domain_id()
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->deleteDomain('');
     }
 
     /**
-     * @dataProvider validDomainParamsProvider
+     * @dataProvider validDomainRecipientsDataProvider
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_recipients(DomainParams $domainParams)
+    public function test_recipients(array $domainParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -89,7 +106,11 @@ class DomainTest extends TestCase
 
         $domain_id = 'domain_id';
 
-        $response = $this->domain->recipients($domain_id, $domainParams);
+        $response = $this->domain->recipients(
+            $domain_id,
+            $domainParams['page'] ?? null,
+            $domainParams['limit'] ?? null
+        );
 
         $request = $this->client->getLastRequest();
 
@@ -99,48 +120,258 @@ class DomainTest extends TestCase
         self::assertEquals("/v1/domains/$domain_id/recipients", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals($domainParams->getPage(), Arr::get($query, 'page'));
-        self::assertEquals($domainParams->getLimit(), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
+        self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
     }
 
-    public function validDomainParamsProvider(): array
+    /**
+     * @dataProvider invalidDomainRecipientsDataProvider
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_recipients_with_errors(array $domainParams): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->recipients(
+            $domainParams['domain_id'] ?? null,
+            $domainParams['page'] ?? null,
+            $domainParams['limit'] ?? null
+        );
+    }
+
+    /**
+     * @dataProvider domainSettingsDataProvider
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_domain_settings(DomainSettingsParams $domainSettingsParams)
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $domain_id = 'domain_id';
+
+        $response = $this->domain->domainSettings($domain_id, $domainSettingsParams);
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('PUT', $request->getMethod());
+        self::assertEquals("/v1/domains/$domain_id/settings", $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        self::assertEquals($domainSettingsParams->getSendPaused(), Arr::get($request_body, 'send_paused'));
+        self::assertEquals($domainSettingsParams->getTrackClicks(), Arr::get($request_body, 'track_clicks'));
+        self::assertEquals($domainSettingsParams->getTrackOpens(), Arr::get($request_body, 'track_opens'));
+        self::assertEquals($domainSettingsParams->getTrackUnsubscribe(), Arr::get($request_body, 'track_unsubscribe'));
+        self::assertEquals($domainSettingsParams->getTrackContent(), Arr::get($request_body, 'track_content'));
+        self::assertEquals($domainSettingsParams->getTrackUnsubscribeHtml(), Arr::get($request_body, 'track_unsubscribe_html'));
+        self::assertEquals($domainSettingsParams->getTrackUnsubscribePlain(), Arr::get($request_body, 'track_unsubscribe_plain'));
+        self::assertEquals($domainSettingsParams->getCustomTrackingEnabled(), Arr::get($request_body, 'custom_tracking_enabled'));
+        self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), Arr::get($request_body, 'custom_tracking_subdomain'));
+    }
+
+    public function validDomainListDataProvider(): array
     {
         return [
             'empty request' => [
-                (new DomainParams()),
+                [],
+                [
+                    'page' => null,
+                    'limit' => null,
+                    'verified' => null,
+                ],
             ],
             'with page' => [
-                (new DomainParams())
-                    ->setPage(1),
+                [
+                    'page' => 1,
+                ],
+                [
+                    'page' => 1,
+                    'limit' => null,
+                    'verified' => null,
+                ],
             ],
             'with limit' => [
-                (new DomainParams())
-                    ->setLimit(10),
+                [
+                    'limit' => 10,
+                ],
+                [
+                    'page' => null,
+                    'limit' => 10,
+                    'verified' => null,
+                ],
             ],
-            'with verified' => [
-                (new DomainParams())
-                    ->setVerified(true),
+            'with verified true' => [
+                [
+                    'verified' => true,
+                ],
+                [
+                    'page' => null,
+                    'limit' => null,
+                    'verified' => true,
+                ],
+            ],
+            'with verified false' => [
+                [
+                    'verified' => false,
+                ],
+                [
+                    'page' => null,
+                    'limit' => null,
+                    'verified' => false,
+                ],
             ],
             'complete request' => [
-                (new DomainParams())
-                    ->setPage(1)
-                    ->setLimit(10)
-                    ->setVerified(true),
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                    'verified' => true,
+                ],
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                    'verified' => true,
+                ],
+            ],
+        ];
+    }
+
+    public function validDomainRecipientsDataProvider(): array
+    {
+        return [
+            'empty request' => [
+                [],
+                [
+                    'page' => null,
+                    'limit' => null,
+                ],
+            ],
+            'with page' => [
+                [
+                    'page' => 1
+                ],
+                [
+                    'page' => 1,
+                    'limit' => null,
+                ],
+            ],
+            'with limit' => [
+                [
+                    'limit' => 10,
+                ],
+                [
+                    'page' => null,
+                    'limit' => 10,
+                ]
+            ],
+            'complete request' => [
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                ],
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                ]
             ]
         ];
     }
 
-    public function invalidDomainParamsProvider(): array
+    public function invalidDomainListDataProvider(): array
     {
         return [
             'with limit under 10' => [
-                (new DomainParams())
-                    ->setLimit(9),
+                [
+                    'limit' => 9,
+                ],
             ],
             'with limit over 100' => [
-                (new DomainParams())
-                    ->setLimit(101),
+                [
+                    'limit' => 101,
+                ],
             ]
+        ];
+    }
+
+    public function invalidDomainRecipientsDataProvider(): array
+    {
+        return [
+            'domain id missing' => [
+                [
+                    'domain_id' => '',
+                ]
+            ],
+            'with limit under 10' => [
+                [
+                    'domain_id' => 'domain_id',
+                    'limit' => 9,
+                ],
+            ],
+            'with limit over 100' => [
+                [
+                    'domain_id' => 'domain_id',
+                    'limit' => 101,
+                ],
+            ]
+        ];
+    }
+
+    public function domainSettingsDataProvider(): array
+    {
+        return [
+            'complete request' => [
+                  (new DomainSettingsParams())
+                    ->setSendPaused(true)
+                    ->setTrackClicks(true)
+                    ->setTrackOpens(false)
+                    ->setTrackUnsubscribe(false)
+                    ->setTrackContent(true)
+                    ->setTrackUnsubscribeHtml('html')
+                    ->setTrackUnsubscribePlain('plain')
+                    ->setCustomTrackingEnabled(true)
+                    ->setCustomTrackingSubdomain(false),
+            ],
+            'with send paused' => [
+                (new DomainSettingsParams())
+                    ->setSendPaused(true),
+            ],
+            'with track clicks' => [
+                (new DomainSettingsParams())
+                    ->setTrackClicks(true),
+            ],
+            'with track opens' => [
+                (new DomainSettingsParams())
+                    ->setTrackOpens(true),
+            ],
+            'with track unsubscribes' => [
+                (new DomainSettingsParams())
+                    ->setTrackUnsubscribe(true),
+            ],
+            'with track content' => [
+                (new DomainSettingsParams())
+                    ->setTrackContent(true),
+            ],
+            'with unsubscribe html' => [
+                (new DomainSettingsParams())
+                    ->setTrackUnsubscribeHtml('html'),
+            ],
+            'with unsubscribe plain' => [
+                (new DomainSettingsParams())
+                    ->setTrackUnsubscribePlain('plain'),
+            ],
+            'with custom tracking enabled' => [
+                (new DomainSettingsParams())
+                    ->setCustomTrackingEnabled(true),
+            ],
+            'with custom tracking subdomain' => [
+                (new DomainSettingsParams())
+                    ->setCustomTrackingSubdomain(true),
+            ],
         ];
     }
 }
