@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `GET`, `PUT` and `DELETE` methods to `HttpLayer` class
 - Token create, update, delete endpoints.
+- Analytics API: activities data by date, opens by country, opens by user-agent name and opens by reading environment.
 
 ### Changed
 

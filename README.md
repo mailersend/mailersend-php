@@ -111,6 +111,70 @@ $mailersend->token->delete('token_id');
 
 For more expanded usage info, see [guide](GUIDE.md).
 
+### Analytics
+
+**Activity data by date**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setGroupBy('days')
+                    ->setTags(['tag'])
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->analytics->activityDataByDate($activityAnalyticsParams);
+```
+
+**Opens by country**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByCountry($opensAnalyticsParams);
+```
+
+**Opens by user-agent name**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
+```
+
+**Opens by reading environment**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
+```
+
 <a name="endpoints"></a>
 # Available endpoints
 
@@ -120,6 +184,10 @@ For more expanded usage info, see [guide](GUIDE.md).
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
+| Analytics         | `GET activityDataByDate`          | ✅        |
+| Analytics         | `GET opensByCountry`              | ✅        |
+| Analytics         | `GET opensByUserAgentName`        | ✅        |
+| Analytics         | `GET opensByReadingEnvironment`   | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
