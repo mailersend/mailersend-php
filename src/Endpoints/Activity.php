@@ -3,11 +3,14 @@
 namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
+use MailerSend\Common\Constants;
 use MailerSend\Helpers\Builder\ActivityParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class Activity extends AbstractEndpoint
 {
+    protected string $endpoint = 'activity';
+
     /**
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
@@ -17,7 +20,12 @@ class Activity extends AbstractEndpoint
     {
         if ($activityParams->getLimit()) {
             GeneralHelpers::assert(
-                fn () => Assertion::range($activityParams->getLimit(), 10, 100, 'Limit is supposed to be between 10 and 100.')
+                fn () => Assertion::range(
+                    $activityParams->getLimit(),
+                    Constants::MIN_LIMIT,
+                    Constants::MAX_LIMIT,
+                    'Limit is supposed to be between' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                )
             );
         }
 
@@ -28,14 +36,13 @@ class Activity extends AbstractEndpoint
         }
 
         if (! empty($activityParams->getEvent())) {
-            $possibleEventTypes = ['processed', 'queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints'];
-            $diff = array_diff($activityParams->getEvent(), $possibleEventTypes);
+            $diff = array_diff($activityParams->getEvent(), Constants::POSSIBLE_EVENT_TYPES);
             GeneralHelpers::assert(
                 fn () => Assertion::count($diff, 0, 'The following types are invalid: ' . implode(', ', $diff))
             );
         }
 
 
-        return $this->httpLayer->get($this->buildUri("activity/$domainId", $activityParams->toArray()));
+        return $this->httpLayer->get($this->buildUri("$this->endpoint/$domainId", $activityParams->toArray()));
     }
 }
