@@ -18,6 +18,10 @@ class Activity extends AbstractEndpoint
      */
     public function activityList(string $domainId, ActivityParams $activityParams): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         if ($activityParams->getLimit()) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(

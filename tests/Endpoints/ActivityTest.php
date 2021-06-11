@@ -63,11 +63,9 @@ class ActivityTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function test_get_activities_list_with_errors(ActivityParams $activityParams): void
+    public function test_get_activities_list_with_errors(string $domainId, ActivityParams $activityParams): void
     {
         $this->expectException(MailerSendAssertException::class);
-
-        $domainId = 'domainId';
 
         $httpLayer = $this->createMock(HttpLayer::class);
         $httpLayer->method('get')
@@ -114,20 +112,29 @@ class ActivityTest extends TestCase
     public function invalidActivityParamsProvider(): array
     {
         return [
+            'missing domain id' => [
+                '',
+                (new ActivityParams())
+                    ->setLimit(10),
+            ],
             'limit under 10' => [
+                'domainId',
                 (new ActivityParams())
                     ->setLimit(9),
             ],
             'limit over 100' => [
+                'domainId',
                 (new ActivityParams())
                     ->setLimit(101),
             ],
             'date_from greater than date_to' => [
+                'domainId',
                 (new ActivityParams())
                     ->setDateFrom(1623074976)
                     ->setDateTo(1623074975),
             ],
             'event is not a possible type' => [
+                'domainId',
                 (new ActivityParams())
                     ->setEvent(['invalid_type', 'processed']),
             ],
