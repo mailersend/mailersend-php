@@ -34,7 +34,7 @@ class ActivityTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_get_activities_list(ActivityParams $activityParams)
+    public function test_get_activities_list(ActivityParams $activityParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -63,7 +63,7 @@ class ActivityTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function test_get_activities_list_with_errors(ActivityParams $activityParams)
+    public function test_get_activities_list_with_errors(ActivityParams $activityParams): void
     {
         $this->expectException(MailerSendAssertException::class);
 
