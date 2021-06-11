@@ -64,14 +64,75 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+### Webhooks endpoint
+
+**List Webhooks**
+```php
+$mailersend->webhooks->get('domain_id');
+```
+
+**Find a Webhook**
+```php
+$mailersend->webhooks->find('webhook_id');
+```
+
+**Create a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
+);
+```
+
+**Create a disabled Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
+);
+```
+
+**Update a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+```
+
+**Disable/Enable a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
+```
+
+**Delete a Webhook**
+
+```php
+$mailersend->webhooks->delete('webhook_id');
+```
+
+
 For more expanded usage info, see [guide](GUIDE.md).
 
 <a name="endpoints"></a>
 # Available endpoints
 
-| Feature group | Endpoint    | Available |
-| ------------- | ----------- | --------- |
-| Email         | `POST send` | ✅         |
+| Feature group             | Endpoint                      | Available  |
+| -------------             | -----------                   | ---------  |
+| Email                     | `POST send`                   | ✅         |
+| Webhook : list            | `GET webhooks`                | ✅         |
+| Webhook : find            | `GET webhooks/{webhook_id}`   | ✅         |
+| Webhook : create          | `POST webhooks`               | ✅         |
+| Webhook : update          | `PUT webhooks/{webhook_id}`   | ✅         |
+| Webhook : delete          | `DELETE webhooks/{webhook_id}`| ✅         |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
