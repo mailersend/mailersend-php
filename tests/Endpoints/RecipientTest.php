@@ -25,21 +25,21 @@ class RecipientTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    public function test_get_messages_min_limit_is_validated()
+    public function test_get_recipients_min_limit_is_validated()
     {
         $this->expectExceptionMessage('Minimum limit is ' . Recipient::MIN_LIMIT . '.');
 
         $this->recipients->get(9);
     }
 
-    public function test_get_messages_max_limit_is_validated()
+    public function test_get_recipients_max_limit_is_validated()
     {
         $this->expectExceptionMessage('Maximum limit is ' . Recipient::MAX_LIMIT . '.');
 
         $this->recipients->get(101);
     }
 
-    public function test_get_messages()
+    public function test_get_recipients()
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
