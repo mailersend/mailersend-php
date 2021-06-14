@@ -68,11 +68,19 @@ $mailersend->email->send($emailParams);
 
 **List Webhooks**
 ```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
 $mailersend->webhooks->get('domain_id');
 ```
 
 **Find a Webhook**
 ```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
 $mailersend->webhooks->find('webhook_id');
 ```
 
@@ -80,6 +88,9 @@ $mailersend->webhooks->find('webhook_id');
 
 ```php
 use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
@@ -90,6 +101,9 @@ $mailersend->webhooks->create(
 
 ```php
 use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
@@ -100,6 +114,9 @@ $mailersend->webhooks->create(
 
 ```php
 use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
 ```
@@ -108,6 +125,9 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 
 ```php
 use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
@@ -116,6 +136,10 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 **Delete a Webhook**
 
 ```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
 $mailersend->webhooks->delete('webhook_id');
 ```
 
