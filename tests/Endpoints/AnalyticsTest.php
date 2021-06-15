@@ -2,6 +2,7 @@
 
 namespace MailerSend\Tests\Endpoints;
 
+use MailerSend\Common\Constants;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 use MailerSend\Tests\TestCase;
@@ -82,7 +83,7 @@ class AnalyticsTest extends TestCase
             'complete request' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setGroupBy('days')
+                    ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
                     ->setEvent(['processed', 'sent']),
             ],

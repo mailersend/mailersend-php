@@ -118,12 +118,13 @@ For more expanded usage info, see [guide](GUIDE.md).
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
+use MailerSend\Common\Constants;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setGroupBy('days')
+                    ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
                     ->setEvent(['processed', 'sent']);
 
