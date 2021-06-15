@@ -128,7 +128,7 @@ $activityParams = (new ActivityParams())
                     ->setDateTo(1623074976)
                     ->setEvent(['processed', 'sent']);
 
-$mailersend->activity->activityList('domainId', $activityParams);
+$mailersend->activity->getAll('domainId', $activityParams);
 ```
 
 <a name="endpoints"></a>
@@ -140,7 +140,7 @@ $mailersend->activity->activityList('domainId', $activityParams);
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
-| Activity          | `GET activityList`                | ✅        |
+| Activity          | `GET getAll`                      | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 

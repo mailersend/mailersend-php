@@ -34,14 +34,14 @@ class ActivityTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_get_activities_list(ActivityParams $activityParams): void
+    public function test_get_all(ActivityParams $activityParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
 
-        $response = $this->activity->activityList('domainId', $activityParams);
+        $response = $this->activity->getAll('domainId', $activityParams);
 
         $request = $this->client->getLastRequest();
 
@@ -63,7 +63,7 @@ class ActivityTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function test_get_activities_list_with_errors(string $domainId, ActivityParams $activityParams): void
+    public function test_get_all_with_errors(string $domainId, ActivityParams $activityParams): void
     {
         $this->expectException(MailerSendAssertException::class);
 
@@ -72,7 +72,7 @@ class ActivityTest extends TestCase
             ->withAnyParameters()
             ->willReturn([]);
 
-        (new Activity($httpLayer, self::OPTIONS))->activityList($domainId, $activityParams);
+        (new Activity($httpLayer, self::OPTIONS))->getAll($domainId, $activityParams);
     }
 
     public function validActivityParamsProvider(): array

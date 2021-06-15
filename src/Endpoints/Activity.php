@@ -16,7 +16,7 @@ class Activity extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function activityList(string $domainId, ActivityParams $activityParams): array
+    public function getAll(string $domainId, ActivityParams $activityParams): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
