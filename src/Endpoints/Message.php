@@ -50,9 +50,6 @@ class Message extends AbstractEndpoint
      */
     public function find(string $id): array
     {
-        return $this->httpLayer->get(
-            $this->buildUri($this->endpoint . '/' . $id),
-            []
-        );
+        return $this->httpLayer->get($this->buildUri($this->endpoint . '/' . $id));
     }
 }
