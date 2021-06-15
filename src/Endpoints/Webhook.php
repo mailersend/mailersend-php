@@ -102,10 +102,7 @@ class Webhook extends AbstractEndpoint
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.')
         );
 
-        return $this->httpLayer->get(
-            $this->buildUri($this->endpoint . '/' . $id),
-            []
-        );
+        return $this->httpLayer->get($this->buildUri($this->endpoint . '/' . $id));
     }
 
 
@@ -122,9 +119,6 @@ class Webhook extends AbstractEndpoint
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.')
         );
 
-        return $this->httpLayer->delete(
-            $this->buildUri($this->endpoint . '/' . $id),
-            []
-        );
+        return $this->httpLayer->delete($this->buildUri($this->endpoint . '/' . $id));
     }
 }
