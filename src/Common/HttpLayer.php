@@ -46,7 +46,7 @@ class HttpLayer
      * @throws ClientExceptionInterface
      * @throws JsonException
      */
-    public function get(string $uri, array $body): array
+    public function get(string $uri, array $body = []): array
     {
         return $this->call_method('GET', $uri, $body);
     }
@@ -73,7 +73,7 @@ class HttpLayer
      * @throws ClientExceptionInterface
      * @throws JsonException
      */
-    public function delete(string $uri, array $body): array
+    public function delete(string $uri, array $body = []): array
     {
         return $this->call_method('DELETE', $uri, $body);
     }
