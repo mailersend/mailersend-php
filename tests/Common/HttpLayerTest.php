@@ -22,6 +22,17 @@ class HttpLayerTest extends TestCase
         ], $this->client);
     }
 
+    public function test_call_get(): void
+    {
+        $this->httpLayer->get('endpoint', ['test' => 'body']);
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('{"test":"body"}', $lastRequest->getBody());
+    }
+
     public function test_call_post(): void
     {
         $this->httpLayer->post('endpoint', ['test' => 'body']);
@@ -29,6 +40,28 @@ class HttpLayerTest extends TestCase
         $lastRequest = $this->client->getLastRequest();
 
         self::assertEquals('POST', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('{"test":"body"}', $lastRequest->getBody());
+    }
+
+    public function test_call_put(): void
+    {
+        $this->httpLayer->put('endpoint', ['test' => 'body']);
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('PUT', $lastRequest->getMethod());
+        self::assertEquals('endpoint', $lastRequest->getUri());
+        self::assertEquals('{"test":"body"}', $lastRequest->getBody());
+    }
+
+    public function test_call_delete(): void
+    {
+        $this->httpLayer->delete('endpoint', ['test' => 'body']);
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('DELETE', $lastRequest->getMethod());
         self::assertEquals('endpoint', $lastRequest->getUri());
         self::assertEquals('{"test":"body"}', $lastRequest->getBody());
     }
