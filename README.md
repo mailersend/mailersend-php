@@ -113,14 +113,14 @@ For more expanded usage info, see [guide](GUIDE.md).
 
 ### Domain
 
-**Get list of domains**
+**Get all domains**
 
 ```php
 use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->domain->domainList($page = 1, $limit = 10, $verified = true);
+$mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
 ```
 
 **Get a single domain**
@@ -130,7 +130,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->domain->domain('domain_id');
+$mailersend->domain->find('domain_id');
 ```
 
 **Delete a domain**
@@ -140,7 +140,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->domain->deleteDomain('domain_id');
+$mailersend->domain->delete('domain_id');
 ```
 
 **Get recipients for a domain**
@@ -186,9 +186,9 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
-| Domain            | `GET domainList`                  | ✅        |
-| Domain            | `GET domain`                      | ✅        |
-| Domain            | `DELETE deleteDomain`             | ✅        |
+| Domain            | `GET getAll`                      | ✅        |
+| Domain            | `GET find`                        | ✅        |
+| Domain            | `DELETE delete`                   | ✅        |
 | Domain            | `GET recipients`                  | ✅        |
 | Domain            | `PUT domainSettings`              | ✅        |
 

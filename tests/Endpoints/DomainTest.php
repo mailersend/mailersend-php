@@ -34,14 +34,14 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_list(array $domainParams, array $expected): void
+    public function test_get_all(array $domainParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
 
-        $response = $this->domain->domainList(
+        $response = $this->domain->getAll(
             $domainParams['page'] ?? null,
             $domainParams['limit'] ?? null,
             $domainParams['verified'] ?? null
@@ -66,29 +66,29 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_list_with_errors(array $domainParams): void
+    public function test_get_all_with_errors(array $domainParams): void
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->domain->domainList(
+        $this->domain->getAll(
             $domainParams['page'] ?? null,
             $domainParams['limit'] ?? null,
             $domainParams['verified'] ?? null
         );
     }
 
-    public function test_get_domain_requires_domain_id()
+    public function test_find_requires_domain_id()
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->domain->domain('');
+        $this->domain->find('');
     }
 
-    public function test_delete_domain_requires_domain_id()
+    public function test_delete_requires_domain_id()
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->domain->deleteDomain('');
+        $this->domain->delete('');
     }
 
     /**

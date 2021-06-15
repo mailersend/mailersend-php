@@ -16,7 +16,7 @@ class Domain extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \JsonException
      */
-    public function domainList(?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT, ?bool $verified = null): array
+    public function getAll(?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT, ?bool $verified = null): array
     {
         if ($limit) {
             GeneralHelpers::assert(
@@ -43,7 +43,7 @@ class Domain extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function domain(string $domainId): array
+    public function find(string $domainId): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
@@ -59,7 +59,7 @@ class Domain extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function deleteDomain(string $domainId): array
+    public function delete(string $domainId): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
