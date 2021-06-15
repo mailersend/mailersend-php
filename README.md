@@ -40,7 +40,7 @@ composer require mailersend/mailersend
 <a name="usage"></a>
 # Usage
 
-Sending a basic email.
+### Sending a basic email.
 
 ```php
 use MailerSend\MailerSend;
@@ -64,14 +64,62 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+### Managing Tokens
+
+**Create a new token**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+```
+
+Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$response = $mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+
+echo $response['body']['data']['accessToken'];
+```
+
+**Pause / Unpause Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
+$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
+```
+
+**Delete Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->delete('token_id');
+```
+
+
 For more expanded usage info, see [guide](GUIDE.md).
 
 <a name="endpoints"></a>
 # Available endpoints
 
-| Feature group | Endpoint    | Available |
-| ------------- | ----------- | --------- |
-| Email         | `POST send` | ✅         |
+| Feature group     | Endpoint                          | Available |
+| -------------     | -----------                       | --------- |
+| Email             | `POST send`                       | ✅        |
+| Token : Create    | `POST token`                      | ✅        |
+| Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
+| Token : Delete    | `DELETE token/{token_id}`         | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 

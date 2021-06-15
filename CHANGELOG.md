@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `GET`, `PUT` and `DELETE` methods to `HttpLayer` class
+- Token create, update, delete endpoints.
 
 ### Changed
 
