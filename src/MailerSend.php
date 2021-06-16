@@ -4,6 +4,7 @@ namespace MailerSend;
 
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Analytics;
+use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\Token;
 use MailerSend\Exceptions\MailerSendException;
@@ -31,6 +32,7 @@ class MailerSend
     public Email $email;
     public Token $token;
     public Analytics $analytics;
+    public Domain $domain;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -49,6 +51,7 @@ class MailerSend
         $this->email = new Email($this->httpLayer, $this->options);
         $this->token = new Token($this->httpLayer, $this->options);
         $this->analytics = new Analytics($this->httpLayer, $this->options);
+        $this->domain = new Domain($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void

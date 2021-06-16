@@ -176,6 +176,72 @@ $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
 $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
 
+### Domain
+
+**Get all domains**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
+```
+
+**Get a single domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->find('domain_id');
+```
+
+**Delete a domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->delete('domain_id');
+```
+
+**Get recipients for a domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->recipients($domainId = 'domain_id', $page = 1, $limit = 10);
+```
+
+**Update domain settings**
+
+Here you can set as many properties as you need, one or multiple.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\DomainSettingsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$domainSettingsParam = (new DomainSettingsParams())
+                            ->setSendPaused(true)
+                            ->setTrackClicks(true)
+                            ->setTrackOpens(false)
+                            ->setTrackUnsubscribe(false)
+                            ->setTrackContent(true)
+                            ->setTrackUnsubscribeHtml('html')
+                            ->setTrackUnsubscribePlain('plain')
+                            ->setCustomTrackingEnabled(true)
+                            ->setCustomTrackingSubdomain(false);
+
+$mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
+```
+
 <a name="endpoints"></a>
 # Available endpoints
 
@@ -189,6 +255,11 @@ $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 | Analytics         | `GET opensByCountry`              | ✅        |
 | Analytics         | `GET opensByUserAgentName`        | ✅        |
 | Analytics         | `GET opensByReadingEnvironment`   | ✅        |
+| Domain            | `GET getAll`                      | ✅        |
+| Domain            | `GET find`                        | ✅        |
+| Domain            | `DELETE delete`                   | ✅        |
+| Domain            | `GET recipients`                  | ✅        |
+| Domain            | `PUT domainSettings`              | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
