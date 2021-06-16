@@ -69,6 +69,56 @@ $mailersend->email->send($emailParams);
 **List messages**
 
 ```php
+### Webhooks endpoint
+
+**List Webhooks**
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->get('domain_id');
+```
+
+**Find a Webhook**
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->find('webhook_id');
+```
+
+**Create a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
+);
+```
+
+**Create a disabled Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
+);
+```
+
+**Update a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
@@ -79,6 +129,13 @@ $mailersend->messages->get($limit = 100, $page = 3);
 **Find a specific message**
 
 ```php
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+```
+
+**Disable/Enable a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
@@ -86,6 +143,18 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->messages->find('message_id');
 ```
 
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
+```
+
+**Delete a Webhook**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->delete('webhook_id');
 ### Managing Tokens
 
 **Create a new token**
@@ -128,6 +197,91 @@ $mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
 use MailerSend\Helpers\Builder\TokenParams;
 
 $mailersend->token->delete('token_id');
+```
+
+### Analytics
+
+**Activity data by date**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
+use MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setGroupBy(Constants::GROUP_BY_DAYS)
+                    ->setTags(['tag'])
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->analytics->activityDataByDate($activityAnalyticsParams);
+```
+
+**Opens by country**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByCountry($opensAnalyticsParams);
+```
+
+**Opens by user-agent name**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
+```
+
+**Opens by reading environment**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
+```
+
+### Activity
+
+**List activities**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityParams = (new ActivityParams())
+                    ->setPage(3)
+                    ->setLimit(15)
+                    ->setDateFrom(1623073576)
+                    ->setDateTo(1623074976)
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->activity->getAll('domainId', $activityParams);
 ```
 
 ### Domain
@@ -204,9 +358,19 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 | Email                 | `POST send`                   | ✅        |
 | Messages : list       | `GET messages`                | ✅        |
 | Messages : find       | `GET messages/{message_id}`     | ✅        |
+| Webhook : list            | `GET webhooks`                | ✅         |
+| Webhook : find            | `GET webhooks/{webhook_id}`   | ✅         |
+| Webhook : create          | `POST webhooks`               | ✅         |
+| Webhook : update          | `PUT webhooks/{webhook_id}`   | ✅         |
+| Webhook : delete          | `DELETE webhooks/{webhook_id}`| ✅         |
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
+| Activity          | `GET getAll`                      | ✅        |
+| Analytics         | `GET activityDataByDate`          | ✅        |
+| Analytics         | `GET opensByCountry`              | ✅        |
+| Analytics         | `GET opensByUserAgentName`        | ✅        |
+| Analytics         | `GET opensByReadingEnvironment`   | ✅        |
 | Domain            | `GET getAll`                      | ✅        |
 | Domain            | `GET find`                        | ✅        |
 | Domain            | `DELETE delete`                   | ✅        |

@@ -11,7 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `GET`, `PUT` and `DELETE` methods to `HttpLayer` class
 - Messages API, listing resources, and showing a specific one.
+- Webhook, get, find, create, update, and delete endpoints.
 - Token create, update, delete endpoints.
+- Activity API: list all activities endpoint.
+- Analytics API: activities data by date, opens by country, opens by user-agent name and opens by reading environment.
 - Domain API: list domains, get a single domain, delete domain, get recipients for a domain and update domain settings.
 
 ### Changed
