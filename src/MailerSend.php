@@ -10,6 +10,7 @@ use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
+use MailerSend\Endpoints\Recipient;
 use MailerSend\Exceptions\MailerSendException;
 use Tightenco\Collect\Support\Arr;
 
@@ -39,6 +40,7 @@ class MailerSend
     public Activity $activity;
     public Analytics $analytics;
     public Domain $domain;
+    public Recipient $recipients;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -61,6 +63,7 @@ class MailerSend
         $this->activity = new Activity($this->httpLayer, $this->options);
         $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
+        $this->recipients = new Recipient($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
