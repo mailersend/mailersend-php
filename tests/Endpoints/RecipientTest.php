@@ -36,7 +36,7 @@ class RecipientTest extends TestCase
     {
         $this->expectExceptionMessage('Maximum limit is ' . Recipient::MAX_LIMIT . '.');
 
-        $this->recipients->get('domain_id',101);
+        $this->recipients->get('domain_id', 101);
     }
 
     public function test_get_recipients()
@@ -45,7 +45,7 @@ class RecipientTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
-        $response = $this->recipients->get(null,30, 2);
+        $response = $this->recipients->get(null, 30, 2);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
@@ -65,7 +65,7 @@ class RecipientTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
-        $response = $this->recipients->get('domain_id',30, 2);
+        $response = $this->recipients->get('domain_id', 30, 2);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
