@@ -33,6 +33,18 @@ class HttpLayerTest extends TestCase
         self::assertEquals('{"test":"body"}', $lastRequest->getBody());
     }
 
+    public function test_call_get_with_parameters(): void
+    {
+        $this->httpLayer->get('endpoint?key=value');
+
+        $lastRequest = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $lastRequest->getMethod());
+        self::assertEquals('endpoint?key=value', $lastRequest->getUri());
+        parse_str($lastRequest->getUri()->getQuery(), $query);
+        self::assertEquals('value', Arr::get($query, 'key'));
+    }
+
     public function test_call_post(): void
     {
         $this->httpLayer->post('endpoint', ['test' => 'body']);
