@@ -3,6 +3,7 @@
 namespace MailerSend;
 
 use MailerSend\Common\HttpLayer;
+use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\Webhook;
@@ -32,6 +33,7 @@ class MailerSend
     public Email $email;
     public Webhook $webhooks;
     public Token $token;
+    public Analytics $analytics;
     public Domain $domain;
 
     /**
@@ -51,6 +53,7 @@ class MailerSend
         $this->email = new Email($this->httpLayer, $this->options);
         $this->webhooks = new Webhook($this->httpLayer, $this->options);
         $this->token = new Token($this->httpLayer, $this->options);
+        $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
     }
 

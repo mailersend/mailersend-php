@@ -185,6 +185,71 @@ use MailerSend\Helpers\Builder\TokenParams;
 $mailersend->token->delete('token_id');
 ```
 
+### Analytics
+
+**Activity data by date**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
+use MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setGroupBy(Constants::GROUP_BY_DAYS)
+                    ->setTags(['tag'])
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->analytics->activityDataByDate($activityAnalyticsParams);
+```
+
+**Opens by country**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByCountry($opensAnalyticsParams);
+```
+
+**Opens by user-agent name**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
+```
+
+**Opens by reading environment**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+                    ->setDomainId('domain_id')
+                    ->setTags(['tag']);
+
+$mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
+```
+
 ### Domain
 
 **Get all domains**
@@ -265,6 +330,10 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
+| Analytics         | `GET activityDataByDate`          | ✅        |
+| Analytics         | `GET opensByCountry`              | ✅        |
+| Analytics         | `GET opensByUserAgentName`        | ✅        |
+| Analytics         | `GET opensByReadingEnvironment`   | ✅        |
 | Domain            | `GET getAll`                      | ✅        |
 | Domain            | `GET find`                        | ✅        |
 | Domain            | `DELETE delete`                   | ✅        |
