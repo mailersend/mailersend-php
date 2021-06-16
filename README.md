@@ -12,7 +12,7 @@ MailerSend PHP SDK
   * [Sending and email with CC and BCC](#cc_and_bcc)
   * [Sending an email with variables (simple personalisation)](#variables)
   * [Sending an email with personalization (advanced personalisation)](#personalization)
-  * [Sending a templated email](#templated)
+  * [Sending a template-based email](#template)
   * [Sending an email with attachment](#attachments)
   * [Debugging validation errors](#debugging-validation-errors)
   * [Activity API](#activity)
@@ -193,8 +193,8 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="templated"></a>
-## Sending a templated email
+<a name="template"></a>
+## Sending a template-based email
 
 ```php
 use MailerSend\MailerSend;
