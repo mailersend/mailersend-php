@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.3.1] - 2021 06 16
+
+### Changed
+
+- Updated constant to identify SDK version
+
 ## [0.3.0] - 2021 06 16
 
 ### Added
