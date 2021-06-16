@@ -611,7 +611,11 @@ $mailersend->webhooks->create(
 **Update a Webhook**
 
 ```php
-use MailerSend\MailerSend;use MailerSend\Helpers\Builder\WebhookParams;$mailersend = new MailerSend(['api_key' => 'key']);$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+use MailerSend\MailerSend;use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
 ```
 
 **Disable/Enable a Webhook**
@@ -628,7 +632,11 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 **Delete a Webhook**
 
 ```php
-use MailerSend\MailerSend;$mailersend = new MailerSend(['api_key' => 'key']);$mailersend->webhooks->delete('webhook_id');
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->delete('webhook_id');
 ```
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
