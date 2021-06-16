@@ -64,6 +64,11 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+### Messages
+
+**List messages**
+
+```php
 ### Webhooks endpoint
 
 **List Webhooks**
@@ -118,6 +123,12 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
+$mailersend->messages->get($limit = 100, $page = 3);
+```
+
+**Find a specific message**
+
+```php
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
 ```
 
@@ -128,6 +139,9 @@ use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->messages->find('message_id');
+```
 
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
@@ -339,9 +353,11 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 <a name="endpoints"></a>
 # Available endpoints
 
-| Feature group             | Endpoint                      | Available  |
-| -------------             | -----------                   | ---------  |
-| Email                     | `POST send`                   | ✅         |
+| Feature group         | Endpoint                      | Available |
+| -------------         | -----------                   | --------- |
+| Email                 | `POST send`                   | ✅        |
+| Messages : list       | `GET messages`                | ✅        |
+| Messages : find       | `GET messages/{message_id}`     | ✅        |
 | Webhook : list            | `GET webhooks`                | ✅         |
 | Webhook : find            | `GET webhooks/{webhook_id}`   | ✅         |
 | Webhook : create          | `POST webhooks`               | ✅         |

@@ -7,6 +7,7 @@ use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
+use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Exceptions\MailerSendException;
@@ -32,6 +33,7 @@ class MailerSend
     protected ?HttpLayer $httpLayer;
 
     public Email $email;
+    public Message $messages;
     public Webhook $webhooks;
     public Token $token;
     public Activity $activity;
@@ -53,6 +55,7 @@ class MailerSend
     protected function setEndpoints(): void
     {
         $this->email = new Email($this->httpLayer, $this->options);
+        $this->messages = new Message($this->httpLayer, $this->options);
         $this->webhooks = new Webhook($this->httpLayer, $this->options);
         $this->token = new Token($this->httpLayer, $this->options);
         $this->activity = new Activity($this->httpLayer, $this->options);
