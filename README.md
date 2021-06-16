@@ -2,18 +2,32 @@
 
 MailerSend PHP SDK
 
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md)
-![build badge](https://github.com/mailersend/mailersend-php/actions/workflows/php.yml/badge.svg)
-![analysis badge](https://github.com/mailersend/mailersend-php/actions/workflows/static-analysis.yml/badge.svg)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE.md) ![build badge](https://github.com/mailersend/mailersend-php/actions/workflows/php.yml/badge.svg) ![analysis badge](https://github.com/mailersend/mailersend-php/actions/workflows/static-analysis.yml/badge.svg)
 
 # Table of Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
+  * [Sending and email](#sending_an_email)
+  * [Sending and email with CC and BCC](#cc_and_bcc)
+  * [Sending an email with variables (simple personalisation)](#variables)
+  * [Sending an email with personalization (advanced personalisation)](#personalization)
+  * [Sending a templated email](#templated)
+  * [Sending an email with attachment](#attachments)
+  * [Debugging validation errors](#debugging-validation-errors)
+  * [Activity API](#activity)
+  * [Analytics API](#analytics)
+  * [Domains API](#domains)
+  * [Messages API](#messages)
+  * [Recipients API](#recipients)
+  * [Tokens API](#tokens)
+  * [Webhooks API](#webhooks)
+* [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
 * [License](#license)
 
 <a name="installation"></a>
+
 # Installation
 
 ## Requirements
@@ -38,9 +52,11 @@ composer require mailersend/mailersend
 ```
 
 <a name="usage"></a>
+
 # Usage
 
-### Sending a basic email.
+<a name="sending_an_email"></a>
+## Sending a basic email.
 
 ```php
 use MailerSend\MailerSend;
@@ -64,145 +80,243 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-### Messages
+<a name="cc_and_bcc"></a>
+## Sending an email with CC and BCC
 
-**List messages**
-
-```php
-### Webhooks endpoint
-
-**List Webhooks**
-```php
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->webhooks->get('domain_id');
-```
-
-**Find a Webhook**
-```php
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->webhooks->find('webhook_id');
-```
-
-**Create a Webhook**
-
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->webhooks->create(
-    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
-);
-```
-
-**Create a disabled Webhook**
-
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->webhooks->create(
-    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
-);
-```
-
-**Update a Webhook**
-
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->messages->get($limit = 100, $page = 3);
-```
-
-**Find a specific message**
-
-```php
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
-```
-
-**Disable/Enable a Webhook**
-
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->messages->find('message_id');
-```
-
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
-```
-
-**Delete a Webhook**
+Send an email with CC and BCC.
 
 ```php
 use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->webhooks->delete('webhook_id');
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
 
+$cc = [
+    new Recipient('cc@mail.com', 'CC'),
+];
+
+$bcc = [
+    new Recipient('bcc@mail.com', 'BCC'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setCc($cc)
+    ->setBcc($bcc)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$mailersend->email->send($emailParams);
 ```
 
-###Managing Tokens
-
-**Create a new token**
+<a name="variables"></a>
+## Sending an email with variables (simple personalization)
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\TokenParams;
+use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->token->create(
-    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
-);
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$variables = [
+    new Variable('your@client.com', ['var' => 'value'])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setVariables($variables);
+
+$mailersend->email->send($emailParams);
 ```
 
-Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
+<a name="personalization"></a>
+## Sending an email with personalization (advanced personalization)
 
 ```php
-use MailerSend\Helpers\Builder\TokenParams;
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Personalization;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
-$response = $mailersend->token->create(
-    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
-);
+$mailersend = new MailerSend(['api_key' => 'key']);
 
-echo $response['body']['data']['accessToken'];
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$personalization = [
+    new Personalization('your@client.com', [
+        'var' => 'variable',
+        'number' => 123,
+        'object' => [
+            'key' => 'object-value'
+        ],
+        'objectCollection' => [
+            [
+                'name' => 'John'
+            ],
+            [
+                'name' => 'Patrick'
+            ]
+        ],
+    ])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setPersonalization($personalization);
+
+$mailersend->email->send($emailParams);
 ```
 
-**Pause / Unpause Token**
+<a name="templated"></a>
+## Sending a templated email
 
 ```php
-use MailerSend\Helpers\Builder\TokenParams;
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
-$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$variables = [
+    new Variable('your@client.com', ['var' => 'value'])
+];
+
+$tags = ['tag'];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setTemplateId('ss243wdasd')
+    ->setVariables($variables);
+
+$mailersend->email->send($emailParams);
 ```
 
-**Delete Token**
+<a name="attachments"></a>
+## Sending an email with attachment
 
 ```php
-use MailerSend\Helpers\Builder\TokenParams;
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Attachment;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend->token->delete('token_id');
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$attachments = [
+    new Attachment(file_get_contents('attachment.jpg'), 'attachment.jpg')
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the html version.')
+    ->setText('This is the text version.')
+    ->setAttachments($attachments);
+
+$mailersend->email->send($emailParams);
 ```
 
-### Analytics
+<a name="debugging-validation-errors"></a>
+## Debugging validation errors
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Exceptions\MailerSendValidationException;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+// This should be your@client.com, as in $recipients
+$variables = [
+    new Variable('your@domain.com', ['var' => 'value'])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setVariables($variables);
+
+try{
+    $mailersend->email->send($emailParams);
+} catch(MailerSendValidationException $e){
+    // See src/Exceptions/MailerSendValidationException.php for more more info
+    print_r($e->getResponse()->getBody()->getContents());
+}
+```
+
+<a name="activity"></a>
+## Activity
+
+**List activities**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityParams = (new ActivityParams())
+                    ->setPage(3)
+                    ->setLimit(15)
+                    ->setDateFrom(1623073576)
+                    ->setDateTo(1623074976)
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->activity->getAll('domainId', $activityParams);
+```
+
+<a name="analytics"></a>
+## Analytics
 
 **Activity data by date**
 
@@ -267,27 +381,8 @@ $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
 $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
 
-### Activity
-
-**List activities**
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\ActivityParams;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$activityParams = (new ActivityParams())
-                    ->setPage(3)
-                    ->setLimit(15)
-                    ->setDateFrom(1623073576)
-                    ->setDateTo(1623074976)
-                    ->setEvent(['processed', 'sent']);
-
-$mailersend->activity->getAll('domainId', $activityParams);
-```
-
-### Domain
+<a name="domains"></a>
+## Domains
 
 **Get all domains**
 
@@ -352,7 +447,31 @@ $domainSettingsParam = (new DomainSettingsParams())
 
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
-### Recipients
+## Messages
+
+**List messages**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->messages->get($limit = 100, $page = 3);
+```
+
+**Find a specific message**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->messages->find('message_id');
+```
+
+<a name="recipients"></a>
+
+## Recipients
 
 **List recipients**
 
@@ -394,45 +513,136 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->recipients->delete('recipient_id');
 ```
 
-For more expanded usage info, see [guide](GUIDE.md).
+<a name="tokens"></a>
 
-<a name="endpoints"></a>
-# Available endpoints
+## Tokens
 
-| Feature group             | Endpoint                          | Available |
-| -------------             | -----------                       | --------- |
-| Email                     | `POST send`                       | ✅        |
-| Webhook : list            | `GET webhooks`                    | ✅        |
-| Webhook : find            | `GET webhooks/{webhook_id}`       | ✅        |
-| Webhook : create          | `POST webhooks`                   | ✅        |
-| Webhook : update          | `PUT webhooks/{webhook_id}`       | ✅        |
-| Webhook : delete          | `DELETE webhooks/{webhook_id}`    | ✅        |
-| Token : Create            | `POST token`                      | ✅        |
-| Token : Update            | `PUT token/{token_id}/settings`   | ✅        |
-| Token : Delete            | `DELETE token/{token_id}`         | ✅        |
-| Analytics                 | `GET activityDataByDate`          | ✅        |
-| Analytics                 | `GET opensByCountry`              | ✅        |
-| Analytics                 | `GET opensByUserAgentName`        | ✅        |
-| Analytics                 | `GET opensByReadingEnvironment`   | ✅        |
-| Domain                    | `GET getAll`                      | ✅        |
-| Domain                    | `GET find`                        | ✅        |
-| Domain                    | `DELETE delete`                   | ✅        |
-| Domain                    | `GET recipients`                  | ✅        |
-| Domain                    | `PUT domainSettings`              | ✅        |
-| Recipients : list         | `GET messages`                    | ✅        |
-| Recipients : find         | `GET messages/{token_id}`         | ✅        |
-| Recipients : delete       | `DELETE messages/{token_id}`      | ✅        |
+**Create a new token**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+```
+
+Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$response = $mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+
+echo $response['body']['data']['accessToken'];
+```
+
+**Pause / Unpause Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
+$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
+```
+
+**Delete Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->delete('token_id');
+```
+
+<a name="webhooks"></a>
+## Webhooks
+
+**List Webhooks**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->get('domain_id');
+```
+
+**Find a Webhook**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->find('webhook_id');
+```
+
+**Create a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
+);
+```
+
+**Create a disabled Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
+);
+```
+
+**Update a Webhook**
+
+```php
+use MailerSend\MailerSend;use MailerSend\Helpers\Builder\WebhookParams;$mailersend = new MailerSend(['api_key' => 'key']);$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+```
+
+**Disable/Enable a Webhook**
+
+```php
+use MailerSend\Helpers\Builder\WebhookParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
+```
+
+**Delete a Webhook**
+
+```php
+use MailerSend\MailerSend;$mailersend = new MailerSend(['api_key' => 'key']);$mailersend->webhooks->delete('webhook_id');
+```
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
-## Testing
+
+<a name="testing"></a>
+# Testing
 
 ``` bash
 composer test
 ```
 
 <a name="support-and-feedback"></a>
-# Support and Feedback
+## Support and Feedback
 
 In case you find any bugs, submit an issue directly here in GitHub.
 
@@ -446,5 +656,4 @@ The official documentation is at [https://developers.mailersend.com](https://dev
 # License
 
 [The MIT License (MIT)](LICENSE.md)
-
 
