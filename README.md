@@ -651,7 +651,7 @@ composer test
 ```
 
 <a name="support-and-feedback"></a>
-## Support and Feedback
+# Support and Feedback
 
 In case you find any bugs, submit an issue directly here in GitHub.
 
