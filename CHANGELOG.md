@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.3.0] - 2021 06 16
+
+### Added
+
 - Add `GET`, `PUT` and `DELETE` methods to `HttpLayer` class
 - Messages API, listing resources, and showing a specific one.
 - Webhook, get, find, create, update, and delete endpoints.
