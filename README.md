@@ -611,7 +611,8 @@ $mailersend->webhooks->create(
 **Update a Webhook**
 
 ```php
-use MailerSend\MailerSend;use MailerSend\Helpers\Builder\WebhookParams;
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WebhookParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
