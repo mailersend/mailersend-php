@@ -250,6 +250,26 @@ $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
 $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
 
+### Activity
+
+**List activities**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$activityParams = (new ActivityParams())
+                    ->setPage(3)
+                    ->setLimit(15)
+                    ->setDateFrom(1623073576)
+                    ->setDateTo(1623074976)
+                    ->setEvent(['processed', 'sent']);
+
+$mailersend->activity->getAll('domainId', $activityParams);
+```
+
 ### Domain
 
 **Get all domains**
@@ -330,6 +350,7 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 | Token : Create    | `POST token`                      | ✅        |
 | Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
 | Token : Delete    | `DELETE token/{token_id}`         | ✅        |
+| Activity          | `GET getAll`                      | ✅        |
 | Analytics         | `GET activityDataByDate`          | ✅        |
 | Analytics         | `GET opensByCountry`              | ✅        |
 | Analytics         | `GET opensByUserAgentName`        | ✅        |
