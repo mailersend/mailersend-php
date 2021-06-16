@@ -40,7 +40,7 @@ composer require mailersend/mailersend
 <a name="usage"></a>
 # Usage
 
-Sending a basic email.
+### Sending a basic email.
 
 ```php
 use MailerSend\MailerSend;
@@ -141,10 +141,115 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->delete('webhook_id');
+### Managing Tokens
+
+**Create a new token**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
 ```
 
+Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
 
-For more expanded usage info, see [guide](GUIDE.md).
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$response = $mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+
+echo $response['body']['data']['accessToken'];
+```
+
+**Pause / Unpause Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
+$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
+```
+
+**Delete Token**
+
+```php
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend->token->delete('token_id');
+```
+
+### Domain
+
+**Get all domains**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
+```
+
+**Get a single domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->find('domain_id');
+```
+
+**Delete a domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->delete('domain_id');
+```
+
+**Get recipients for a domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->recipients($domainId = 'domain_id', $page = 1, $limit = 10);
+```
+
+**Update domain settings**
+
+Here you can set as many properties as you need, one or multiple.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\DomainSettingsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$domainSettingsParam = (new DomainSettingsParams())
+                            ->setSendPaused(true)
+                            ->setTrackClicks(true)
+                            ->setTrackOpens(false)
+                            ->setTrackUnsubscribe(false)
+                            ->setTrackContent(true)
+                            ->setTrackUnsubscribeHtml('html')
+                            ->setTrackUnsubscribePlain('plain')
+                            ->setCustomTrackingEnabled(true)
+                            ->setCustomTrackingSubdomain(false);
+
+$mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
+```
 
 <a name="endpoints"></a>
 # Available endpoints
@@ -157,6 +262,14 @@ For more expanded usage info, see [guide](GUIDE.md).
 | Webhook : create          | `POST webhooks`               | ✅         |
 | Webhook : update          | `PUT webhooks/{webhook_id}`   | ✅         |
 | Webhook : delete          | `DELETE webhooks/{webhook_id}`| ✅         |
+| Token : Create    | `POST token`                      | ✅        |
+| Token : Update    | `PUT token/{token_id}/settings`   | ✅        |
+| Token : Delete    | `DELETE token/{token_id}`         | ✅        |
+| Domain            | `GET getAll`                      | ✅        |
+| Domain            | `GET find`                        | ✅        |
+| Domain            | `DELETE delete`                   | ✅        |
+| Domain            | `GET recipients`                  | ✅        |
+| Domain            | `PUT domainSettings`              | ✅        |
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
