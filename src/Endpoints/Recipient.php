@@ -15,6 +15,7 @@ class Recipient extends AbstractEndpoint
 
 
     /**
+     * @param string|null $domainId
      * @param int|null $limit
      * @param int|null $page
      * @return array
@@ -22,7 +23,7 @@ class Recipient extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function get(?int $limit = self::DEFAULT_LIMIT, ?int $page = null): array
+    public function get(?string $domainId, ?int $limit = self::DEFAULT_LIMIT, ?int $page = null): array
     {
         if ($limit) {
             GeneralHelpers::assert(
@@ -31,9 +32,16 @@ class Recipient extends AbstractEndpoint
             );
         }
 
+        if ($domainId) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($domainId, 1, 'Domain id cannot be empty.')
+            );
+        }
+
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint),
             array_filter([
+                'domain_id' => $domainId,
                 'limit' => $limit,
                 'page' => $page
             ])
@@ -48,10 +56,7 @@ class Recipient extends AbstractEndpoint
      */
     public function find(string $id): array
     {
-        return $this->httpLayer->get(
-            $this->buildUri($this->endpoint . '/' . $id),
-            []
-        );
+        return $this->httpLayer->get($this->buildUri($this->endpoint . '/' . $id));
     }
 
     /**
@@ -62,9 +67,6 @@ class Recipient extends AbstractEndpoint
      */
     public function delete(string $id): array
     {
-        return $this->httpLayer->delete(
-            $this->buildUri($this->endpoint . '/' . $id),
-            []
-        );
+        return $this->httpLayer->delete($this->buildUri($this->endpoint . '/' . $id));
     }
 }

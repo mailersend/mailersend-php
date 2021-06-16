@@ -29,14 +29,14 @@ class RecipientTest extends TestCase
     {
         $this->expectExceptionMessage('Minimum limit is ' . Recipient::MIN_LIMIT . '.');
 
-        $this->recipients->get(9);
+        $this->recipients->get('domain_id', 9);
     }
 
     public function test_get_recipients_max_limit_is_validated()
     {
         $this->expectExceptionMessage('Maximum limit is ' . Recipient::MAX_LIMIT . '.');
 
-        $this->recipients->get(101);
+        $this->recipients->get('domain_id',101);
     }
 
     public function test_get_recipients()
@@ -45,7 +45,7 @@ class RecipientTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
-        $response = $this->recipients->get(30, 2);
+        $response = $this->recipients->get(null,30, 2);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
@@ -56,6 +56,27 @@ class RecipientTest extends TestCase
 
         self::assertSame(30, Arr::get($request_body, 'limit'));
         self::assertSame(2, Arr::get($request_body, 'page'));
+        self::assertNull(Arr::get($request_body, 'domain_id'));
+    }
+
+    public function test_get_recipients_with_domain_filter()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->recipients->get('domain_id',30, 2);
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/recipients', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        self::assertSame(30, Arr::get($request_body, 'limit'));
+        self::assertSame(2, Arr::get($request_body, 'page'));
+        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
     }
 
     public function test_delete_recipient()
