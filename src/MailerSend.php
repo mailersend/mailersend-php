@@ -4,8 +4,10 @@ namespace MailerSend;
 
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
+use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
+use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Exceptions\MailerSendException;
 use Tightenco\Collect\Support\Arr;
@@ -30,8 +32,10 @@ class MailerSend
     protected ?HttpLayer $httpLayer;
 
     public Email $email;
+    public Webhook $webhooks;
     public Token $token;
     public Activity $activity;
+    public Analytics $analytics;
     public Domain $domain;
 
     /**
@@ -49,8 +53,10 @@ class MailerSend
     protected function setEndpoints(): void
     {
         $this->email = new Email($this->httpLayer, $this->options);
+        $this->webhooks = new Webhook($this->httpLayer, $this->options);
         $this->token = new Token($this->httpLayer, $this->options);
         $this->activity = new Activity($this->httpLayer, $this->options);
+        $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
     }
 
