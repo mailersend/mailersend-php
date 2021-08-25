@@ -22,8 +22,8 @@ class Email extends AbstractEndpoint
     public function send(EmailParams $params): array
     {
         GeneralHelpers::assert(fn () => Assertion::notEmpty(array_filter([
-            $params->getTemplateId(), $params->getHtml(), $params->getText()
-        ], fn ($v) => $v !== null), 'One of template_id, html or text must be supplied'));
+            $params->getTemplateId(), $params->getText()
+        ], fn ($v) => $v !== null), 'One of template_id or text must be supplied'));
 
         if (!$params->getTemplateId()) {
             GeneralHelpers::assert(
