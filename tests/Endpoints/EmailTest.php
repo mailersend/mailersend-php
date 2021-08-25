@@ -56,7 +56,7 @@ class EmailTest extends TestCase
                 ]
             ])
             ->setSubject('Subject')
-            ->setHtml('HTML');
+            ->setText('TEXT');
 
         $this->email->send($emailParams);
     }
