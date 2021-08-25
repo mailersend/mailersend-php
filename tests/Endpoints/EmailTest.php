@@ -217,7 +217,7 @@ class EmailTest extends TestCase
                         new Recipient('recipient@mailersend.com', 'Recipient')
                     ])
                     ->setSubject('Subject')
-                    ->setHtml('HTML'),
+                    ->setText('TEXT'),
             ],
             'using attachments helper' => [
                 (new EmailParams())
@@ -297,7 +297,7 @@ class EmailTest extends TestCase
                         new Recipient('cc@mailersend.com', 'CC')
                     ])
                     ->setSubject('Subject')
-                    ->setHtml('HTML'),
+                    ->setText('TEXT'),
             ],
             'with bcc' => [
                 (new EmailParams())
@@ -312,7 +312,23 @@ class EmailTest extends TestCase
                         new Recipient('bcc@mailersend.com', 'BCC')
                     ])
                     ->setSubject('Subject')
-                    ->setHtml('HTML'),
+                    ->setText('TEXT'),
+            ],
+
+            'without html' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setText('Text')
             ]
         ];
     }
@@ -535,6 +551,22 @@ class EmailTest extends TestCase
                     ])
                     ->setSubject('Subject')
                     ->setHtml('HTML'),
+            ],
+
+            'without text param' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
             ],
         ];
     }
