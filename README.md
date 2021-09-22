@@ -80,6 +80,29 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+HTML content is not required. You still can send an email with Text only.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setText('This is the text content');
+
+$mailersend->email->send($emailParams);
+```
+
 <a name="cc_and_bcc"></a>
 ## Sending an email with CC and BCC
 
