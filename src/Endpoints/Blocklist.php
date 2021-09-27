@@ -71,7 +71,7 @@ class Blocklist extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function delete(?array $ids = null, ?bool $all = false): array
+    public function delete(?array $ids = null, bool $all = false): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(

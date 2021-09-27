@@ -143,7 +143,7 @@ class BlocklistTest extends TestCase
 
         $response = $this->blocklist->delete(
             Arr::get($params, 'ids'),
-            Arr::get($params, 'all'),
+            Arr::get($params, 'all', false),
         );
 
         $request = $this->client->getLastRequest();
@@ -153,7 +153,7 @@ class BlocklistTest extends TestCase
         self::assertEquals('/v1/suppressions/blocklist', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame(Arr::get($params, 'ids'), Arr::get($request_body, 'ids'));
-        self::assertSame(Arr::get($params, 'all'), Arr::get($request_body, 'all'));
+        self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
 
     }
 
@@ -208,7 +208,7 @@ class BlocklistTest extends TestCase
         ];
     }
 
-    public function validDeleteDataProvider()
+    public function validDeleteDataProvider(): array
     {
         return [
             'with ids' => [
