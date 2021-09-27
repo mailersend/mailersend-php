@@ -117,7 +117,12 @@ class Domain extends AbstractEndpoint
         );
     }
 
-    public function verify(string $domainId)
+    /**
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function verify(string $domainId): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
