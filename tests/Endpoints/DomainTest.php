@@ -175,6 +175,13 @@ class DomainTest extends TestCase
         self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), Arr::get($request_body, 'custom_tracking_subdomain'));
     }
 
+    public function test_verify_required_domain_id()
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->verify('');
+    }
+
     public function validDomainListDataProvider(): array
     {
         return [

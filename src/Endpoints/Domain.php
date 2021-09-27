@@ -116,4 +116,15 @@ class Domain extends AbstractEndpoint
             $domainSettingsParams->toArray()
         );
     }
+
+    public function verify(string $domainId)
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("$this->endpoint/$domainId/verify")
+        );
+    }
 }
