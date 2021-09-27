@@ -107,6 +107,16 @@ class BlocklistTest extends TestCase
         self::assertSame(['pattern'], Arr::get($request_body, 'patterns'));
     }
 
+    public function test_create_requires_domain_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id is required.');
+
+        $this->blocklist->create(
+            (new BlocklistParams())
+        );
+    }
+
     public function test_create_requires_either_recipients_or_patterns(): void
     {
         $this->expectException(MailerSendAssertException::class);

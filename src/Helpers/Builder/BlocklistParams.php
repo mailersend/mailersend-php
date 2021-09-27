@@ -4,15 +4,9 @@ namespace MailerSend\Helpers\Builder;
 
 class BlocklistParams
 {
-    private string $domainId;
-    private array $recipients;
-    private array $patterns;
-
-    public function __construct()
-    {
-        $this->recipients = [];
-        $this->patterns = [];
-    }
+    private ?string $domainId = null;
+    private array $recipients = [];
+    private array $patterns = [];
 
     /**
      * @return string

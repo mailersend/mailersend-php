@@ -49,6 +49,10 @@ class Blocklist extends AbstractEndpoint
     public function create(BlocklistParams $params): array
     {
         GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
+        );
+
+        GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
                 array_filter([$params->getRecipients(), $params->getPatterns()], fn ($v) => ! empty($v)),
                 'Either recipients or patterns must be provided.'
