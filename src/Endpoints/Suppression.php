@@ -5,6 +5,7 @@ namespace MailerSend\Endpoints;
 use Assert\Assertion;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
+use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class Suppression extends AbstractEndpoint
@@ -52,19 +53,16 @@ class Suppression extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function create(string $domainId, array $recipients): array
+    public function create(SuppressionParams $params): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
-                && Assertion::notEmpty($recipients, 'Recipients is required.')
+            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
+                && Assertion::notEmpty($params->getRecipients(), 'Recipients is required.')
         );
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            [
-                'domain_id' => $domainId,
-                'recipients' => $recipients,
-            ]
+            $params->toArray(),
         );
     }
 

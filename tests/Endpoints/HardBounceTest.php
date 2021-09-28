@@ -7,6 +7,7 @@ use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Tightenco\Collect\Support\Arr;
@@ -84,7 +85,11 @@ class HardBounceTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $response = $this->hardBounce->create('domain_id', ['recipient']);
+        $params = (new SuppressionParams())
+            ->setDomainId('domain_id')
+            ->setRecipients(['recipient']);
+
+        $response = $this->hardBounce->create($params);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
@@ -106,7 +111,10 @@ class HardBounceTest extends TestCase
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('Domain id is required.');
 
-        $this->hardBounce->create('', ['recipient']);
+        $params = (new SuppressionParams())
+            ->setRecipients(['recipient']);
+
+        $this->hardBounce->create($params);
     }
 
     public function test_create_requires_recipients(): void
@@ -114,7 +122,10 @@ class HardBounceTest extends TestCase
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('Recipients is required.');
 
-        $this->hardBounce->create('domain_id', []);
+        $params = (new SuppressionParams())
+            ->setDomainId('domain_id');
+
+        $this->hardBounce->create($params);
     }
 
     /**
