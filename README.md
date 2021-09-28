@@ -665,6 +665,45 @@ $mailersend->webhooks->delete('webhook_id');
 
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
+<a name="templates"></a>
+## Templates
+
+**Get a list of templates**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Get all templates of an account
+$mailersend->template->getAll();
+
+// Get all templates of a domain
+$mailersend->template->getAll('domain_id');
+
+// Get page 2 of templates with 20 records per page
+$mailersend->template->getAll('domain_id', 2, 20);
+```
+
+**Get a single template**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->template->find('template_id');
+```
+
+**Delete a template**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->template->delete('template_id');
+```
 
 <a name="testing"></a>
 # Testing
