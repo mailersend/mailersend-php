@@ -558,30 +558,45 @@ $mailersend->blocklist->create($params);
 
 ```php
 use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SuppressionParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->hardBounce->create('domain_id', ['recipient_one', 'recipient_two']);
+$params = (new SuppressionParams())
+    ->setDomainId('domain_id')
+    ->setRecipients(['recipient_one', 'recipient_two']);
+
+$mailersend->hardBounce->create($params);
 ```
 
 **Spam Complaints**
 
 ```php
 use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SuppressionParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->spamComplaint->create('domain_id', ['recipient_one', 'recipient_two']);
+$params = (new SuppressionParams())
+    ->setDomainId('domain_id')
+    ->setRecipients(['recipient_one', 'recipient_two']);
+
+$mailersend->spamComplaint->create($params);
 ```
 
 **Unsubscribes**
 
 ```php
 use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SuppressionParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->unsubscribe->create('domain_id', ['recipient_one', 'recipient_two']);
+$params = (new SuppressionParams())
+    ->setDomainId('domain_id')
+    ->setRecipients(['recipient_one', 'recipient_two']);
+
+$mailersend->unsubscribe->create($params);
 ```
 
 **Delete recipients from a suppression list**
