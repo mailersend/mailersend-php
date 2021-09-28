@@ -41,6 +41,7 @@ class TemplateTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->template->getAll(
+            Arr::get($params, 'domain_id'),
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
@@ -53,6 +54,7 @@ class TemplateTest extends TestCase
         self::assertEquals('/v1/templates', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
+        self::assertEquals(Arr::get($expected, 'domain_id'), Arr::get($query, 'domain_id'));
         self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
     }
@@ -68,6 +70,7 @@ class TemplateTest extends TestCase
         $this->expectException(MailerSendAssertException::class);
 
         $this->template->getAll(
+            Arr::get($params, 'domain_id'),
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
@@ -101,8 +104,19 @@ class TemplateTest extends TestCase
     {
         return [
             'empty request' => [
-                [],
-                [
+                'params' => [],
+                'expected' => [
+                    'domain_id' => null,
+                    'page' => null,
+                    'limit' => null,
+                ],
+            ],
+            'with domain id' => [
+                'params' => [
+                    'domain_id' => 'domain_id',
+                ],
+                'expected' => [
+                    'domain_id' => 'domain_id',
                     'page' => null,
                     'limit' => null,
                 ],
@@ -112,6 +126,7 @@ class TemplateTest extends TestCase
                     'page' => 1,
                 ],
                 [
+                    'domain_id' => null,
                     'page' => 1,
                     'limit' => null,
                 ],
@@ -121,16 +136,19 @@ class TemplateTest extends TestCase
                     'limit' => 10,
                 ],
                 [
+                    'domain_id' => null,
                     'page' => null,
                     'limit' => 10,
                 ],
             ],
             'complete request' => [
                 [
+                    'domain_id' => 'domain_id',
                     'page' => 1,
                     'limit' => 10,
                 ],
                 [
+                    'domain_id' => 'domain_id',
                     'page' => 1,
                     'limit' => 10,
                 ],

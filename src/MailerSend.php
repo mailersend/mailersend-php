@@ -8,6 +8,7 @@ use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\Message;
+use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
@@ -41,6 +42,7 @@ class MailerSend
     public Analytics $analytics;
     public Domain $domain;
     public Recipient $recipients;
+    public Template $template;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -64,6 +66,7 @@ class MailerSend
         $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
         $this->recipients = new Recipient($this->httpLayer, $this->options);
+        $this->template = new Template($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void

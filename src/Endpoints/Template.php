@@ -15,7 +15,7 @@ class Template extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \JsonException
      */
-    public function getAll(?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
         if ($limit) {
             GeneralHelpers::assert(
@@ -30,6 +30,7 @@ class Template extends AbstractEndpoint
 
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint, [
+                'domain_id' => $domainId,
                 'page' => $page,
                 'limit' => $limit,
             ])
