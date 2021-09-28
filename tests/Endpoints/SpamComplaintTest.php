@@ -141,7 +141,6 @@ class SpamComplaintTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertSame(Arr::get($params, 'ids'), Arr::get($request_body, 'ids'));
         self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
-
     }
 
     public function test_delete_requires_either_ids_or_all(): void
