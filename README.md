@@ -22,6 +22,7 @@ MailerSend PHP SDK
   * [Recipients API](#recipients)
   * [Tokens API](#tokens)
   * [Webhooks API](#webhooks)
+  * [Templates API](#templates)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
 * [License](#license)
