@@ -23,12 +23,8 @@ class Suppression extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function getAll(string $domainId, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
-        GeneralHelpers::assert(
-            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
-        );
-
         if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
@@ -43,6 +39,7 @@ class Suppression extends AbstractEndpoint
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint, [
                 'domain_id' => $domainId,
+                'page' => $page,
                 'limit' => $limit,
             ])
         );
@@ -56,8 +53,7 @@ class Suppression extends AbstractEndpoint
     public function create(SuppressionParams $params): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
-                && Assertion::notEmpty($params->getRecipients(), 'Recipients is required.')
+            fn () => Assertion::notEmpty($params->getRecipients(), 'Recipients is required.')
         );
 
         return $this->httpLayer->post(

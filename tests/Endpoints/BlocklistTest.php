@@ -43,6 +43,7 @@ class BlocklistTest extends TestCase
 
         $response = $this->blocklist->getAll(
             Arr::get($params, 'domain_id'),
+            Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
 
@@ -53,6 +54,7 @@ class BlocklistTest extends TestCase
         self::assertEquals('/v1/suppressions/blocklist', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
+        self::assertEquals(Arr::get($params, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($params, 'limit'), Arr::get($query, 'limit'));
     }
 
@@ -69,6 +71,7 @@ class BlocklistTest extends TestCase
 
         $this->blocklist->getAll(
             Arr::get($params, 'domain_id'),
+            Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
     }
@@ -105,16 +108,6 @@ class BlocklistTest extends TestCase
         self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
         self::assertSame(['recipient'], Arr::get($request_body, 'recipients'));
         self::assertSame(['pattern'], Arr::get($request_body, 'patterns'));
-    }
-
-    public function test_create_requires_domain_id(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Domain id is required.');
-
-        $this->blocklist->create(
-            (new BlocklistParams())
-        );
     }
 
     public function test_create_requires_either_recipients_or_patterns(): void
@@ -168,14 +161,28 @@ class BlocklistTest extends TestCase
     public function validGetAllDataProvider(): array
     {
         return [
-            'without limit' => [
+            'empty request' => [
+                'params' => [],
+            ],
+            'with domain id' => [
                 'params' => [
                     'domain_id' => 'domain_id',
                 ],
             ],
             'with limit' => [
                 'params' => [
+                    'limit' => 10,
+                ],
+            ],
+            'with page' => [
+                'params' => [
+                    'page' => 1,
+                ],
+            ],
+            'complete request' => [
+                'params' => [
                     'domain_id' => 'domain_id',
+                    'page' => 1,
                     'limit' => 10,
                 ],
             ]
@@ -185,12 +192,6 @@ class BlocklistTest extends TestCase
     public function invalidGetAllDataProvider(): array
     {
         return [
-            'empty domain_id' => [
-                'params' => [
-                    'domain_id' => '',
-                ],
-                'errorMessage' => 'Domain id is required.',
-            ],
             'with limit under 10' => [
                 'params' => [
                     'domain_id' => 'domain_id',

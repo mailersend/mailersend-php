@@ -16,12 +16,8 @@ class Blocklist extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function getAll(string $domainId, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
-        GeneralHelpers::assert(
-            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
-        );
-
         if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
@@ -36,6 +32,7 @@ class Blocklist extends AbstractEndpoint
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint, [
                 'domain_id' => $domainId,
+                'page' => $page,
                 'limit' => $limit,
             ])
         );
@@ -48,10 +45,6 @@ class Blocklist extends AbstractEndpoint
      */
     public function create(BlocklistParams $params): array
     {
-        GeneralHelpers::assert(
-            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
-        );
-
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
                 array_filter([$params->getRecipients(), $params->getPatterns()], fn ($v) => ! empty($v)),
