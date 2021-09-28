@@ -536,6 +536,154 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->recipients->delete('recipient_id');
 ```
 
+**Add recipients to a suppression list**
+
+**Blocklist**
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\BlocklistParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$params = (new BlocklistParams())
+    ->setDomainId('domain_id')
+    ->setRecipients(['recipient_one', 'recipient_two'])
+    ->setPatterns(['pattern_one', 'pattern_two']);
+
+$mailersend->blocklist->create($params);
+```
+
+**Hard Bounces**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->hardBounce->create('domain_id', ['recipient_one', 'recipient_two']);
+```
+
+**Spam Complaints**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->spamComplaint->create('domain_id', ['recipient_one', 'recipient_two']);
+```
+
+**Unsubscribes**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->unsubscribe->create('domain_id', ['recipient_one', 'recipient_two']);
+```
+
+**Delete recipients from a suppression list**
+
+**Blocklist**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Delete specific instances
+$mailersend->blocklist->delete(['id_one', 'id_two']);
+
+// or delete all
+$mailersend->blocklist->delete(null, true);
+```
+
+**Hard Bounces**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Delete specific instances
+$mailersend->hardBounce->delete(['id_one', 'id_two']);
+
+// or delete all
+$mailersend->hardBounce->delete(null, true);
+```
+
+**Spam Complaints**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Delete specific instances
+$mailersend->spamComplaint->delete(['id_one', 'id_two']);
+
+// or delete all
+$mailersend->spamComplaint->delete(null, true);
+```
+
+**Unsubscribes**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Delete specific instances
+$mailersend->unsubscribe->delete(['id_one', 'id_two']);
+
+// or delete all
+$mailersend->unsubscribe->delete(null, true);
+```
+
+**Get recipients from a suppression list**
+
+**Blocklist**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->blocklist->getAll('domain_id', 15);
+```
+
+**Hard Bounces**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->hardBounce->getAll('domain_id', 15);
+```
+
+**Spam Complaints**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->spamComplaint->getAll('domain_id', 15);
+```
+
+**Unsubscribes**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->unsubscribe->getAll('domain_id', 15);
+```
+
 <a name="tokens"></a>
 
 ## Tokens
