@@ -470,6 +470,17 @@ $domainSettingsParam = (new DomainSettingsParams())
 
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
+
+**Verify a domain**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->verify('domain_id');
+```
+
 ## Messages
 
 **List messages**
