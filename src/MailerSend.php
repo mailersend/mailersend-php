@@ -5,9 +5,13 @@ namespace MailerSend;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
+use MailerSend\Endpoints\Blocklist;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
+use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Message;
+use MailerSend\Endpoints\SpamComplaint;
+use MailerSend\Endpoints\Unsubscribe;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
@@ -41,6 +45,10 @@ class MailerSend
     public Analytics $analytics;
     public Domain $domain;
     public Recipient $recipients;
+    public Blocklist $blocklist;
+    public HardBounce $hardBounce;
+    public SpamComplaint $spamComplaint;
+    public Unsubscribe $unsubscribe;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -64,6 +72,10 @@ class MailerSend
         $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
         $this->recipients = new Recipient($this->httpLayer, $this->options);
+        $this->blocklist = new Blocklist($this->httpLayer, $this->options);
+        $this->hardBounce = new HardBounce($this->httpLayer, $this->options);
+        $this->spamComplaint = new SpamComplaint($this->httpLayer, $this->options);
+        $this->unsubscribe = new Unsubscribe($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
