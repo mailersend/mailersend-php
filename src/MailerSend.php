@@ -10,6 +10,7 @@ use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Message;
+use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
 use MailerSend\Endpoints\Webhook;
@@ -45,6 +46,7 @@ class MailerSend
     public Analytics $analytics;
     public Domain $domain;
     public Recipient $recipients;
+    public Template $template;
     public Blocklist $blocklist;
     public HardBounce $hardBounce;
     public SpamComplaint $spamComplaint;
@@ -72,6 +74,7 @@ class MailerSend
         $this->analytics = new Analytics($this->httpLayer, $this->options);
         $this->domain = new Domain($this->httpLayer, $this->options);
         $this->recipients = new Recipient($this->httpLayer, $this->options);
+        $this->template = new Template($this->httpLayer, $this->options);
         $this->blocklist = new Blocklist($this->httpLayer, $this->options);
         $this->hardBounce = new HardBounce($this->httpLayer, $this->options);
         $this->spamComplaint = new SpamComplaint($this->httpLayer, $this->options);
