@@ -206,7 +206,8 @@ $emailParams = (new EmailParams())
     ->setRecipients($recipients)
     ->setSubject('Subject')
     ->setTemplateId('ss243wdasd')
-    ->setVariables($variables);
+    ->setVariables($variables)
+    ->setTags($tags);
 
 $mailersend->email->send($emailParams);
 ```
