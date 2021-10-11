@@ -8,21 +8,52 @@ MailerSend PHP SDK
 
 * [Installation](#installation)
 * [Usage](#usage)
-  * [Sending and email](#sending_an_email)
-  * [Sending and email with CC and BCC](#cc_and_bcc)
-  * [Sending an email with variables (simple personalisation)](#variables)
-  * [Sending an email with personalization (advanced personalisation)](#personalization)
-  * [Sending a template-based email](#template)
-  * [Sending an email with attachment](#attachments)
-  * [Debugging validation errors](#debugging-validation-errors)
+  * [Email API](#email-api)
+    * [Send an email](#send-an-email)
+    * [Add CC, BCC recipients](#cc-bcc-recipients)
+    * [Send a template-based email](#template)
+    * [Advanced personalization](#personalization)
+    * [Simple personalization](#variables)
+    * [Send an email with attachment](#attachments)
   * [Activity API](#activity)
+    * [Get a list of activities](#get-a-list-of-activities)
   * [Analytics API](#analytics)
+    * [Get activity data by date](#get-activity-data-by-date)
+    * [Opens by country](#opens-by-country)
+    * [Opens by user-agent](#opens-by-user-agent)
+    * [Opens by reading environment](#opens-by-reading-environment)
   * [Domains API](#domains)
+    * [Get a list of domains](#get-a-list-of-domains)
+    * [Get domain](#get-domain)
+    * [Delete domain](#delete-domain)
+    * [Get a list of recipients per domain](#get-a-list-of-recipients-per-domain)
+    * [Update domain settings](#update-domain-settings)
+    * [Verify a domain](#verify-a-domain)
   * [Messages API](#messages)
-  * [Recipients API](#recipients)
+    * [Get a list of messages](#get-a-list-of-messages)
+    * [Get info on a message](#get-info-on-a-message)
   * [Tokens API](#tokens)
+    * [Create a token](#create-a-token)
+    * [Update token](#update-token)
+    * [Delete token](#delete-token)
+  * [Recipients API](#recipients)
+    * [Get a list of recipients](#get-a-list-of-recipients)
+    * [Get single recipient](#get-single-recipient)
+    * [Delete recipient](#delete-recipient)
+    * [Add recipients to a suppression list](#add-recipients-to-a-suppression-list)
+    * [Delete recipients from a suppression list](#delete-recipients-from-a-suppression-list)
+    * [Get recipients from a suppression list](#get-recipients-from-a-suppression-list)
   * [Webhooks API](#webhooks)
+    * [Get a list of webhooks](#get-a-list-of-webhooks)
+    * [Get webhook](#get-webhook)
+    * [Create webhook](#create-webhook)
+    * [Update webhook](#update-webhook)
+    * [Delete webhook](#delete-webhook)
   * [Templates API](#templates)
+    * [Get a list of templates](#get-a-list-of-templates)
+    * [Get a single template](#get-a-single-template)
+    * [Delete a template](#delete-a-template)
+* [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
 * [License](#license)
@@ -56,8 +87,13 @@ composer require mailersend/mailersend
 
 # Usage
 
-<a name="sending_an_email"></a>
-## Sending a basic email.
+<a name="email-api"></a>
+
+## Email
+
+<a name="send-an-email"></a>
+
+### Send an email
 
 ```php
 use MailerSend\MailerSend;
@@ -104,8 +140,9 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="cc_and_bcc"></a>
-## Sending an email with CC and BCC
+<a name="cc-bcc-recipients"></a>
+
+### Add CC, BCC recipients
 
 Send an email with CC and BCC.
 
@@ -141,8 +178,9 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="variables"></a>
-## Sending an email with variables (simple personalization)
+<a name="template"></a>
+
+### Send a template-based email
 
 ```php
 use MailerSend\MailerSend;
@@ -160,20 +198,23 @@ $variables = [
     new Variable('your@client.com', ['var' => 'value'])
 ];
 
+$tags = ['tag'];
+
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
     ->setRecipients($recipients)
-    ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
+    ->setSubject('Subject')
+    ->setTemplateId('ss243wdasd')
+    ->setVariables($variables)
+    ->setTags($tags);
 
 $mailersend->email->send($emailParams);
 ```
 
 <a name="personalization"></a>
-## Sending an email with personalization (advanced personalization)
+
+### Advanced personalization
 
 ```php
 use MailerSend\MailerSend;
@@ -217,8 +258,9 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="template"></a>
-## Sending a template-based email
+<a name="variables"></a>
+
+### Simple personalization
 
 ```php
 use MailerSend\MailerSend;
@@ -236,21 +278,21 @@ $variables = [
     new Variable('your@client.com', ['var' => 'value'])
 ];
 
-$tags = ['tag'];
-
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
     ->setRecipients($recipients)
-    ->setSubject('Subject')
-    ->setTemplateId('ss243wdasd')
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
     ->setVariables($variables);
 
 $mailersend->email->send($emailParams);
 ```
 
 <a name="attachments"></a>
-## Sending an email with attachment
+
+### Send email with attachment
 
 ```php
 use MailerSend\MailerSend;
@@ -280,48 +322,13 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="debugging-validation-errors"></a>
-## Debugging validation errors
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
-use MailerSend\Helpers\Builder\Recipient;
-use MailerSend\Helpers\Builder\EmailParams;
-use MailerSend\Exceptions\MailerSendValidationException;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$recipients = [
-    new Recipient('your@client.com', 'Your Client'),
-];
-
-// This should be your@client.com, as in $recipients
-$variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
-];
-
-$emailParams = (new EmailParams())
-    ->setFrom('your@domain.com')
-    ->setFromName('Your Name')
-    ->setRecipients($recipients)
-    ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
-
-try{
-    $mailersend->email->send($emailParams);
-} catch(MailerSendValidationException $e){
-    // See src/Exceptions/MailerSendValidationException.php for more more info
-    print_r($e->getResponse()->getBody()->getContents());
-}
-```
-
 <a name="activity"></a>
+
 ## Activity
 
-**List activities**
+<a name="get-a-list-of-activities"></a>
+
+### Get a list of activities
 
 ```php
 use MailerSend\MailerSend;
@@ -340,9 +347,12 @@ $mailersend->activity->getAll('domainId', $activityParams);
 ```
 
 <a name="analytics"></a>
+
 ## Analytics
 
-**Activity data by date**
+<a name="activity-data-by-date"></a>
+
+### Get activity data by date
 
 ```php
 use MailerSend\MailerSend;
@@ -360,7 +370,9 @@ $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
 $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 ```
 
-**Opens by country**
+<a name="opens-by-country"></a>
+
+### Opens by country
 
 ```php
 use MailerSend\MailerSend;
@@ -375,7 +387,9 @@ $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
 $mailersend->analytics->opensByCountry($opensAnalyticsParams);
 ```
 
-**Opens by user-agent name**
+<a name="opens-by-user-agent"></a>
+
+### Opens by user-agent
 
 ```php
 use MailerSend\MailerSend;
@@ -390,7 +404,9 @@ $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
 $mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
 ```
 
-**Opens by reading environment**
+<a name="opens-by-reading-environment"></a>
+
+### Opens by reading environment
 
 ```php
 use MailerSend\MailerSend;
@@ -406,9 +422,12 @@ $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
 
 <a name="domains"></a>
+
 ## Domains
 
-**Get all domains**
+<a name="get-a-list-of-domains"></a>
+
+### Get a list of domains
 
 ```php
 use MailerSend\MailerSend;
@@ -418,7 +437,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
 ```
 
-**Get a single domain**
+<a name="get-domain"></a>
+
+### Get domain
 
 ```php
 use MailerSend\MailerSend;
@@ -428,7 +449,8 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->find('domain_id');
 ```
 
-**Delete a domain**
+<a name="delete-domain"></a>
+### Delete domain
 
 ```php
 use MailerSend\MailerSend;
@@ -438,7 +460,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->delete('domain_id');
 ```
 
-**Get recipients for a domain**
+<a name="get-a-list-of-recipients-per-domain"></a>
+
+## Get a list of recipients per domain
 
 ```php
 use MailerSend\MailerSend;
@@ -448,7 +472,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->recipients($domainId = 'domain_id', $page = 1, $limit = 10);
 ```
 
-**Update domain settings**
+<a name="update-domain-settings"></a>
+
+### Update domain settings
 
 Here you can set as many properties as you need, one or multiple.
 
@@ -472,7 +498,9 @@ $domainSettingsParam = (new DomainSettingsParams())
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
 
-**Verify a domain**
+<a name="verify-a-domain"></a>
+
+### Verify a domain
 
 ```php
 use MailerSend\MailerSend;
@@ -482,9 +510,13 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->verify('domain_id');
 ```
 
+<a name="messages"></a>
+
 ## Messages
 
-**List messages**
+<a name="get-a-list-of-messages"></a>
+
+### Get a list of messages
 
 ```php
 use MailerSend\MailerSend;
@@ -494,7 +526,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->messages->get($limit = 100, $page = 3);
 ```
 
-**Find a specific message**
+<a name="get-info-on-a-message"></a>
+
+### Get info on a message
 
 ```php
 use MailerSend\MailerSend;
@@ -504,11 +538,74 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->messages->find('message_id');
 ```
 
+<a name="tokens"></a>
+
+## Tokens
+
+<a name="create_a_token"></a>
+
+### Create a token
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+```
+
+Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$response = $mailersend->token->create(
+    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
+);
+
+echo $response['body']['data']['accessToken'];
+```
+
+<a name="update-token"></a>
+
+### Update token
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
+$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
+```
+
+<a name="delete-token"></a>
+
+### Delete Token
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->token->delete('token_id');
+```
+
 <a name="recipients"></a>
 
 ## Recipients
 
-**List recipients**
+<a name="get-a-list-of-recipients"></a>
+
+### Get a list of recipients
 
 ```php
 use MailerSend\MailerSend;
@@ -516,19 +613,13 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->recipients->get(null, $limit = 100, $page = 3);
-```
-
-**List recipients in a specific domain**
-
-```php
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
+// Or for a specific domain
 $mailersend->recipients->get('domain_id', $limit = 100, $page = 3);
 ```
 
-**Find a specific recipient**
+<a name="get-single-recipient"></a>
+
+### Get single recipient
 
 ```php
 use MailerSend\MailerSend;
@@ -538,7 +629,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->recipients->find('recipient_id');
 ```
 
-**Delete a recipient**
+<a name="delete-recipient"></a>
+
+### Delete recipient
 
 ```php
 use MailerSend\MailerSend;
@@ -548,7 +641,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->recipients->delete('recipient_id');
 ```
 
-**Add recipients to a suppression list**
+<a name="add-recipients-to-a-suppression-list"></a>
+
+### Add recipients to a suppression list
 
 **Blocklist**
 
@@ -611,7 +706,9 @@ $params = (new SuppressionParams())
 $mailersend->unsubscribe->create($params);
 ```
 
-**Delete recipients from a suppression list**
+<a name="delete-recipients-from-a-suppression-list"></a>
+
+### Delete recipients from a suppression list
 
 **Blocklist**
 
@@ -669,7 +766,9 @@ $mailersend->unsubscribe->delete(['id_one', 'id_two']);
 $mailersend->unsubscribe->delete(null, true);
 ```
 
-**Get recipients from a suppression list**
+<a name="get-recipients-from-a-suppression-list"></a>
+
+### Get recipients from a suppression list
 
 **Blocklist**
 
@@ -711,56 +810,13 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->unsubscribe->getAll('domain_id', 15);
 ```
 
-<a name="tokens"></a>
-
-## Tokens
-
-**Create a new token**
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\TokenParams;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->token->create(
-    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
-);
-```
-
-Because of security reasons, we only allow access token appearance once during creation. In order to see the access token created you can do:
-
-```php
-use MailerSend\Helpers\Builder\TokenParams;
-
-$response = $mailersend->token->create(
-    new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
-);
-
-echo $response['body']['data']['accessToken'];
-```
-
-**Pause / Unpause Token**
-
-```php
-use MailerSend\Helpers\Builder\TokenParams;
-
-$mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
-$mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
-```
-
-**Delete Token**
-
-```php
-use MailerSend\Helpers\Builder\TokenParams;
-
-$mailersend->token->delete('token_id');
-```
-
 <a name="webhooks"></a>
+
 ## Webhooks
 
-**List Webhooks**
+<a name="get-a-list-of-webhooks"></a>
+
+### Get a list of webhooks
 
 ```php
 use MailerSend\MailerSend;
@@ -770,7 +826,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->webhooks->get('domain_id');
 ```
 
-**Find a Webhook**
+<a name="get-webhook"></a>
+
+### Get webhook
 
 ```php
 use MailerSend\MailerSend;
@@ -780,7 +838,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->webhooks->find('webhook_id');
 ```
 
-**Create a Webhook**
+<a name="create-webhook"></a>
+
+### Create webhook
 
 ```php
 use MailerSend\Helpers\Builder\WebhookParams;
@@ -791,22 +851,17 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
 );
-```
 
-**Create a disabled Webhook**
-
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
+// Or a disabled webhook
 
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
 );
 ```
 
-**Update a Webhook**
+<a name="update-webhook"></a>
+
+### Update webhook
 
 ```php
 use MailerSend\MailerSend;
@@ -815,20 +870,17 @@ use MailerSend\Helpers\Builder\WebhookParams;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+
+// Enable webhook
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true);
+
+// Disable webhook
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false);
 ```
 
-**Disable/Enable a Webhook**
+<a name="delete-webhook"></a>
 
-```php
-use MailerSend\Helpers\Builder\WebhookParams;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true); //Enabled
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false); //Disabled
-```
-
-**Delete a Webhook**
+### Delete webhook
 
 ```php
 use MailerSend\MailerSend;
@@ -841,9 +893,12 @@ $mailersend->webhooks->delete('webhook_id');
 *If, at the moment, some endpoint is not available, please use `cURL` and other available tools to access it. [Refer to official API docs for more info](https://developers.mailersend.com/).*
 
 <a name="templates"></a>
+
 ## Templates
 
-**Get a list of templates**
+<a name="get-a-list-of-templates"></a>
+
+### Get a list of templates
 
 ```php
 use MailerSend\MailerSend;
@@ -860,7 +915,9 @@ $mailersend->template->getAll('domain_id');
 $mailersend->template->getAll('domain_id', 2, 20);
 ```
 
-**Get a single template**
+<a name="Get-a-single-template"></a>
+
+### Get a single template
 
 ```php
 use MailerSend\MailerSend;
@@ -870,7 +927,9 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->template->find('template_id');
 ```
 
-**Delete a template**
+<a name="delete-a-template"></a>
+
+### Delete a template
 
 ```php
 use MailerSend\MailerSend;
@@ -878,6 +937,44 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->template->delete('template_id');
+```
+
+<a name="debugging-validation-errors"></a>
+# Debugging validation errors
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Exceptions\MailerSendValidationException;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+// This should be your@client.com, as in $recipients
+$variables = [
+    new Variable('your@domain.com', ['var' => 'value'])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setVariables($variables);
+
+try{
+    $mailersend->email->send($emailParams);
+} catch(MailerSendValidationException $e){
+    // See src/Exceptions/MailerSendValidationException.php for more more info
+    print_r($e->getResponse()->getBody()->getContents());
+}
 ```
 
 <a name="testing"></a>
