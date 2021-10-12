@@ -16,7 +16,8 @@ MailerSend PHP SDK
     * [Simple personalization](#variables)
     * [Send an email with attachment](#attachments)
   * [Bulk emails API](#bulk-email-api)
-  * [Debugging validation errors](#debugging-validation-errors)
+    * [Send bulk email](#send-bulk-email)
+    * [Get bulk email status](#get-bulk-email-status)
   * [Activity API](#activity)
     * [Get a list of activities](#get-a-list-of-activities)
   * [Analytics API](#analytics)
@@ -327,6 +328,9 @@ $mailersend->email->send($emailParams);
 <a name="bulk-email-api"></a>
 ## Bulk email API
 
+<a name="send-bulk-email"></a>
+###Send bulk email
+
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
@@ -359,7 +363,8 @@ $bulkEmailParams[] = (new EmailParams())
 $mailersend->bulkEmail->send($bulkEmailParams);
 ```
 
-**Get bulk email status**
+<a name="get-bulk-email-status"></a>
+###Get bulk email status
 
 ```php
 use MailerSend\MailerSend;
@@ -367,44 +372,6 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->bulkEmail->getStatus('bulk_email_id');
-```
-
-<a name="debugging-validation-errors"></a>
-## Debugging validation errors
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
-use MailerSend\Helpers\Builder\Recipient;
-use MailerSend\Helpers\Builder\EmailParams;
-use MailerSend\Exceptions\MailerSendValidationException;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$recipients = [
-    new Recipient('your@client.com', 'Your Client'),
-];
-
-// This should be your@client.com, as in $recipients
-$variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
-];
-
-$emailParams = (new EmailParams())
-    ->setFrom('your@domain.com')
-    ->setFromName('Your Name')
-    ->setRecipients($recipients)
-    ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
-
-try{
-    $mailersend->email->send($emailParams);
-} catch(MailerSendValidationException $e){
-    // See src/Exceptions/MailerSendValidationException.php for more more info
-    print_r($e->getResponse()->getBody()->getContents());
-}
 ```
 
 <a name="activity"></a>
