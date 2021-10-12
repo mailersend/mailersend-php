@@ -15,6 +15,8 @@ MailerSend PHP SDK
     * [Advanced personalization](#personalization)
     * [Simple personalization](#variables)
     * [Send an email with attachment](#attachments)
+  * [Bulk emails API](#bulk-email-api)
+  * [Debugging validation errors](#debugging-validation-errors)
   * [Activity API](#activity)
     * [Get a list of activities](#get-a-list-of-activities)
   * [Analytics API](#analytics)
@@ -320,6 +322,89 @@ $emailParams = (new EmailParams())
     ->setAttachments($attachments);
 
 $mailersend->email->send($emailParams);
+```
+
+<a name="bulk-email-api"></a>
+## Bulk email API
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$bulkEmailParams = [];
+
+$bulkEmailParams[] = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$bulkEmailParams[] = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$mailersend->bulkEmail->send($bulkEmailParams);
+```
+
+**Get bulk email status**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->bulkEmail->getStatus('bulk_email_id');
+```
+
+<a name="debugging-validation-errors"></a>
+## Debugging validation errors
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Exceptions\MailerSendValidationException;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+// This should be your@client.com, as in $recipients
+$variables = [
+    new Variable('your@domain.com', ['var' => 'value'])
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
+    ->setVariables($variables);
+
+try{
+    $mailersend->email->send($emailParams);
+} catch(MailerSendValidationException $e){
+    // See src/Exceptions/MailerSendValidationException.php for more more info
+    print_r($e->getResponse()->getBody()->getContents());
+}
 ```
 
 <a name="activity"></a>

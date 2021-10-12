@@ -6,6 +6,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\Blocklist;
+use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\HardBounce;
@@ -39,6 +40,7 @@ class MailerSend
     protected ?HttpLayer $httpLayer;
 
     public Email $email;
+    public BulkEmail $bulkEmail;
     public Message $messages;
     public Webhook $webhooks;
     public Token $token;
@@ -67,6 +69,7 @@ class MailerSend
     protected function setEndpoints(): void
     {
         $this->email = new Email($this->httpLayer, $this->options);
+        $this->bulkEmail = new BulkEmail($this->httpLayer, $this->options);
         $this->messages = new Message($this->httpLayer, $this->options);
         $this->webhooks = new Webhook($this->httpLayer, $this->options);
         $this->token = new Token($this->httpLayer, $this->options);

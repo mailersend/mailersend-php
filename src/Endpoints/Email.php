@@ -5,6 +5,7 @@ namespace MailerSend\Endpoints;
 use Assert\Assertion;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
@@ -21,73 +22,14 @@ class Email extends AbstractEndpoint
      */
     public function send(EmailParams $params): array
     {
-        GeneralHelpers::assert(fn () => Assertion::notEmpty(array_filter([
-            $params->getTemplateId(), $params->getText()
-        ], fn ($v) => $v !== null), 'One of template_id or text must be supplied'));
+        GeneralHelpers::validateEmailParams($params);
 
-        if (!$params->getTemplateId()) {
-            GeneralHelpers::assert(
-                fn () => Assertion::email($params->getFrom()) &&
-                Assertion::minLength($params->getFromName(), 1) &&
-                Assertion::minLength($params->getSubject(), 1) &&
-                Assertion::minCount($params->getRecipients(), 1)
-            );
-        } else {
-            GeneralHelpers::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
-        }
-
-        if (count($params->getCc()) > 0) {
-            GeneralHelpers::assert(fn () => Assertion::maxCount($params->getCc(), 10));
-            foreach ($params->getCc() as $key => $cc) {
-                $cc = ! is_array($cc) ? $cc->toArray() : $cc;
-                GeneralHelpers::assert(
-                    fn () => Assertion::keyExists($cc, 'email', "The element with index $key in CC array does not contain the email parameter.")
-                );
-                if (isset($cc['name'])) {
-                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(';', $cc['name']))));
-                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(',', $cc['name']))));
-                }
-            }
-        }
-
-        if (count($params->getBcc()) > 0) {
-            GeneralHelpers::assert(fn () => Assertion::maxCount($params->getBcc(), 10));
-            foreach ($params->getBcc() as $key => $bcc) {
-                $bcc = ! is_array($bcc) ? $bcc->toArray() : $bcc;
-                GeneralHelpers::assert(
-                    fn () => Assertion::keyExists($bcc, 'email', "The element with index $key in BCC array does not contain the email parameter.")
-                );
-                if (isset($bcc['name'])) {
-                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(';', $bcc['name']))));
-                    GeneralHelpers::assert(fn () => Assertion::eq(1, count(explode(',', $bcc['name']))));
-                }
-            }
-        }
-
-        $recipients_mapped = (new Collection($params->getRecipients()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            Recipient::class
-        ) ? $v->toArray() : $v)->toArray();
-        $cc_mapped = (new Collection($params->getCc()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            Recipient::class
-        ) ? $v->toArray() : $v)->toArray();
-        $bcc_mapped = (new Collection($params->getBcc()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            Recipient::class
-        ) ? $v->toArray() : $v)->toArray();
-        $attachments_mapped = (new Collection($params->getAttachments()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            Attachment::class
-        ) ? $v->toArray() : $v)->toArray();
-        $variables_mapped = (new Collection($params->getVariables()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            Variable::class
-        ) ? $v->toArray() : $v)->toArray();
-        $personalization_mapped = (new Collection($params->getPersonalization()))->map(fn ($v) => is_object($v) && is_a(
-            $v,
-            \MailerSend\Helpers\Builder\Personalization::class
-        ) ? $v->toArray() : $v)->toArray();
+        $recipients_mapped = GeneralHelpers::mapToArray($params->getRecipients(), Recipient::class);
+        $cc_mapped = GeneralHelpers::mapToArray($params->getCc(), Recipient::class);
+        $bcc_mapped = GeneralHelpers::mapToArray($params->getBcc(), Recipient::class);
+        $attachments_mapped = GeneralHelpers::mapToArray($params->getAttachments(), Attachment::class);
+        $variables_mapped = GeneralHelpers::mapToArray($params->getVariables(), Variable::class);
+        $personalization_mapped = GeneralHelpers::mapToArray($params->getPersonalization(), Personalization::class);
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
