@@ -15,6 +15,9 @@ MailerSend PHP SDK
     * [Advanced personalization](#personalization)
     * [Simple personalization](#variables)
     * [Send an email with attachment](#attachments)
+  * [Bulk emails API](#bulk-email-api)
+    * [Send bulk email](#send-bulk-email)
+    * [Get bulk email status](#get-bulk-email-status)
   * [Activity API](#activity)
     * [Get a list of activities](#get-a-list-of-activities)
   * [Analytics API](#analytics)
@@ -320,6 +323,55 @@ $emailParams = (new EmailParams())
     ->setAttachments($attachments);
 
 $mailersend->email->send($emailParams);
+```
+
+<a name="bulk-email-api"></a>
+## Bulk email API
+
+<a name="send-bulk-email"></a>
+###Send bulk email
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$bulkEmailParams = [];
+
+$bulkEmailParams[] = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$bulkEmailParams[] = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content');
+
+$mailersend->bulkEmail->send($bulkEmailParams);
+```
+
+<a name="get-bulk-email-status"></a>
+###Get bulk email status
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->bulkEmail->getStatus('bulk_email_id');
 ```
 
 <a name="activity"></a>
