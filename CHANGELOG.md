@@ -9,16 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add template endpoints
-- Add the recipient/suppression lists endpoints
-- Add domain verification endpoint
-- Bulk email endpoints
-
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+## [0.4.0] - 2021 10 13
+
+### Added
+
+- Add template endpoints
+- Add the recipient/suppression lists endpoints
+- Add domain verification endpoint
+- Bulk email endpoints
 
 ## [0.3.1] - 2021 06 16
 
@@ -90,7 +94,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPUnit tests
 - Documentation
 
-[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.4.0
+[0.3.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.1
 [0.3.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.0
 [0.2.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.2.1
 [0.2]: https://github.com/mailersend/mailersend-php/releases/tag/v0.2
