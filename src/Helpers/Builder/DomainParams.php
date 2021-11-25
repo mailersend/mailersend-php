@@ -21,9 +21,11 @@ class DomainParams implements Arrayable, \JsonSerializable
         return $this->name;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function getReturnPathSubdomain(): ?string
@@ -31,9 +33,11 @@ class DomainParams implements Arrayable, \JsonSerializable
         return $this->returnPathSubdomain;
     }
 
-    public function setReturnPathSubdomain(?string $returnPathSubdomain): void
+    public function setReturnPathSubdomain(?string $returnPathSubdomain): self
     {
         $this->returnPathSubdomain = $returnPathSubdomain;
+
+        return $this;
     }
 
     public function getCustomTrackingSubdomain(): ?string
@@ -41,9 +45,11 @@ class DomainParams implements Arrayable, \JsonSerializable
         return $this->customTrackingSubdomain;
     }
 
-    public function setCustomTrackingSubdomain(?string $customTrackingSubdomain): void
+    public function setCustomTrackingSubdomain(?string $customTrackingSubdomain): self
     {
         $this->customTrackingSubdomain = $customTrackingSubdomain;
+
+        return $this;
     }
 
     public function getInboundRoutingSubdomain(): ?string
@@ -51,9 +57,11 @@ class DomainParams implements Arrayable, \JsonSerializable
         return $this->inboundRoutingSubdomain;
     }
 
-    public function setInboundRoutingSubdomain(?string $inboundRoutingSubdomain): void
+    public function setInboundRoutingSubdomain(?string $inboundRoutingSubdomain): self
     {
         $this->inboundRoutingSubdomain = $inboundRoutingSubdomain;
+
+        return $this;
     }
 
     public function toArray(): array
