@@ -167,7 +167,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_settings(DomainSettingsParams $domainSettingsParams)
+    public function test_domain_settings(DomainSettingsParams $domainSettingsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -196,11 +196,26 @@ class DomainTest extends TestCase
         self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), Arr::get($request_body, 'custom_tracking_subdomain'));
     }
 
-    public function test_verify_required_domain_id()
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_verify_required_domain_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
 
         $this->domain->verify('');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_get_dns_records_requires_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->getDnsRecords('');
     }
 
     public function validDomainListDataProvider(): array

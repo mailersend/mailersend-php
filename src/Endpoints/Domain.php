@@ -150,4 +150,20 @@ class Domain extends AbstractEndpoint
             $this->buildUri("$this->endpoint/$domainId/verify")
         );
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function getDnsRecords(string $domainId): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("$this->endpoint/$domainId/dns-records")
+        );
+    }
 }
