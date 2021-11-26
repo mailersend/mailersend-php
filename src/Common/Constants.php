@@ -34,5 +34,5 @@ class Constants
     public const COMPARER_NOT_ENDS_WITH = 'not-ends-with';
 
     // Forward Types
-    const TYPE_WEBHOOK = 'webhook';
+    public const TYPE_WEBHOOK = 'webhook';
 }
