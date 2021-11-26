@@ -115,7 +115,9 @@ $emailParams = (new EmailParams())
     ->setRecipients($recipients)
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
-    ->setText('This is the text content');
+    ->setText('This is the text content')
+    ->setReplyTo('reply to')
+    ->setReplyToName('reply to name');
 
 $mailersend->email->send($emailParams);
 ```
