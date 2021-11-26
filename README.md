@@ -18,6 +18,12 @@ MailerSend PHP SDK
   * [Bulk emails API](#bulk-email-api)
     * [Send bulk email](#send-bulk-email)
     * [Get bulk email status](#get-bulk-email-status)
+  * [Inbound routing](#inbound-routing)
+    * [Get a list of inbound routes](#get-a-list-of-inbound-routes)
+    * [Get a single inbound route](#get-a-single-inbound-route)
+    * [Add an inbound route](#add-an-inbound-route)
+    * [Update an inbound route](#update-an-inbound-route)
+    * [Delete an inbound route](#delete-an-inbound-route)
   * [Activity API](#activity)
     * [Get a list of activities](#get-a-list-of-activities)
   * [Analytics API](#analytics)
@@ -372,6 +378,97 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->bulkEmail->getStatus('bulk_email_id');
+```
+
+<a name="inbound-routing"></a>
+
+## Inbound routing
+
+<a name="get-a-list-of-inbound-routes"></a>
+
+### Get a list of inbound routes
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inboundRouting->getAll($domainId = 'domainId', $page = 1, $limit = 10);
+```
+
+<a name="get-a-single-inbound-route"></a>
+
+### Get a single inbound route
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inboundRouting->find('inboundId');
+```
+
+<a name="add-an-inbound-route"></a>
+
+### Add an inbound route
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\InboundRouteParams;
+use \MailerSend\Helpers\Builder\CatchFilter;
+use \MailerSend\Helpers\Builder\MatchFilter;
+use \MailerSend\Helpers\Builder\Forward;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inboundRouting->create(
+    (new InboundRouteParams('domainId', 'name', true))
+        ->setInboundDomain('inboundDomain')
+        ->setCatchFilter(
+            (new CatchFilter(Constants::TYPE_CATCH_ALL))
+        )
+        ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
+        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+);
+```
+
+<a name="update-an-inbound-route"></a>
+
+### Update an inbound route
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\InboundRouteParams;
+use \MailerSend\Helpers\Builder\CatchFilter;
+use \MailerSend\Helpers\Builder\MatchFilter;
+use \MailerSend\Helpers\Builder\Forward;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inboundRouting->update(
+    'inboundId',
+    (new InboundRouteParams('domainId', 'name', true))
+        ->setInboundDomain('inboundDomain')
+        ->setCatchFilter(
+            (new CatchFilter(Constants::TYPE_CATCH_ALL))
+        )
+        ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
+        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+);
+```
+
+<a name="delete-an-inbound-route"></a>
+
+### Delete an inbound route
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inboundRouting->delete('inboundId');
 ```
 
 <a name="activity"></a>
