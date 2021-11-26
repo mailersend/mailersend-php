@@ -10,6 +10,7 @@ use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\HardBounce;
+use MailerSend\Endpoints\InboundRouting;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
@@ -53,6 +54,7 @@ class MailerSend
     public HardBounce $hardBounce;
     public SpamComplaint $spamComplaint;
     public Unsubscribe $unsubscribe;
+    public InboundRouting $inboundRouting;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -82,6 +84,7 @@ class MailerSend
         $this->hardBounce = new HardBounce($this->httpLayer, $this->options);
         $this->spamComplaint = new SpamComplaint($this->httpLayer, $this->options);
         $this->unsubscribe = new Unsubscribe($this->httpLayer, $this->options);
+        $this->inboundRouting = new InboundRouting($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
