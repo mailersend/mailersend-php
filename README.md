@@ -28,10 +28,12 @@ MailerSend PHP SDK
   * [Domains API](#domains)
     * [Get a list of domains](#get-a-list-of-domains)
     * [Get domain](#get-domain)
+    * [Add a domain](#add-a-domain)
     * [Delete domain](#delete-domain)
     * [Get a list of recipients per domain](#get-a-list-of-recipients-per-domain)
     * [Update domain settings](#update-domain-settings)
     * [Verify a domain](#verify-a-domain)
+    * [Get DNS records](#get-dns-records)
   * [Messages API](#messages)
     * [Get a list of messages](#get-a-list-of-messages)
     * [Get info on a message](#get-info-on-a-message)
@@ -503,6 +505,25 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->domain->find('domain_id');
 ```
 
+<a name="add-a-domain"></a>
+
+### Add a domain
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\DomainParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$domainParams = (new DomainParams('domainName'))
+                    ->setReturnPathSubdomain('returnPath')
+                    ->setCustomTrackingSubdomain('customTracking')
+                    ->getInboundRoutingSubdomain('inboundRouting');
+
+$mailersend->domain->create($domainParams);
+
+```
+
 <a name="delete-domain"></a>
 ### Delete domain
 
@@ -516,7 +537,7 @@ $mailersend->domain->delete('domain_id');
 
 <a name="get-a-list-of-recipients-per-domain"></a>
 
-## Get a list of recipients per domain
+### Get a list of recipients per domain
 
 ```php
 use MailerSend\MailerSend;
@@ -562,6 +583,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->domain->verify('domain_id');
+```
+
+<a name="get-dns-records"></a>
+
+### Get DNS records
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->domain->getDnsRecords('domain_id');
 ```
 
 <a name="messages"></a>
