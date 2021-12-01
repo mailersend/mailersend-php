@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Add `reply_to` option to README.md
+
 ### Removed
 
 ## [0.4.0] - 2021 10 13
