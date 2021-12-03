@@ -4,14 +4,10 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
-use MailerSend\Helpers\Builder\CatchFilter;
-use MailerSend\Helpers\Builder\Filter;
-use MailerSend\Helpers\Builder\Forward;
-use MailerSend\Helpers\Builder\InboundRouteParams;
-use MailerSend\Helpers\Builder\MatchFilter;
+use MailerSend\Helpers\Builder\Inbound as InboundBuilder;
 use MailerSend\Helpers\GeneralHelpers;
 
-class InboundRouting extends AbstractEndpoint
+class Inbound extends AbstractEndpoint
 {
     protected string $endpoint = 'inbound';
 
@@ -62,7 +58,7 @@ class InboundRouting extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function create(InboundRouteParams $params): array
+    public function create(InboundBuilder $params): array
     {
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
@@ -74,7 +70,7 @@ class InboundRouting extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function update(string $inboundId, InboundRouteParams $params): array
+    public function update(string $inboundId, InboundBuilder $params): array
     {
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$inboundId"),

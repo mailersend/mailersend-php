@@ -4,7 +4,7 @@ namespace MailerSend\Helpers\Builder;
 
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class InboundRouteParams implements Arrayable, \JsonSerializable
+class Inbound implements Arrayable, \JsonSerializable
 {
     protected string $domainId;
     protected string $name;

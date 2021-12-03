@@ -5,20 +5,20 @@ namespace MailerSend\Tests\Endpoints;
 use Http\Mock\Client;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
-use MailerSend\Endpoints\InboundRouting;
+use MailerSend\Endpoints\Inbound;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\CatchFilter;
 use MailerSend\Helpers\Builder\Filter;
 use MailerSend\Helpers\Builder\Forward;
-use MailerSend\Helpers\Builder\InboundRouteParams;
+use MailerSend\Helpers\Builder\Inbound as InboundBuilder;
 use MailerSend\Helpers\Builder\MatchFilter;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Tightenco\Collect\Support\Arr;
 
-class InboundRoutingTest extends TestCase
+class InboundTest extends TestCase
 {
-    protected InboundRouting $inboundRouting;
+    protected Inbound $inboundRouting;
     protected ResponseInterface $defaultResponse;
 
     public function setUp(): void
@@ -27,7 +27,7 @@ class InboundRoutingTest extends TestCase
 
         $this->client = new Client();
 
-        $this->inboundRouting = new InboundRouting(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
+        $this->inboundRouting = new Inbound(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
 
         $this->defaultResponse = $this->createMock(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
@@ -99,7 +99,7 @@ class InboundRoutingTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_create(InboundRouteParams $params, array $expected): void
+    public function test_create(InboundBuilder $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -134,7 +134,7 @@ class InboundRoutingTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new InboundRouteParams('domainId', 'name', false));
+        $params = (new InboundBuilder('domainId', 'name', false));
 
         $response = $this->inboundRouting->update(
             'inboundId',
@@ -260,7 +260,7 @@ class InboundRoutingTest extends TestCase
     {
         return [
             'enabled, catch all, match all' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -289,7 +289,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'disabled, catch all, match all' => [
-                'params' => (new InboundRouteParams('domainId', 'name', false))
+                'params' => (new InboundBuilder('domainId', 'name', false))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -318,7 +318,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'enabled, catch recipient, match all' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))
@@ -354,7 +354,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'enabled, catch all, match domain' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -391,7 +391,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'enabled, catch all, match header' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -428,7 +428,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'enabled, catch all, match sender' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -465,7 +465,7 @@ class InboundRoutingTest extends TestCase
                 ],
             ],
             'multiple filters, multiple forwards' => [
-                'params' => (new InboundRouteParams('domainId', 'name', true))
+                'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
                     ->setCatchFilter(
                         (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))

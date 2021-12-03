@@ -393,7 +393,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->inboundRouting->getAll($domainId = 'domainId', $page = 1, $limit = 10);
+$mailersend->inbound->getAll($domainId = 'domainId', $page = 1, $limit = 10);
 ```
 
 <a name="get-a-single-inbound-route"></a>
@@ -405,16 +405,44 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->inboundRouting->find('inboundId');
+$mailersend->inbound->find('inboundId');
 ```
 
 <a name="add-an-inbound-route"></a>
 
 ### Add an inbound route
 
+Example using only classes:
+
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\InboundRouteParams;
+use MailerSend\Helpers\Builder\Inbound;
+use \MailerSend\Helpers\Builder\CatchFilter;
+use \MailerSend\Helpers\Builder\MatchFilter;
+use \MailerSend\Helpers\Builder\Forward;
+use \MailerSend\Helpers\Builder\Filter;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inbound->create(
+    (new Inbound('domainId', 'name', true))
+        ->setInboundDomain('inboundDomain')
+        ->setCatchFilter(
+            (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT)
+                ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'test@mailersend.com'))))
+        ->setMatchFilter(
+            (new MatchFilter(Constants::TYPE_MATCH_SENDER))
+                ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'sender@mailersend.com', 'sender')))
+        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+);
+```
+
+Example using both classes and arrays:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Inbound;
 use \MailerSend\Helpers\Builder\CatchFilter;
 use \MailerSend\Helpers\Builder\MatchFilter;
 use \MailerSend\Helpers\Builder\Forward;
@@ -422,14 +450,72 @@ use \MailerSend\Common\Constants;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->inboundRouting->create(
-    (new InboundRouteParams('domainId', 'name', true))
+$mailersend->inbound->create(
+    (new Inbound('domainId', 'name', true))
         ->setInboundDomain('inboundDomain')
         ->setCatchFilter(
-            (new CatchFilter(Constants::TYPE_CATCH_ALL))
+            (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))
+                ->setFilters([
+                    [
+                        'comparer' => Constants::COMPARER_EQUAL,
+                        'value' => 'test@mailersend.com',
+                    ]
+                ])
         )
-        ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
+        ->setMatchFilter(
+            (new MatchFilter(Constants::TYPE_MATCH_SENDER))
+                ->setFilters([
+                    [
+                        'comparer' => Constants::COMPARER_EQUAL,
+                        'value' => 'sender@mailersend.com',
+                        'key' => 'sender',
+                    ]
+                ])
+        )
         ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+);
+```
+
+Example using only arrays:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Inbound;
+use \MailerSend\Helpers\Builder\CatchFilter;
+use \MailerSend\Helpers\Builder\MatchFilter;
+use \MailerSend\Helpers\Builder\Forward;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->inbound->create(
+    (new Inbound('domainId', 'name', true))
+        ->setInboundDomain('inboundDomain')
+        ->setCatchFilter([
+            'type' => Constants::TYPE_CATCH_RECIPIENT,
+            'filters' => [
+                [
+                    'comparer' => Constants::COMPARER_EQUAL,
+                    'value' => 'test@mailersend.com',
+                ],
+            ],
+        ])
+        ->setMatchFilter([
+            'type' => Constants::TYPE_MATCH_SENDER,
+            'filters' => [
+                [
+                    'comparer' => Constants::COMPARER_EQUAL,
+                    'value' => 'sender@mailersend.com',
+                    'key' => 'sender',
+                ],
+            ],
+        ])
+        ->setForwards([
+            [
+                'type' => Constants::COMPARER_EQUAL,
+                'value' => 'value',
+            ]
+        ])
 );
 ```
 
@@ -437,9 +523,11 @@ $mailersend->inboundRouting->create(
 
 ### Update an inbound route
 
+The examples on building the `Inbound` object portrayed in the 'Add an inbound route' also apply in here.
+
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\InboundRouteParams;
+use MailerSend\Helpers\Builder\Inbound;
 use \MailerSend\Helpers\Builder\CatchFilter;
 use \MailerSend\Helpers\Builder\MatchFilter;
 use \MailerSend\Helpers\Builder\Forward;
@@ -447,9 +535,9 @@ use \MailerSend\Common\Constants;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->inboundRouting->update(
+$mailersend->inbound->update(
     'inboundId',
-    (new InboundRouteParams('domainId', 'name', true))
+    (new Inbound('domainId', 'name', true))
         ->setInboundDomain('inboundDomain')
         ->setCatchFilter(
             (new CatchFilter(Constants::TYPE_CATCH_ALL))
@@ -468,7 +556,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->inboundRouting->delete('inboundId');
+$mailersend->inbound->delete('inboundId');
 ```
 
 <a name="activity"></a>
