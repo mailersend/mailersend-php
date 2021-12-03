@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Helpers\Builder\DomainParams;
 use MailerSend\Helpers\Builder\DomainSettingsParams;
 use MailerSend\Helpers\GeneralHelpers;
 
@@ -51,6 +52,23 @@ class Domain extends AbstractEndpoint
 
         return $this->httpLayer->get(
             $this->buildUri("$this->endpoint/$domainId")
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function create(DomainParams $params): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getName(), 1, 'Domain name is required.')
+        );
+
+        return $this->httpLayer->post(
+            $this->buildUri($this->endpoint),
+            $params->toArray()
         );
     }
 
@@ -130,6 +148,22 @@ class Domain extends AbstractEndpoint
 
         return $this->httpLayer->get(
             $this->buildUri("$this->endpoint/$domainId/verify")
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function getDnsRecords(string $domainId): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("$this->endpoint/$domainId/dns-records")
         );
     }
 }

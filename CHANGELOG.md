@@ -10,10 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add inbound routes endpoints
+- Add Domain endpoint
+- Get DNS Records endpoint
 
 ### Changed
 
 ### Fixed
+
+- Add `reply_to` option to README.md
 
 ### Removed
 

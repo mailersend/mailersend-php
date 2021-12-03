@@ -6,6 +6,7 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\DomainParams;
 use MailerSend\Helpers\Builder\DomainSettingsParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -84,6 +85,26 @@ class DomainTest extends TestCase
         $this->domain->find('');
     }
 
+    public function test_create(): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->domain->create(
+            (new DomainParams('mailersend.com'))
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/v1/domains', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame('mailersend.com', Arr::get($request_body, 'name'));
+    }
+
     public function test_delete_requires_domain_id()
     {
         $this->expectException(MailerSendAssertException::class);
@@ -146,7 +167,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_domain_settings(DomainSettingsParams $domainSettingsParams)
+    public function test_domain_settings(DomainSettingsParams $domainSettingsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
@@ -175,11 +196,26 @@ class DomainTest extends TestCase
         self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), Arr::get($request_body, 'custom_tracking_subdomain'));
     }
 
-    public function test_verify_required_domain_id()
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_verify_required_domain_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
 
         $this->domain->verify('');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_get_dns_records_requires_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->domain->getDnsRecords('');
     }
 
     public function validDomainListDataProvider(): array
