@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.4.1] - 2021 12 07
+
+### Added
+
 - Add inbound routes endpoints
 - Add Domain endpoint
 - Get DNS Records endpoint
@@ -100,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPUnit tests
 - Documentation
 
-[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.4.1
 [0.4.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.4.0
 [0.3.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.1
 [0.3.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.0
