@@ -990,10 +990,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->blocklist->delete(['id_one', 'id_two']);
+$mailersend->blocklist->delete('domain_id', ['id_one', 'id_two']);
 
 // or delete all
-$mailersend->blocklist->delete(null, true);
+$mailersend->blocklist->delete('domain_id', null, true);
 ```
 
 **Hard Bounces**
@@ -1004,10 +1004,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->hardBounce->delete(['id_one', 'id_two']);
+$mailersend->hardBounce->delete('domain_id', ['id_one', 'id_two']);
 
 // or delete all
-$mailersend->hardBounce->delete(null, true);
+$mailersend->hardBounce->delete('domain_id', null, true);
 ```
 
 **Spam Complaints**
@@ -1018,10 +1018,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->spamComplaint->delete(['id_one', 'id_two']);
+$mailersend->spamComplaint->delete('domain_id', ['id_one', 'id_two']);
 
 // or delete all
-$mailersend->spamComplaint->delete(null, true);
+$mailersend->spamComplaint->delete('domain_id', null, true);
 ```
 
 **Unsubscribes**
@@ -1032,10 +1032,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->unsubscribe->delete(['id_one', 'id_two']);
+$mailersend->unsubscribe->delete('domain_id', ['id_one', 'id_two']);
 
 // or delete all
-$mailersend->unsubscribe->delete(null, true);
+$mailersend->unsubscribe->delete('domain_id', null, true);
 ```
 
 <a name="get-recipients-from-a-suppression-list"></a>
