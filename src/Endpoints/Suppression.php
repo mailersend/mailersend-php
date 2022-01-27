@@ -67,8 +67,12 @@ class Suppression extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function delete(?array $ids = null, bool $all = false): array
+    public function delete(string $domainId, ?array $ids = null, bool $all = false): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
                 array_filter([$ids, $all], fn ($v) => $v !== null && ! empty($v)),
@@ -79,6 +83,7 @@ class Suppression extends AbstractEndpoint
         return $this->httpLayer->delete(
             $this->buildUri($this->endpoint),
             [
+                'domain_id' => $domainId,
                 'ids' => $ids,
                 'all' => $all,
             ]

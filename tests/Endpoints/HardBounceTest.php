@@ -129,6 +129,7 @@ class HardBounceTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->hardBounce->delete(
+            Arr::get($params, 'domain_id'),
             Arr::get($params, 'ids'),
             Arr::get($params, 'all', false),
         );
@@ -143,12 +144,28 @@ class HardBounceTest extends TestCase
         self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
     }
 
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
     public function test_delete_requires_either_ids_or_all(): void
     {
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('Either ids or all must be provided.');
 
-        $this->hardBounce->delete();
+        $this->hardBounce->delete('domain_id');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_delete_requires_domain_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id is required.');
+
+        $this->hardBounce->delete('');
     }
 
     public function validGetAllDataProvider(): array
@@ -207,11 +224,13 @@ class HardBounceTest extends TestCase
         return [
             'with ids' => [
                 'params' => [
+                    'domain_id' => 'domain_id',
                     'ids' => ['id']
                 ],
             ],
             'all' => [
                 'params' => [
+                    'domain_id' => 'domain_id',
                     'all' => true,
                 ],
             ],
