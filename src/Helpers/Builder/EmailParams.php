@@ -19,6 +19,7 @@ class EmailParams
     protected array $variables = [];
     protected array $attachments = [];
     protected array $personalization = [];
+    protected ?int $send_at = null;
 
     public function getFrom(): ?string
     {
@@ -182,6 +183,18 @@ class EmailParams
     public function setPersonalization(array $personalization): EmailParams
     {
         $this->personalization = $personalization;
+        return $this;
+    }
+
+    public function getSendAt(): ?int
+    {
+        return $this->send_at;
+    }
+
+    public function setSendAt(?int $send_at): self
+    {
+        $this->send_at = $send_at;
+
         return $this;
     }
 }

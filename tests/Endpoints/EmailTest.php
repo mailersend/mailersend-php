@@ -166,6 +166,7 @@ class EmailTest extends TestCase
                 self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));
             }
         }
+        self::assertEquals($emailParams->getSendAt(), Arr::get($request_body, 'send_at'));
     }
 
     /**
@@ -187,7 +188,7 @@ class EmailTest extends TestCase
         (new Email($httpLayer, self::OPTIONS))->send($emailParams);
     }
 
-    public function validEmailParamsProvider()
+    public function validEmailParamsProvider(): array
     {
         return [
             'simple request' => [
@@ -314,7 +315,6 @@ class EmailTest extends TestCase
                     ->setSubject('Subject')
                     ->setText('TEXT'),
             ],
-
             'without html' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
@@ -329,11 +329,31 @@ class EmailTest extends TestCase
                     ])
                     ->setSubject('Subject')
                     ->setText('Text')
+            ],
+            'with send at' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setTags([
+                        'tag'
+                    ])
+                    ->setSendAt(1665626400),
             ]
         ];
     }
 
-    public function invalidEmailParamsProvider()
+    public function invalidEmailParamsProvider(): array
     {
         return [
             'template id, html and text missing' => [

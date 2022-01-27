@@ -53,7 +53,8 @@ class Email extends AbstractEndpoint
                     'tags' => $params->getTags(),
                     'attachments' => $attachments_mapped,
                     'variables' => $variables_mapped,
-                    'personalization' => $personalization_mapped
+                    'personalization' => $personalization_mapped,
+                    'send_at' => $params->getSendAt(),
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             )
