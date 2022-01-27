@@ -12,6 +12,7 @@ use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
+use MailerSend\Endpoints\ScheduleMessages;
 use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
@@ -55,6 +56,7 @@ class MailerSend
     public SpamComplaint $spamComplaint;
     public Unsubscribe $unsubscribe;
     public Inbound $inbound;
+    public ScheduleMessages $scheduleMessages;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -85,6 +87,7 @@ class MailerSend
         $this->spamComplaint = new SpamComplaint($this->httpLayer, $this->options);
         $this->unsubscribe = new Unsubscribe($this->httpLayer, $this->options);
         $this->inbound = new Inbound($this->httpLayer, $this->options);
+        $this->scheduleMessages = new ScheduleMessages($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
