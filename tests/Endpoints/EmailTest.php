@@ -166,6 +166,7 @@ class EmailTest extends TestCase
                 self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));
             }
         }
+        self::assertEquals($emailParams->getPrecedenceBulkHeader(), Arr::get($request_body, 'precedence_bulk'));
     }
 
     /**
@@ -314,7 +315,6 @@ class EmailTest extends TestCase
                     ->setSubject('Subject')
                     ->setText('TEXT'),
             ],
-
             'without html' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
@@ -328,8 +328,28 @@ class EmailTest extends TestCase
                         ]
                     ])
                     ->setSubject('Subject')
+                    ->setText('Text'),
+            ],
+            'with precedence bulk header' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
                     ->setText('Text')
-            ]
+                    ->setTags([
+                        'tag'
+                    ])
+                    ->setPrecedenceBulkHeader(true),
+            ],
         ];
     }
 
