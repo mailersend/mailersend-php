@@ -17,6 +17,16 @@ class ScheduleMessages extends AbstractEndpoint
      */
     public function getAll(?string $domainId = null, ?string $status = null, ?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
+        if ($status) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray(
+                    $status,
+                    Constants::SCHEDULED_MESSAGES_STATUSES,
+                    'The status provided is invalid.'
+                )
+            );
+        }
+
         if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(

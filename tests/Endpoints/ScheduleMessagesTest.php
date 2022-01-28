@@ -186,7 +186,12 @@ class ScheduleMessagesTest extends TestCase
                 [
                     'limit' => 101,
                 ],
-            ]
+            ],
+            'with invalid status' => [
+                [
+                    'status' => 'invalid',
+                ],
+            ],
         ];
     }
 }
