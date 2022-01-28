@@ -3,6 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\ScheduleMessages;
 use MailerSend\Exceptions\MailerSendAssertException;
@@ -148,11 +149,11 @@ class ScheduleMessagesTest extends TestCase
             ],
             'with status' => [
                 [
-                    'status' => 'test_status',
+                    'status' => Constants::STATUS_SCHEDULED,
                 ],
                 [
                     'domain_id' => null,
-                    'status' => 'test_status',
+                    'status' => Constants::STATUS_SCHEDULED,
                     'page' => null,
                     'limit' => null,
                 ],
@@ -160,13 +161,13 @@ class ScheduleMessagesTest extends TestCase
             'complete request' => [
                 [
                     'domain_id' => 'test_id',
-                    'status' => 'test_status',
+                    'status' => Constants::STATUS_SCHEDULED,
                     'page' => 1,
                     'limit' => 10,
                 ],
                 [
                     'domain_id' => 'test_id',
-                    'status' => 'test_status',
+                    'status' => Constants::STATUS_SCHEDULED,
                     'page' => 1,
                     'limit' => 10,
                 ],
