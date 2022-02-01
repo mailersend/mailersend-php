@@ -20,6 +20,7 @@ class EmailParams
     protected array $attachments = [];
     protected array $personalization = [];
     protected ?int $send_at = null;
+    protected ?bool $precedenceBulkHeader = null;
 
     public function getFrom(): ?string
     {
@@ -194,6 +195,15 @@ class EmailParams
     public function setSendAt(?int $send_at): self
     {
         $this->send_at = $send_at;
+
+    public function getPrecedenceBulkHeader(): ?bool
+    {
+        return $this->precedenceBulkHeader;
+    }
+
+    public function setPrecedenceBulkHeader(?bool $precedenceBulkHeader): self
+    {
+        $this->precedenceBulkHeader = $precedenceBulkHeader;
 
         return $this;
     }
