@@ -1022,6 +1022,9 @@ $mailersend->blocklist->delete(['id_one', 'id_two']);
 
 // or delete all
 $mailersend->blocklist->delete(null, true);
+
+// You can also specify the domain
+$mailersend->blocklist->delete(['id'], false, 'domain_id');
 ```
 
 **Hard Bounces**
@@ -1036,6 +1039,9 @@ $mailersend->hardBounce->delete(['id_one', 'id_two']);
 
 // or delete all
 $mailersend->hardBounce->delete(null, true);
+
+// You can also specify the domain
+$mailersend->hardBounce->delete(['id'], false, 'domain_id');
 ```
 
 **Spam Complaints**
@@ -1050,6 +1056,9 @@ $mailersend->spamComplaint->delete(['id_one', 'id_two']);
 
 // or delete all
 $mailersend->spamComplaint->delete(null, true);
+
+// You can also specify the domain
+$mailersend->spamComplaint->delete(['id'], false, 'domain_id');
 ```
 
 **Unsubscribes**
@@ -1064,6 +1073,9 @@ $mailersend->unsubscribe->delete(['id_one', 'id_two']);
 
 // or delete all
 $mailersend->unsubscribe->delete(null, true);
+
+// You can also specify the domain
+$mailersend->unsubscribe->delete(['id'], false, 'domain_id');
 ```
 
 <a name="get-recipients-from-a-suppression-list"></a>

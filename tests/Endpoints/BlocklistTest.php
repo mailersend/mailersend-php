@@ -137,6 +137,7 @@ class BlocklistTest extends TestCase
         $response = $this->blocklist->delete(
             Arr::get($params, 'ids'),
             Arr::get($params, 'all', false),
+            Arr::get($params, 'domain_id'),
         );
 
         $request = $this->client->getLastRequest();
@@ -147,8 +148,13 @@ class BlocklistTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertSame(Arr::get($params, 'ids'), Arr::get($request_body, 'ids'));
         self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
+        self::assertSame(Arr::get($params, 'domain_id'), Arr::get($request_body, 'domain_id'));
     }
 
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
     public function test_delete_requires_either_ids_or_all(): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -221,6 +227,12 @@ class BlocklistTest extends TestCase
                     'all' => true,
                 ],
             ],
+            'with domain id' => [
+                'params' => [
+                    'ids' => ['id'],
+                    'domain_id' => 'domain_id',
+                ]
+            ]
         ];
     }
 }

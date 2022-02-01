@@ -64,7 +64,7 @@ class Blocklist extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function delete(?array $ids = null, bool $all = false): array
+    public function delete(?array $ids = null, bool $all = false, ?string $domainId = null): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
@@ -75,10 +75,11 @@ class Blocklist extends AbstractEndpoint
 
         return $this->httpLayer->delete(
             $this->buildUri($this->endpoint),
-            [
+            array_filter([
+                'domain_id' => $domainId,
                 'ids' => $ids,
                 'all' => $all,
-            ]
+            ], fn ($e) => !is_null($e))
         );
     }
 }
