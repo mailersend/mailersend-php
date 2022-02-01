@@ -195,6 +195,7 @@ class EmailParams
     public function setSendAt(?int $send_at): self
     {
         $this->send_at = $send_at;
+    }
 
     public function getPrecedenceBulkHeader(): ?bool
     {
