@@ -19,6 +19,7 @@ class EmailParams
     protected array $variables = [];
     protected array $attachments = [];
     protected array $personalization = [];
+    protected ?bool $precedenceBulkHeader = null;
 
     public function getFrom(): ?string
     {
@@ -182,6 +183,18 @@ class EmailParams
     public function setPersonalization(array $personalization): EmailParams
     {
         $this->personalization = $personalization;
+        return $this;
+    }
+
+    public function getPrecedenceBulkHeader(): ?bool
+    {
+        return $this->precedenceBulkHeader;
+    }
+
+    public function setPrecedenceBulkHeader(?bool $precedenceBulkHeader): self
+    {
+        $this->precedenceBulkHeader = $precedenceBulkHeader;
+
         return $this;
     }
 }

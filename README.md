@@ -15,6 +15,7 @@ MailerSend PHP SDK
     * [Advanced personalization](#personalization)
     * [Simple personalization](#variables)
     * [Send an email with attachment](#attachments)
+    * [Send email with precedence bulk header](#precedence-bulk-header)
   * [Bulk emails API](#bulk-email-api)
     * [Send bulk email](#send-bulk-email)
     * [Get bulk email status](#get-bulk-email-status)
@@ -331,6 +332,33 @@ $emailParams = (new EmailParams())
     ->setHtml('This is the html version.')
     ->setText('This is the text version.')
     ->setAttachments($attachments);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="precedence-bulk-header"></a>
+### Send email with precedence bulk header
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Attachment;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the html version.')
+    ->setText('This is the text version.')
+    ->setPrecedenceBulkHeader(true);
 
 $mailersend->email->send($emailParams);
 ```
