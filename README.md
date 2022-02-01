@@ -1007,10 +1007,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->hardBounce->delete('domain_id', ['id_one', 'id_two']);
+$mailersend->hardBounce->delete(['id_one', 'id_two']);
 
 // or delete all
-$mailersend->hardBounce->delete('domain_id', null, true);
+$mailersend->hardBounce->delete(null, true);
 
 // You can also specify the domain
 $mailersend->hardBounce->delete(['id'], false, 'domain_id');
@@ -1024,10 +1024,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->spamComplaint->delete('domain_id', ['id_one', 'id_two']);
+$mailersend->spamComplaint->delete(['id_one', 'id_two']);
 
 // or delete all
-$mailersend->spamComplaint->delete('domain_id', null, true);
+$mailersend->spamComplaint->delete(null, true);
 
 // You can also specify the domain
 $mailersend->spamComplaint->delete(['id'], false, 'domain_id');
@@ -1041,10 +1041,10 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 // Delete specific instances
-$mailersend->unsubscribe->delete('domain_id', ['id_one', 'id_two']);
+$mailersend->unsubscribe->delete(['id_one', 'id_two']);
 
 // or delete all
-$mailersend->unsubscribe->delete('domain_id', null, true);
+$mailersend->unsubscribe->delete(null, true);
 
 // You can also specify the domain
 $mailersend->unsubscribe->delete(['id'], false, 'domain_id');
