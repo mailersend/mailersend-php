@@ -35,4 +35,15 @@ class Constants
 
     // Forward Types
     public const TYPE_WEBHOOK = 'webhook';
+
+    // Scheduled messages status
+    public const STATUS_SCHEDULED = 'scheduled';
+    public const STATUS_SENT = 'sent';
+    public const STATUS_ERROR = 'error';
+
+    public const SCHEDULED_MESSAGES_STATUSES = [
+        self::STATUS_SCHEDULED,
+        self::STATUS_SENT,
+        self::STATUS_ERROR,
+    ];
 }

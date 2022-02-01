@@ -15,6 +15,7 @@ MailerSend PHP SDK
     * [Advanced personalization](#personalization)
     * [Simple personalization](#variables)
     * [Send an email with attachment](#attachments)
+    * [Send a scheduled message](#send-a-scheduled-message)
     * [Send email with precedence bulk header](#precedence-bulk-header)
   * [Bulk emails API](#bulk-email-api)
     * [Send bulk email](#send-bulk-email)
@@ -44,6 +45,10 @@ MailerSend PHP SDK
   * [Messages API](#messages)
     * [Get a list of messages](#get-a-list-of-messages)
     * [Get info on a message](#get-info-on-a-message)
+  * [Scheduled messages API](#scheduled-messages)
+    * [Get a list of scheduled messages](#get-a-list-of-scheduled-messages)
+    * [Get a single scheduled message](#get-a-single-scheduled-message)
+    * [Delete a scheduled message](#delete-a-scheduled-message)
   * [Tokens API](#tokens)
     * [Create a token](#create-a-token)
     * [Update token](#update-token)
@@ -336,12 +341,38 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+<a name="send-a-scheduled-message"></a>
+### Send a scheduled message
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the html version.')
+    ->setText('This is the text version.')
+    ->setSendAt(1665626400);
+    ->setPrecedenceBulkHeader(true);
+
+$mailersend->email->send($emailParams);
+```
+
 <a name="precedence-bulk-header"></a>
 ### Send email with precedence bulk header
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
@@ -836,6 +867,53 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->messages->find('message_id');
+```
+
+<a name="scheduled-messages"></a>
+
+## Scheduled Messages
+
+<a name="get-a-list-of-scheduled-messages"></a>
+
+### Get a list of scheduled messages
+
+```php
+use MailerSend\MailerSend;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->scheduleMessages->getAll(
+    'domain_id',
+    Constants::STATUS_SCHEDULED,
+    $limit = 100,
+    $page = 3
+)
+```
+
+<a name="get-a-single-scheduled-message"></a>
+
+### Get a single scheduled message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->scheduleMessages->find('message_id');
+```
+
+<a name="delete-a-scheduled-message"></a>
+
+### Delete a scheduled message
+
+```php
+use MailerSend\MailerSend;
+use \MailerSend\Common\Constants;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->scheduleMessages->delete('message_id');
 ```
 
 <a name="tokens"></a>
