@@ -47,7 +47,7 @@ class Variable implements Arrayable, \JsonSerializable
         foreach ($substitutions as $var => $value) {
             $mapped[] = [
                 'var' => $var,
-                'value' => $value,
+                'value' => (string) $value,
             ];
         }
 
