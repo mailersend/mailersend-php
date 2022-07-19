@@ -19,6 +19,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
     public const MAILBOX_NOT_FOUND = 'mailbox_not_found';
     public const DISPOSABLE = 'disposable';
     public const MAILBOX_BLOCKED = 'mailbox_blocked';
+    public const FAILED = 'failed';
 
     public const POSSIBLE_RESULTS = [
         self::VALID,
@@ -31,6 +32,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
         self::MAILBOX_NOT_FOUND,
         self::DISPOSABLE,
         self::MAILBOX_BLOCKED,
+        self::FAILED,
     ];
 
     public function __construct(string $name)
