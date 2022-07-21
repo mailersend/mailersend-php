@@ -4,10 +4,6 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
-use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\Builder\DomainParams;
-use MailerSend\Helpers\Builder\DomainSettingsParams;
-use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class SmsNumber extends AbstractEndpoint
