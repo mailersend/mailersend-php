@@ -70,6 +70,12 @@ MailerSend PHP SDK
     * [Get a list of templates](#get-a-list-of-templates)
     * [Get a single template](#get-a-single-template)
     * [Delete a template](#delete-a-template)
+  * [Email Verification API](#email-verification)
+    * [Get all email verification lists](#get-all-email-verification-lists)
+    * [Get an email verification list](#get-an-email-verification-list)
+    * [Create an email verification list](#create-an-email–verification-list)
+    * [Verify an email list](#verify-an-email-list)
+    * [Get email verification list results](#get-email-verification-list-results)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -1327,6 +1333,83 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->template->delete('template_id');
+```
+
+<a name="email-verification"></a>
+
+## Email Verification
+
+<a name="get-all-email-verification-lists"></a>
+
+### Get all email verification lists
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->emailVerification->getAll($page = 1, $limit = 10);
+```
+
+<a name="get-an-email-verification-list"></a>
+
+### Get an email verification list
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->emailVerification->find('email_verification_id');
+```
+
+<a name="create-an-email–verification-list"></a>
+
+### Create an email verification list
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\EmailVerificationParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$emailVerificationParams = (new EmailVerificationParams('file.csv'))
+    ->setEmailAddresses(['test@mail.com']);
+
+$mailersend->emailVerification->create($emailVerificationParams);
+```
+
+<a name="verify-an-email-list"></a>
+
+### Verify an email list
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->emailVerification->verify('email_verification_id');
+```
+
+<a name="get-email-verification-list-results"></a>
+
+### Get email verification list results
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\EmailVerificationParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->emailVerification->getResults(
+        $emailVerificationId = 'email_verification_id',
+        $page = 1,
+        $limit = 10,
+        $results = [
+            EmailVerificationParams::TYPO,
+            EmailVerificationParams::CATCH_ALL,
+        ],
+    );
 ```
 
 <a name="debugging-validation-errors"></a>
