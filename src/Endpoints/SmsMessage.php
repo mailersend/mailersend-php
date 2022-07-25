@@ -51,4 +51,6 @@ class SmsMessage extends AbstractEndpoint
             $this->buildUri("$this->endpoint/$smsMessageId")
         );
     }
+
+
 }
