@@ -51,7 +51,7 @@ class SmsActivityTest extends TestCase
         self::assertEquals('/v1/sms-activity', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals($smsActivityParams->getSmsNumberid(), Arr::get($query, 'sms_number_id'));
+        self::assertEquals($smsActivityParams->getSmsNumberId(), Arr::get($query, 'sms_number_id'));
         self::assertEquals($smsActivityParams->getPage(), Arr::get($query, 'page'));
         self::assertEquals($smsActivityParams->getLimit(), Arr::get($query, 'limit'));
         self::assertEquals($smsActivityParams->getDateFrom(), Arr::get($query, 'date_from'));
@@ -84,7 +84,7 @@ class SmsActivityTest extends TestCase
             ],
             'with sms number id' => [
                 (new SmsActivityParams())
-                    ->setSmsNumberid('hashed_sms_number_id'),
+                    ->setSmsNumberId('hashed_sms_number_id'),
             ],
             'with page' => [
                 (new SmsActivityParams())
@@ -105,7 +105,7 @@ class SmsActivityTest extends TestCase
             ],
             'with all' => [
                 (new SmsActivityParams())
-                    ->setSmsNumberid('hashed_sms_number_id')
+                    ->setSmsNumberId('hashed_sms_number_id')
                     ->setPage(3)
                     ->setLimit(15)
                     ->setDateFrom(1623073576)

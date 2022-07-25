@@ -18,9 +18,9 @@ class SmsActivity extends AbstractEndpoint
      */
     public function getAll(SmsActivityParams $smsActivityParams): array
     {
-        if ($smsActivityParams->getSmsNumberid()) {
+        if ($smsActivityParams->getSmsNumberId()) {
             GeneralHelpers::assert(
-                fn () => Assertion::minLength($smsActivityParams->getSmsNumberid(), 1, 'Sms number id is wrong.')
+                fn () => Assertion::minLength($smsActivityParams->getSmsNumberId(), 1, 'Sms number id is wrong.')
             );
         }
 

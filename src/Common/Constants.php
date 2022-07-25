@@ -10,6 +10,7 @@ class Constants
     public const MAX_LIMIT = 100;
     public const POSSIBLE_EVENT_TYPES = ['processed', 'queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints'];
     public const POSSIBLE_SMS_STATUSES = ['processed', 'queued', 'sent', 'delivered', 'failed'];
+    public const POSSIBLE_SMS_RECIPIENT_STATUSES = ['active', 'opt_out'];
     public const POSSIBLE_GROUP_BY_OPTIONS = ['days', 'weeks', 'months', 'years'];
     public const GROUP_BY_DAYS = 'days';
     public const GROUP_BY_WEEKS = 'weeks';

@@ -2,21 +2,19 @@
 
 namespace MailerSend\Helpers\Builder;
 
-class SmsActivityParams
+class SmsRecipientParams
 {
     protected ?string $sms_number_id = null;
     protected ?int $page = null;
     protected ?int $limit = null;
-    protected ?int $date_from = null;
-    protected ?int $date_to = null;
-    protected array $status = [];
+    protected ?string $status = null;
 
     public function getSmsNumberId(): ?string
     {
         return $this->sms_number_id;
     }
 
-    public function setSmsNumberId(?string $sms_number_id): SmsActivityParams
+    public function setSmsNumberId(?string $sms_number_id): SmsRecipientParams
     {
         $this->sms_number_id = $sms_number_id;
         return $this;
@@ -27,7 +25,7 @@ class SmsActivityParams
         return $this->page;
     }
 
-    public function setPage(?int $page): SmsActivityParams
+    public function setPage(?int $page): SmsRecipientParams
     {
         $this->page = $page;
         return $this;
@@ -38,40 +36,18 @@ class SmsActivityParams
         return $this->limit;
     }
 
-    public function setLimit(?int $limit): SmsActivityParams
+    public function setLimit(?int $limit): SmsRecipientParams
     {
         $this->limit = $limit;
         return $this;
     }
 
-    public function getDateFrom(): ?int
-    {
-        return $this->date_from;
-    }
-
-    public function setDateFrom(?int $date_from): SmsActivityParams
-    {
-        $this->date_from = $date_from;
-        return $this;
-    }
-
-    public function getDateTo(): ?int
-    {
-        return $this->date_to;
-    }
-
-    public function setDateTo(?int $date_to): SmsActivityParams
-    {
-        $this->date_to = $date_to;
-        return $this;
-    }
-
-    public function getStatus(): array
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(array $status): SmsActivityParams
+    public function setStatus(string $status): SmsRecipientParams
     {
         $this->status = $status;
         return $this;
@@ -83,8 +59,6 @@ class SmsActivityParams
             'sms_number_id' => $this->getSmsNumberId(),
             'page' => $this->getPage(),
             'limit' => $this->getLimit(),
-            'date_from' => $this->getDateFrom(),
-            'date_to' => $this->getDateTo(),
             'status' => $this->getStatus(),
         ];
     }
