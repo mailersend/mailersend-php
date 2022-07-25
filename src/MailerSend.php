@@ -13,6 +13,7 @@ use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\ScheduleMessages;
+use MailerSend\Endpoints\SmsActivity;
 use MailerSend\Endpoints\SmsMessage;
 use MailerSend\Endpoints\SmsNumber;
 use MailerSend\Endpoints\Template;
@@ -61,6 +62,7 @@ class MailerSend
     public ScheduleMessages $scheduleMessages;
     public SmsNumber $smsNumber;
     public SmsMessage $smsMessage;
+    public SmsActivity $smsActivity;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -94,6 +96,7 @@ class MailerSend
         $this->scheduleMessages = new ScheduleMessages($this->httpLayer, $this->options);
         $this->smsNumber = new SmsNumber($this->httpLayer, $this->options);
         $this->smsMessage = new SmsMessage($this->httpLayer, $this->options);
+        $this->smsActivity = new SmsActivity($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
