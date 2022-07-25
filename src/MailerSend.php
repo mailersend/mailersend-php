@@ -17,6 +17,7 @@ use MailerSend\Endpoints\SmsActivity;
 use MailerSend\Endpoints\SmsMessage;
 use MailerSend\Endpoints\SmsNumber;
 use MailerSend\Endpoints\SmsRecipient;
+use MailerSend\Endpoints\SmsWebhook;
 use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
@@ -65,6 +66,7 @@ class MailerSend
     public SmsMessage $smsMessage;
     public SmsActivity $smsActivity;
     public SmsRecipient $smsRecipient;
+    public SmsWebhook $smsWebhook;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -100,6 +102,7 @@ class MailerSend
         $this->smsMessage = new SmsMessage($this->httpLayer, $this->options);
         $this->smsActivity = new SmsActivity($this->httpLayer, $this->options);
         $this->smsRecipient = new SmsRecipient($this->httpLayer, $this->options);
+        $this->smsWebhook = new SmsWebhook($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
