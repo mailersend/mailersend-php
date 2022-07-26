@@ -13,6 +13,7 @@ use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\ScheduleMessages;
+use MailerSend\Endpoints\Sms;
 use MailerSend\Endpoints\SmsActivity;
 use MailerSend\Endpoints\SmsInbound;
 use MailerSend\Endpoints\SmsMessage;
@@ -63,6 +64,7 @@ class MailerSend
     public Unsubscribe $unsubscribe;
     public Inbound $inbound;
     public ScheduleMessages $scheduleMessages;
+    public Sms $sms;
     public SmsNumber $smsNumber;
     public SmsMessage $smsMessage;
     public SmsActivity $smsActivity;
@@ -100,6 +102,7 @@ class MailerSend
         $this->unsubscribe = new Unsubscribe($this->httpLayer, $this->options);
         $this->inbound = new Inbound($this->httpLayer, $this->options);
         $this->scheduleMessages = new ScheduleMessages($this->httpLayer, $this->options);
+        $this->sms = new Sms($this->httpLayer, $this->options);
         $this->smsNumber = new SmsNumber($this->httpLayer, $this->options);
         $this->smsMessage = new SmsMessage($this->httpLayer, $this->options);
         $this->smsActivity = new SmsActivity($this->httpLayer, $this->options);

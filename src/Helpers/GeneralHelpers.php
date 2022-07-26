@@ -6,6 +6,7 @@ use Assert\Assertion;
 use Assert\AssertionFailedException;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Helpers\Builder\SmsParams;
 use Tightenco\Collect\Support\Collection;
 
 class GeneralHelpers
@@ -71,6 +72,17 @@ class GeneralHelpers
                 }
             }
         }
+    }
+
+    public static function validateSmsParams(SmsParams $params): void
+    {
+        self::assert(fn () => Assertion::notEmpty($params->getFrom(), 'From phone number is required'));
+        self::assert(fn () => Assertion::startsWith($params->getFrom(), '+', 'From phone number must start with +'));
+        self::assert(fn () => Assertion::notEmpty($params->getTo(), 'At least one recipient is required'));
+        foreach ($params->getTo() as $recipient) {
+            self::assert(fn () => Assertion::startsWith($recipient, '+', 'Recipient phone number must start with +'));
+        }
+        self::assert(fn () => Assertion::minLength($params->getText(), 1, 'Text cannot be empty'));
     }
 
     public static function mapToArray(array $data, string $object): array
