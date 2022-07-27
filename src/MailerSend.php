@@ -9,6 +9,7 @@ use MailerSend\Endpoints\Blocklist;
 use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Endpoints\Email;
+use MailerSend\Endpoints\EmailVerification;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
@@ -64,6 +65,7 @@ class MailerSend
     public Unsubscribe $unsubscribe;
     public Inbound $inbound;
     public ScheduleMessages $scheduleMessages;
+    public EmailVerification $emailVerification;
     public Sms $sms;
     public SmsNumber $smsNumber;
     public SmsMessage $smsMessage;
@@ -102,6 +104,7 @@ class MailerSend
         $this->unsubscribe = new Unsubscribe($this->httpLayer, $this->options);
         $this->inbound = new Inbound($this->httpLayer, $this->options);
         $this->scheduleMessages = new ScheduleMessages($this->httpLayer, $this->options);
+        $this->emailVerification = new EmailVerification($this->httpLayer, $this->options);
         $this->sms = new Sms($this->httpLayer, $this->options);
         $this->smsNumber = new SmsNumber($this->httpLayer, $this->options);
         $this->smsMessage = new SmsMessage($this->httpLayer, $this->options);
