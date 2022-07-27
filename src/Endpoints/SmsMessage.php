@@ -29,7 +29,7 @@ class SmsMessage extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint, [
+            $this->url($this->endpoint, [
                 'page' => $page,
                 'limit' => $limit,
             ])
@@ -48,7 +48,7 @@ class SmsMessage extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$smsMessageId")
+            $this->url("$this->endpoint/$smsMessageId")
         );
     }
 }

@@ -49,6 +49,6 @@ class SmsActivity extends AbstractEndpoint
             );
         }
 
-        return $this->httpLayer->get($this->buildUri("$this->endpoint", $smsActivityParams->toArray()));
+        return $this->httpLayer->get($this->url("$this->endpoint", $smsActivityParams->toArray()));
     }
 }

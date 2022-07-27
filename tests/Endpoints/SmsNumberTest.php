@@ -163,7 +163,7 @@ class SmsNumberTest extends TestCase
                 [
                     'page' => null,
                     'limit' => null,
-                    'paused' => false,
+                    'paused' => 0,
                 ],
             ],
             'complete request' => [

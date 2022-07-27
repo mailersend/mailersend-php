@@ -56,7 +56,7 @@ class SmsActivityTest extends TestCase
         self::assertEquals($smsActivityParams->getLimit(), Arr::get($query, 'limit'));
         self::assertEquals($smsActivityParams->getDateFrom(), Arr::get($query, 'date_from'));
         self::assertEquals($smsActivityParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertEquals(implode(',', $smsActivityParams->getStatus()), Arr::get($query, 'status'));
+        self::assertEquals($smsActivityParams->getStatus(), Arr::get($query, 'status', []));
     }
 
     /**

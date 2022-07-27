@@ -29,7 +29,7 @@ class SmsWebhook extends AbstractEndpoint
         );
 
         return $this->httpLayer->post(
-            $this->buildUri($this->endpoint),
+            $this->url($this->endpoint),
             array_filter($smsWebhookParams->toArray(), function ($value) {
                 return !is_null($value);
             })
@@ -54,7 +54,7 @@ class SmsWebhook extends AbstractEndpoint
         );
 
         return $this->httpLayer->put(
-            $this->buildUri($this->endpoint . '/' . $smsWebhookId),
+            $this->url($this->endpoint . '/' . $smsWebhookId),
             array_filter($smsWebhookParams->toArray(), function ($value) {
                 return !is_null($value);
             })
@@ -75,10 +75,10 @@ class SmsWebhook extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint),
-            array_filter([
+            $this->url($this->endpoint),
+            [
                 'sms_number_id' => $smsNumberId
-            ])
+            ]
         );
     }
 
@@ -96,7 +96,7 @@ class SmsWebhook extends AbstractEndpoint
             fn () => Assertion::minLength($smsWebhookId, 1, 'SMS webhook id is required.')
         );
 
-        return $this->httpLayer->get($this->buildUri($this->endpoint . '/' . $smsWebhookId));
+        return $this->httpLayer->get($this->url($this->endpoint . '/' . $smsWebhookId));
     }
 
 
@@ -113,6 +113,6 @@ class SmsWebhook extends AbstractEndpoint
             fn () => Assertion::minLength($smsWebhookId, 1, 'SMS webhook id is required.')
         );
 
-        return $this->httpLayer->delete($this->buildUri($this->endpoint . '/' . $smsWebhookId));
+        return $this->httpLayer->delete($this->url($this->endpoint . '/' . $smsWebhookId));
     }
 }

@@ -29,7 +29,7 @@ class SmsNumber extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint, [
+            $this->url($this->endpoint, [
                 'page' => $page,
                 'limit' => $limit,
                 'paused' => $paused,
@@ -49,7 +49,7 @@ class SmsNumber extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$smsNumberId")
+            $this->url("$this->endpoint/$smsNumberId")
         );
     }
 
@@ -60,7 +60,7 @@ class SmsNumber extends AbstractEndpoint
         );
 
         return $this->httpLayer->put(
-            $this->buildUri($this->endpoint . '/' . $smsNumberId),
+            $this->url($this->endpoint . '/' . $smsNumberId),
             [
                 'paused' => $paused,
             ]
@@ -79,7 +79,7 @@ class SmsNumber extends AbstractEndpoint
         );
 
         return $this->httpLayer->delete(
-            $this->buildUri("$this->endpoint/$smsNumberId")
+            $this->url("$this->endpoint/$smsNumberId")
         );
     }
 }

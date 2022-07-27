@@ -43,7 +43,7 @@ class SmsRecipient extends AbstractEndpoint
             );
         }
 
-        return $this->httpLayer->get($this->buildUri($this->endpoint, $smsRecipientParams->toArray()));
+        return $this->httpLayer->get($this->url($this->endpoint, $smsRecipientParams->toArray()));
     }
 
     /**
@@ -58,7 +58,7 @@ class SmsRecipient extends AbstractEndpoint
             fn () => Assertion::minLength($smsRecipientId, 1, 'SMS recipient id is required.')
         );
 
-        return $this->httpLayer->get($this->buildUri($this->endpoint . '/' . $smsRecipientId));
+        return $this->httpLayer->get($this->url($this->endpoint . '/' . $smsRecipientId));
     }
 
     /**
@@ -77,7 +77,7 @@ class SmsRecipient extends AbstractEndpoint
         );
 
         return $this->httpLayer->put(
-            $this->buildUri($this->endpoint . '/' . $smsRecipientId),
+            $this->url($this->endpoint . '/' . $smsRecipientId),
             [
                 'status' => $status,
             ]

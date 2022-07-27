@@ -30,9 +30,9 @@ class SmsInbound extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint, [
+            $this->url($this->endpoint, [
                 'sms_number_id' => $smsNumberId,
-                'enabled' => is_null($enabled) ? null : ($enabled ? 1 : 0),
+                'enabled' => $enabled,
                 'page' => $page,
                 'limit' => $limit,
             ])
@@ -51,7 +51,7 @@ class SmsInbound extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$smsInboundId")
+            $this->url("$this->endpoint/$smsInboundId")
         );
     }
 
@@ -68,7 +68,7 @@ class SmsInbound extends AbstractEndpoint
         );
 
         return $this->httpLayer->post(
-            $this->buildUri($this->endpoint),
+            $this->url($this->endpoint),
             array_filter($params->toArray(), function ($value) {
                 return !is_null($value);
             }),
@@ -82,7 +82,7 @@ class SmsInbound extends AbstractEndpoint
     public function update(string $smsInboundId, SmsInboundBuilder $params): array
     {
         return $this->httpLayer->put(
-            $this->buildUri("$this->endpoint/$smsInboundId"),
+            $this->url("$this->endpoint/$smsInboundId"),
             array_filter($params->toArray(), function ($value) {
                 return !is_null($value);
             }),
@@ -101,7 +101,7 @@ class SmsInbound extends AbstractEndpoint
         );
 
         return $this->httpLayer->delete(
-            $this->buildUri("$this->endpoint/$smsInboundId")
+            $this->url("$this->endpoint/$smsInboundId")
         );
     }
 }

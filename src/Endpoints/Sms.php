@@ -29,7 +29,7 @@ class Sms extends AbstractEndpoint
         $personalization_mapped = GeneralHelpers::mapToArray($params->getPersonalization(), SmsPersonalization::class);
 
         return $this->httpLayer->post(
-            $this->buildUri($this->endpoint),
+            $this->url($this->endpoint),
             array_filter(
                 [
                     'from' => $params->getFrom(),
