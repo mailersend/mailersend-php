@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use MailerSend\Common\HttpLayer;
 use MailerSend\Helpers\BuildUri;
+use MailerSend\Helpers\Url;
 
 abstract class AbstractEndpoint
 {
@@ -19,5 +20,10 @@ abstract class AbstractEndpoint
     protected function buildUri(string $path, array $params = []): string
     {
         return (new BuildUri($this->options))->execute($path, $params);
+    }
+
+    protected function url(string $path, array $params = []): string
+    {
+        return (new Url($this->options))->execute($path, $params);
     }
 }
