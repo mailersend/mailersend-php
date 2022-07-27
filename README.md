@@ -70,6 +70,34 @@ MailerSend PHP SDK
     * [Get a list of templates](#get-a-list-of-templates)
     * [Get a single template](#get-a-single-template)
     * [Delete a template](#delete-a-template)
+  * [SMS API](#sms-api)
+      * [Send an sms](#send-sms)
+      * [Personalization](#sms-personalization)
+  * [SMS phone number API](#sms-numbers-api)
+      * [Get a list of sms phone numbers](#get-a-list-of-sms-numbers)
+      * [Get an SMS phone number](#get-sms-number)
+      * [Update a single SMS phone number](#update-sms-number)
+      * [Delete an SMS phone number](#delete-sms-number)
+  * [SMS messages API](#sms-messages-api)
+      * [Get a list of SMS messages](#get-a-list-of-sms-messages)
+      * [Get an SMS message](#get-sms-message)
+  * [SMS Activity API](#sms-activity-api)
+      * [Get a list of SMS activities](#get-a-list-of-sms-activities)
+  * [SMS Recipients API](#sms-recipients-api)
+      * [Get a list of SMS recipients](#get-a-list-of-sms-recipients)
+      * [Get an SMS recipient](#get-sms-recipient)
+      * [Update a single SMS recipient](#update-sms-recipient)
+  * [SMS webhooks API](#sms-webhooks-api)
+      * [Get a list of SMS webhooks](#get-a-list-of-sms-webhooks)
+      * [Get a single SMS webhook](#get-sms-webhook)
+      * [Create an SMS webhook](#create-sms-webhook)
+      * [Update a single SMS webhook](#update-sms-webhook)
+  * [SMS inbound routing API](#sms-inbounds-api)
+      * [Get a list of SMS inbound routes](#get-a-list-of-sms-inbounds)
+      * [Get a single SMS inbound route](#get-sms-inbound)
+      * [Add an SMS inbound route](#create-sms-inbound)
+      * [Update an inbound route](#update-sms-inbound)
+      * [Delete an SMS inbound route](#delete-sms-inbound)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -270,8 +298,8 @@ $emailParams = (new EmailParams())
     ->setFromName('Your Name')
     ->setRecipients($recipients)
     ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
+    ->setHtml('This is the html version with a {{ var }}.')
+    ->setText('This is the text versions with a {{ var }}.')
     ->setPersonalization($personalization);
 
 $mailersend->email->send($emailParams);
@@ -1327,6 +1355,366 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->template->delete('template_id');
+```
+
+<a name="sms-api"></a>
+
+## SMS
+
+<a name="send-sms"></a>
+
+### Send SMS
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsParams = (new SmsParams())
+    ->setFrom('+12065550101')
+    ->setTo(['+12065550102'])
+    ->addRecipient('+12065550103')
+    ->setText('Text');
+    
+$sms = $mailersend->sms->send($smsParams);
+```
+
+<a name="sms-personalization"></a>
+
+### Personalization
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsParams = (new SmsParams())
+    ->setFrom('+12065550101')
+    ->setTo(['+12065550102'])
+    ->setText('Text {{ var }}')
+    ->setPersonalization([
+        new SmsPersonalization('+12065550102', [
+            'var' => 'variable',
+            'number' => 123,
+            'object' => [
+                'key' => 'object-value'
+            ],
+            'objectCollection' => [
+                [
+                    'name' => 'John'
+                ],
+                [
+                    'name' => 'Patrick'
+                ]
+            ],
+        ])
+    ]);
+    
+$sms = $mailersend->sms->send($smsParams);
+```
+
+<a name="sms-numbers-api"></a>
+
+## SMS phone numbers
+
+<a name="get-a-list-of-sms-numbers"></a>
+
+### Get a list of SMS phone numbers
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$sms = $mailersend->smsNumber->getAll($page = 1, $limit = 10, $paused = true);
+```
+
+<a name="get-sms-number"></a>
+
+### Get an SMS phone number
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$sms = $mailersend->smsNumber->find('sms_number_id');
+```
+
+<a name="update-sms-number"></a>
+
+### Update a single SMS phone number
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$sms = $mailersend->smsNumber->update('sms_number_id', $paused = true);
+```
+
+<a name="delete-sms-number"></a>
+
+### Delete an SMS phone number
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$sms = $mailersend->smsNumber->delete('sms_number_id');
+```
+
+<a name="sms-messages-api"></a>
+
+## SMS messages API
+
+<a name="get-a-list-of-sms-messages"></a>
+
+### Get a list of SMS messages
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsMessages = $mailersend->smsMessage->getAll($page = 1, $limit = 10);
+```
+
+<a name="get-sms-message"></a>
+
+### Get an SMS message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsMessage = $mailersend->smsMessage->find('sms_message_id');
+```
+
+<a name="sms-activity-api"></a>
+
+## SMS activity API
+
+<a name="get-a-list-of-sms-activities"></a>
+
+### Get a list of SMS activities
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsActivityParams = (new SmsActivityParams())
+    ->setSmsNumberId('sms_number_id')
+    ->setDateFrom(1623073576)
+    ->setDateTo(1623074976)
+    ->setStatus(['processed', 'queued'])
+    ->setPage(3)
+    ->setLimit(15);
+
+$smsActivity = $mailersend->smsActivity->getAll($smsActivityParams);
+```
+
+<a name="sms-recipients-api"></a>
+
+## SMS recipients API
+
+<a name="get-a-list-of-sms-recipients"></a>
+
+### Get a list of SMS recipients
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsRecipientParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipientParams = (new SmsRecipientParams())
+    ->setSmsNumberId('sms_number_id')
+    ->setStatus('opt_out')
+    ->setPage(3)
+    ->setLimit(15);
+
+$smsRecipients = $mailersend->smsRecipient->getAll($smsRecipientParams);
+```
+
+<a name="get-sms-recipient"></a>
+
+### Get an SMS recipient
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsRecipient->find('sms_recipient_id');
+```
+
+<a name="update-sms-recipient"></a>
+
+### Update a single SMS recipient
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsRecipient->update('sms_recipient_id', $status = 'opt_out');
+```
+
+<a name="sms-webhooks-api"></a>
+
+## SMS webhooks API
+
+<a name="get-a-list-of-sms-webhooks"></a>
+
+### Get a list of SMS webhooks
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsWebhook->get('sms_number_id');
+```
+
+<a name="get-sms-webhook"></a>
+
+### Get a single SMS webhook
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsWebhook->find('sms_webhook_id');
+```
+
+<a name="create-sms-webhook"></a>
+
+### Create a single SMS webhook
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsWebhookParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsWebhookParams = (new SmsWebhookParams())
+    ->setSmsNumberId('sms_number_id')
+    ->setName('Name')
+    ->setUrl('https://mailersend.com/sms_webhook')
+    ->setEvents(['sms.sent', 'sms.delivered', 'sms.failed'])
+    ->setEnabled(false);
+
+$smsRecipients = $mailersend->smsWebhook->create($smsWebhookParams);
+```
+
+<a name="update-sms-webhook"></a>
+
+### Update a single SMS webhook
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsWebhookParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsWebhookParams = (new SmsWebhookParams())
+    ->setSmsNumberId('sms_number_id')
+    ->setName('Name')
+    ->setUrl('https://mailersend.com/sms_webhook')
+    ->setEvents(['sms.sent', 'sms.delivered', 'sms.failed'])
+    ->setEnabled(false);
+
+$smsRecipients = $mailersend->smsWebhook->update($smsWebhookParams);
+```
+
+<a name="sms-inbounds-api"></a>
+
+## SMS inbound routing API
+
+<a name="get-a-list-of-sms-inbounds"></a>
+
+### Get a list of SMS inbound routes
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsInbound->getAll($smsNumberId = 'sms_number_id', $enabled = true, $page = 3, $limit = 15);
+```
+
+<a name="get-sms-inbound"></a>
+
+### Get a single SMS inbound route
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsInbound->find('sms_inbound_id');
+```
+
+<a name="create-sms-inbound"></a>
+
+### Add an SMS inbound route
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsInbound;
+use MailerSend\Helpers\Builder\SmsInboundFilter;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsInboundParams = (new SmsInbound())
+    ->setSmsNumberId('sms_number_id')
+    ->setName('Name')
+    ->setForwardUrl('https://mailersend.com/inbound_webhook')
+    ->setFilter(new SmsInboundFilter($comparer = 'starts-with', $value = 'Stop'))
+    ->setEnabled(true);
+
+$smsRecipients = $mailersend->smsInbound->create($smsInboundParams);
+```
+
+<a name="update-sms-inbound"></a>
+
+### Update an inbound route
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SmsInbound;
+use MailerSend\Helpers\Builder\SmsInboundFilter;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsInboundParams = (new SmsInbound())
+    ->setSmsNumberId('sms_number_id')
+    ->setName('Name')
+    ->setForwardUrl('https://mailersend.com/inbound_webhook')
+    ->setFilter(new SmsInboundFilter($comparer = 'starts-with', $value = 'Stop'))
+    ->setEnabled(true);
+
+$smsRecipients = $mailersend->smsInbound->update('sms_inbound_id', $smsInboundParams);
+```
+
+<a name="delete-sms-inbound"></a>
+
+### Delete an inbound route
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
 ```
 
 <a name="debugging-validation-errors"></a>
