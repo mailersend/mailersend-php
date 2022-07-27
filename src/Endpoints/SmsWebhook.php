@@ -30,7 +30,9 @@ class SmsWebhook extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter($smsWebhookParams->toArray(), function($value) { return !is_null($value); })
+            array_filter($smsWebhookParams->toArray(), function($value) {
+                return !is_null($value);
+            })
         );
     }
 
@@ -53,7 +55,9 @@ class SmsWebhook extends AbstractEndpoint
 
         return $this->httpLayer->put(
             $this->buildUri($this->endpoint . '/' . $smsWebhookId),
-            array_filter($smsWebhookParams->toArray(), function($value) { return !is_null($value); })
+            array_filter($smsWebhookParams->toArray(), function($value) {
+                return !is_null($value);
+            })
         );
     }
 

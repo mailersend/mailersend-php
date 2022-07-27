@@ -83,5 +83,4 @@ class SmsParams
         $this->personalization = $personalization;
         return $this;
     }
-
 }

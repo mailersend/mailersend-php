@@ -69,7 +69,9 @@ class SmsInbound extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter($params->toArray(), function ($value) { return !is_null($value); }),
+            array_filter($params->toArray(), function ($value) {
+                return !is_null($value);
+            }),
         );
     }
 
@@ -81,7 +83,9 @@ class SmsInbound extends AbstractEndpoint
     {
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$smsInboundId"),
-            array_filter($params->toArray(), function ($value) { return !is_null($value); }),
+            array_filter($params->toArray(), function ($value) {
+                return !is_null($value);
+            }),
         );
     }
 

@@ -222,7 +222,8 @@ class SmsWebhookTest extends TestCase
             new SmsWebhookParams(
                 'https://link.com/webhook',
                 'webhook name',
-                SmsWebhookParams::ALL_ACTIVITIES)
+                SmsWebhookParams::ALL_ACTIVITIES
+            )
         );
     }
 
