@@ -447,7 +447,73 @@ class BulkEmailTest extends TestCase
                         ->setSubject('Subject')
                         ->setText('Text')
                 ]
-            ]
+            ],
+            'with send at' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setReplyTo('reply-to@mailersend.com')
+                        ->setReplyToName('Reply To')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setText('Text')
+                        ->setTags([
+                            'tag'
+                        ])
+                        ->setSendAt(1665626400),
+                ],
+            ],
+            'with precedence header' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setReplyTo('reply-to@mailersend.com')
+                        ->setReplyToName('Reply To')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setText('Text')
+                        ->setTags([
+                            'tag'
+                        ])
+                        ->setPrecedenceBulkHeader(true),
+                ],
+            ],
+            'with in-reply-to header' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setReplyTo('reply-to@mailersend.com')
+                        ->setReplyToName('Reply To')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setText('Text')
+                        ->setTags([
+                            'tag'
+                        ])
+                        ->setInReplyToHeader('test@mailersend.com'),
+                ],
+            ],
         ];
     }
 

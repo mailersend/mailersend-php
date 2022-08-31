@@ -168,6 +168,7 @@ class EmailTest extends TestCase
         }
         self::assertEquals($emailParams->getSendAt(), Arr::get($request_body, 'send_at'));
         self::assertEquals($emailParams->getPrecedenceBulkHeader(), Arr::get($request_body, 'precedence_bulk'));
+        self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, 'in-reply-to'));
     }
 
     /**
@@ -331,22 +332,6 @@ class EmailTest extends TestCase
                     ->setSubject('Subject')
                     ->setText('Text'),
             ],
-            'with precedence bulk header' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setReplyTo('reply-to@mailersend.com')
-                    ->setReplyToName('Reply To')
-                    ->setRecipients([
-                        [
-                            'name' => 'Recipient',
-                            'email' => 'recipient@mailersend.com',
-                        ]
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML')
-                    ->setText('Text')
-            ],
             'with send at' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
@@ -386,6 +371,26 @@ class EmailTest extends TestCase
                         'tag'
                     ])
                     ->setPrecedenceBulkHeader(true),
+            ],
+            'with in-reply-to header' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setTags([
+                        'tag'
+                    ])
+                    ->setInReplyToHeader('test@mailersend.com'),
             ],
         ];
     }
