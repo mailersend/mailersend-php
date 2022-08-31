@@ -56,5 +56,8 @@
     "phpcs": [
       "@php vendor/bin/php-cs-fixer fix --verbose --diff"
     ]
+  },
+  "config": {
+    "platform-check": false
   }
 }
