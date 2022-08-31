@@ -9,7 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add Email Verification endpoints
+- Allow users to add in-reply-to header
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.6.0] - 2022 07 28
+
+### Added
+
+- Email Verification
+- SMS endpoints
+- New URL generator
 
 ### Changed
 
