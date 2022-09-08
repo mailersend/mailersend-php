@@ -23,7 +23,7 @@ class Forward implements Arrayable, \JsonSerializable
         ];
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }
