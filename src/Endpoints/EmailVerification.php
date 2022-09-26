@@ -115,4 +115,21 @@ class EmailVerification extends AbstractEndpoint
             ])
         );
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function verifyEmail(string $email): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($email, 1, 'Email address is required.')
+        );
+
+        return $this->httpLayer->post(
+            $this->buildUri("{$this->endpoint}/verify"),
+            ['email' => $email]
+        );
+    }
 }
