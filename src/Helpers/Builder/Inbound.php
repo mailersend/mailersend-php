@@ -132,7 +132,7 @@ class Inbound implements Arrayable, \JsonSerializable
             'forwards' => $this->getForwards(),
         ];
     }
-    
+
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
