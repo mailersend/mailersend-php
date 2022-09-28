@@ -61,7 +61,8 @@ class Variable implements Arrayable, \JsonSerializable
             'substitutions' => $this->substitutions,
         ];
     }
-
+    
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();

@@ -52,7 +52,8 @@ class Personalization implements Arrayable, \JsonSerializable
             'data' => $this->data,
         ];
     }
-
+    
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
