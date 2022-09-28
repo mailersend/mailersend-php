@@ -21,6 +21,7 @@ class EmailParams
     protected array $personalization = [];
     protected ?int $send_at = null;
     protected ?bool $precedenceBulkHeader = null;
+    protected ?string $inReplyToHeader = null;
 
     public function getFrom(): ?string
     {
@@ -207,6 +208,18 @@ class EmailParams
     public function setPrecedenceBulkHeader(?bool $precedenceBulkHeader): self
     {
         $this->precedenceBulkHeader = $precedenceBulkHeader;
+
+        return $this;
+    }
+
+    public function getInReplyToHeader(): ?string
+    {
+        return $this->inReplyToHeader;
+    }
+
+    public function setInReplyToHeader(?string $inReplyToHeader): self
+    {
+        $this->inReplyToHeader = $inReplyToHeader;
 
         return $this;
     }
