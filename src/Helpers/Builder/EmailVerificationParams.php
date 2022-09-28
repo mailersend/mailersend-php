@@ -79,6 +79,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
         ];
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->toArray();
