@@ -151,6 +151,24 @@ class EmailVerificationTest extends TestCase
         self::assertEquals(Arr::get($expected, 'results'), Arr::get($query, 'results'));
     }
 
+    public function test_verify_single_email(): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->emailVerification->verifyEmail('test@mail.com');
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/v1/email-verification/verify', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+        self::assertEquals('test@mail.com', Arr::get($request_body, 'email'));
+    }
+
     public function validGetAllDataProvider(): array
     {
         return [
