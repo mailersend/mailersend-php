@@ -5,7 +5,7 @@ namespace MailerSend\Exceptions;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class MailerSendRateLimitException extends MailerSendException
+class MailerSendRateLimitException extends MailerSendHttpException
 {
     protected RequestInterface $request;
     protected ResponseInterface $response;
