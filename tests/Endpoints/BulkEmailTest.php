@@ -40,11 +40,12 @@ class BulkEmailTest extends TestCase
         $this->expectExceptionMessage('Validation Error');
 
         $responseBody = $this->createMock(StreamInterface::class);
-        $responseBody->method('getContents')->willReturn('{"message": "Validation Error"}');
+        $responseBody->method('getContents')->willReturn('{"message": "Validation Error", "errors": []}');
 
         $validationErrorResponse = $this->createMock(ResponseInterface::class);
         $validationErrorResponse->method('getStatusCode')->willReturn(422);
         $validationErrorResponse->method('getBody')->willReturn($responseBody);
+        $validationErrorResponse->method('getHeaders')->willReturn([]);
         $this->client->addResponse($validationErrorResponse);
 
         $bulkEmailParams[] = (new EmailParams())

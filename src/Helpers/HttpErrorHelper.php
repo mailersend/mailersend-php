@@ -6,6 +6,7 @@ use Http\Client\Common\Plugin;
 use Http\Promise\Promise;
 use MailerSend\Exceptions\MailerSendHttpException;
 use MailerSend\Exceptions\MailerSendValidationException;
+use MailerSend\Exceptions\MailerSendRateLimitException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -24,6 +25,10 @@ class HttpErrorHelper implements Plugin
 
             if ($code === 422) {
                 throw new MailerSendValidationException($request, $response);
+            }
+
+            if ($code === 429) {
+                throw new MailerSendRateLimitException($request, $response);
             }
 
             throw new MailerSendHttpException($request, $response);
