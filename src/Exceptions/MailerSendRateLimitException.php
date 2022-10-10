@@ -19,7 +19,7 @@ class MailerSendRateLimitException extends MailerSendHttpException
         $this->response = $response;
         $this->headers = $response->getHeaders();
 
-        parent::__construct('Too Many Attempts.');
+        parent::__construct($request, $response);
     }
 
     public function getResponse(): ResponseInterface

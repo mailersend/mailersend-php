@@ -638,10 +638,9 @@ class EmailTest extends TestCase
     public function test_should_throw_exception_on_rate_limit(): void
     {
         $this->expectException(MailerSendRateLimitException::class);
-        $this->expectExceptionMessage('Too Many Attempts.');
 
         $responseBody = $this->createMock(StreamInterface::class);
-        $responseBody->method('getContents')->willReturn('{"message": "Validation Error", "errors": []}');
+        $responseBody->method('getContents')->willReturn('{"message": "Too Many Attempts"}');
 
         $validationErrorResponse = $this->createMock(ResponseInterface::class);
         $validationErrorResponse->method('getStatusCode')->willReturn(429);
