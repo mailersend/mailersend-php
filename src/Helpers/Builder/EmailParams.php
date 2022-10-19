@@ -22,6 +22,9 @@ class EmailParams
     protected ?int $send_at = null;
     protected ?bool $precedenceBulkHeader = null;
     protected ?string $inReplyToHeader = null;
+    protected bool $trackClicks = false;
+    protected bool $trackOpens = false;
+    protected bool $trackContent = false;
 
     public function getFrom(): ?string
     {
@@ -220,6 +223,42 @@ class EmailParams
     public function setInReplyToHeader(?string $inReplyToHeader): self
     {
         $this->inReplyToHeader = $inReplyToHeader;
+
+        return $this;
+    }
+
+    public function trackClicks(): bool
+    {
+        return $this->trackClicks;
+    }
+
+    public function setTrackClicks(bool $trackClicks): self
+    {
+        $this->trackClicks = $trackClicks;
+
+        return $this;
+    }
+
+    public function trackOpens(): bool
+    {
+        return $this->trackOpens;
+    }
+
+    public function setTrackOpens(bool $trackOpens): self
+    {
+        $this->trackOpens = $trackOpens;
+
+        return $this;
+    }
+
+    public function trackContent(): bool
+    {
+        return $this->trackContent;
+    }
+
+    public function setTrackContent(bool $trackContent): self
+    {
+        $this->trackContent = $trackContent;
 
         return $this;
     }
