@@ -428,11 +428,38 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+### Send an email with tracking
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content')
+    ->setTrackClicks(true)
+    ->setTrackOpens(true)
+    ->setTrackContent(true);
+
+$mailersend->email->send($emailParams);
+```
+
 <a name="bulk-email-api"></a>
 ## Bulk email API
 
 <a name="send-bulk-email"></a>
-###Send bulk email
+### Send bulk email
 
 ```php
 use MailerSend\MailerSend;
@@ -467,7 +494,7 @@ $mailersend->bulkEmail->send($bulkEmailParams);
 ```
 
 <a name="get-bulk-email-status"></a>
-###Get bulk email status
+### Get bulk email status
 
 ```php
 use MailerSend\MailerSend;
