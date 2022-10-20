@@ -37,7 +37,7 @@
     "guzzlehttp/psr7": "^1.5.2",
     "http-interop/http-factory-guzzle": "^1.0",
     "php-http/guzzle7-adapter": "^0.1",
-    "friendsofphp/php-cs-fixer": "^2.18"
+    "friendsofphp/php-cs-fixer": "^3.12"
   },
   "autoload": {
     "psr-4": {
