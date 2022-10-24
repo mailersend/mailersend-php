@@ -1809,6 +1809,7 @@ use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Exceptions\MailerSendValidationException;
+use MailerSend\Exceptions\MailerSendRateLimitException;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
@@ -1834,6 +1835,13 @@ try{
     $mailersend->email->send($emailParams);
 } catch(MailerSendValidationException $e){
     // See src/Exceptions/MailerSendValidationException.php for more more info
+    print_r($e->getResponse()->getBody()->getContents());
+    print_r($e->getBody());
+    print_r($e->getHeaders());
+    print_r($e->getErrors());
+    print_r($e->getStatusCode());
+} catch (MailerSendRateLimitException $e) {
+    print_r($e->getHeaders());
     print_r($e->getResponse()->getBody()->getContents());
 }
 ```

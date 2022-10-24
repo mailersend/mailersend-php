@@ -6,6 +6,7 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Exceptions\MailerSendRateLimitException;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
@@ -40,11 +41,12 @@ class EmailTest extends TestCase
         $this->expectExceptionMessage('Validation Error');
 
         $responseBody = $this->createMock(StreamInterface::class);
-        $responseBody->method('getContents')->willReturn('{"message": "Validation Error"}');
+        $responseBody->method('getContents')->willReturn('{"message": "Validation Error", "errors": []}');
 
         $validationErrorResponse = $this->createMock(ResponseInterface::class);
         $validationErrorResponse->method('getStatusCode')->willReturn(422);
         $validationErrorResponse->method('getBody')->willReturn($responseBody);
+        $validationErrorResponse->method('getHeaders')->willReturn([]);
         $this->client->addResponse($validationErrorResponse);
 
         $emailParams = (new EmailParams())
@@ -631,5 +633,31 @@ class EmailTest extends TestCase
                     ->setHtml('HTML')
             ],
         ];
+    }
+
+    public function test_should_throw_exception_on_rate_limit(): void
+    {
+        $this->expectException(MailerSendRateLimitException::class);
+
+        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody->method('getContents')->willReturn('{"message": "Too Many Attempts"}');
+
+        $validationErrorResponse = $this->createMock(ResponseInterface::class);
+        $validationErrorResponse->method('getStatusCode')->willReturn(429);
+        $validationErrorResponse->method('getHeaders')->willReturn([]);
+        $this->client->addResponse($validationErrorResponse);
+
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([
+                [
+                    'wrong recipient'
+                ]
+            ])
+            ->setSubject('Subject')
+            ->setText('TEXT');
+
+        $this->email->send($emailParams);
     }
 }
