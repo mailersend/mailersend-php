@@ -78,11 +78,6 @@ class EmailTest extends TestCase
                     $recipients[0]->toArray()
                 ],
                 'template_id' => 'templateId',
-                'settings' => [
-                    'track_clicks' => false,
-                    'track_opens' => false,
-                    'track_content' => false,
-                ],
             ])
             ->willReturn([]);
 

@@ -22,9 +22,9 @@ class EmailParams
     protected ?int $send_at = null;
     protected ?bool $precedenceBulkHeader = null;
     protected ?string $inReplyToHeader = null;
-    protected bool $trackClicks = false;
-    protected bool $trackOpens = false;
-    protected bool $trackContent = false;
+    protected ?bool $trackClicks = null;
+    protected ?bool $trackOpens = null;
+    protected ?bool $trackContent = null;
 
     public function getFrom(): ?string
     {
@@ -227,7 +227,7 @@ class EmailParams
         return $this;
     }
 
-    public function trackClicks(): bool
+    public function trackClicks(): ?bool
     {
         return $this->trackClicks;
     }
@@ -239,7 +239,7 @@ class EmailParams
         return $this;
     }
 
-    public function trackOpens(): bool
+    public function trackOpens(): ?bool
     {
         return $this->trackOpens;
     }
@@ -251,7 +251,7 @@ class EmailParams
         return $this;
     }
 
-    public function trackContent(): bool
+    public function trackContent(): ?bool
     {
         return $this->trackContent;
     }
