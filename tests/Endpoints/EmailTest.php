@@ -79,7 +79,7 @@ class EmailTest extends TestCase
                 'to' => [
                     $recipients[0]->toArray()
                 ],
-                'template_id' => 'templateId'
+                'template_id' => 'templateId',
             ])
             ->willReturn([]);
 
@@ -171,6 +171,9 @@ class EmailTest extends TestCase
         self::assertEquals($emailParams->getSendAt(), Arr::get($request_body, 'send_at'));
         self::assertEquals($emailParams->getPrecedenceBulkHeader(), Arr::get($request_body, 'precedence_bulk'));
         self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, 'in-reply-to'));
+        self::assertEquals($emailParams->trackClicks(), Arr::get($request_body, 'settings.track_clicks'));
+        self::assertEquals($emailParams->trackOpens(), Arr::get($request_body, 'settings.track_opens'));
+        self::assertEquals($emailParams->trackContent(), Arr::get($request_body, 'settings.track_content'));
     }
 
     /**
@@ -393,6 +396,25 @@ class EmailTest extends TestCase
                         'tag'
                     ])
                     ->setInReplyToHeader('test@mailersend.com'),
+            ],
+            'with tracking' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setTrackClicks(true)
+                    ->setTrackOpens(true)
+                    ->setTrackContent(true)
             ],
         ];
     }
