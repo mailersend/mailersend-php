@@ -14,6 +14,7 @@ use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\ScheduleMessages;
+use MailerSend\Endpoints\SenderIdentity;
 use MailerSend\Endpoints\Sms;
 use MailerSend\Endpoints\SmsActivity;
 use MailerSend\Endpoints\SmsInbound;
@@ -73,6 +74,7 @@ class MailerSend
     public SmsRecipient $smsRecipient;
     public SmsWebhook $smsWebhook;
     public SmsInbound $smsInbound;
+    public SenderIdentity $senderIdentity;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -112,6 +114,7 @@ class MailerSend
         $this->smsRecipient = new SmsRecipient($this->httpLayer, $this->options);
         $this->smsWebhook = new SmsWebhook($this->httpLayer, $this->options);
         $this->smsInbound = new SmsInbound($this->httpLayer, $this->options);
+        $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
