@@ -101,7 +101,7 @@ class SenderIdentityTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->senderIdentityRouting->create(
-            (new SenderIdentityBuilder('domainId','Test','test@test.com'))
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
                 ->setReplyToEmail('john@test.com')
                 ->setReplyToName('John Doe')
         );
@@ -254,5 +254,4 @@ class SenderIdentityTest extends TestCase
             ]
         ];
     }
-
 }

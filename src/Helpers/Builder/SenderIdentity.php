@@ -6,7 +6,6 @@ use Tightenco\Collect\Contracts\Support\Arrayable;
 
 class SenderIdentity implements Arrayable, \JsonSerializable
 {
-
     protected string $domainId;
     protected string $name;
     protected string $email;
