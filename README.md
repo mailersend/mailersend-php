@@ -104,12 +104,12 @@ MailerSend PHP SDK
         * [Add an SMS inbound route](#create-sms-inbound)
         * [Update an inbound route](#update-sms-inbound)
         * [Delete an SMS inbound route](#delete-sms-inbound)
-    * [Sender Identity](#sender-identity-routing)
-        * [Get a list of sender identity routes](#get-a-list-of-sender-identity-routes)
-        * [Get a single sender identity route](#get-a-single-sender-identity-route)
-        * [Add a sender_identity route](#add-a-sender-identity-route)
-        * [Update a sender_identity route](#update-a-sender-identity-route)
-        * [Delete a_sender_identity route](#delete-an-sender-identity-route)
+    * [Sender Identities](#sender-identity-routing)
+        * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
+        * [Get a single Sender Identity](#get-a-single-sender-identity-route)
+        * [Add a Sender_Identity](#add-a-sender-identity-route)
+        * [Update a Sender Identity](#update-a-sender-identity-route)
+        * [Delete a Sender Identity](#delete-a-sender-identity-route)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -1835,11 +1835,11 @@ $smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
 
 <a name="sender-identity-routing"></a>
 
-## Sender identity routing
+## Sender identities
 
-<a name="get-a-list-of-inbound-routes"></a>
+<a name="get-a-list-of-sender-identity-routes"></a>
 
-### Get a list of sender identity route
+### Get a list of Sender Identities
 
 ```php
 use MailerSend\MailerSend;
@@ -1851,7 +1851,7 @@ $mailersend->senderIdentity->getAll($domainId = 'domainId', $page = 1, $limit = 
 
 <a name="get-a-single-sender-identity-route"></a>
 
-### Get a single sender identity route
+### Get a single Sender Identity
 
 ```php
 use MailerSend\MailerSend;
@@ -1863,7 +1863,7 @@ $mailersend->senderIdentity->find('identityId');
 
 <a name="add-a-sender-identity-route"></a>
 
-### Add a sender identity route
+### Add a Sender Identity
 
 Example using only classes:
 
@@ -1897,9 +1897,9 @@ $mailersend->senderIdentity->create(
 
 <a name="update-a-sender-identity-route"></a>
 
-### Update a sender identity route
+### Update a Sender Identity
 
-The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity route' also apply in here.
+The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity' also apply in here.
 
 ```php
 use MailerSend\MailerSend;
@@ -1919,7 +1919,7 @@ $mailersend->senderIdentity->update(
 
 <a name="delete-a-sender-identity-route"></a>
 
-### Delete a sender identity route
+### Delete a Sender Identity
 
 ```php
 use MailerSend\MailerSend;
