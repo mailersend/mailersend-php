@@ -24,8 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade PHPCSFixer to v3
+- Allow overriding tracking domain defaults 
 
 ### Fixed
+
+- email->send dont return error content on 422 and 429 errors
 
 ### Removed
 
