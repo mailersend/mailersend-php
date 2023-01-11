@@ -104,6 +104,12 @@ MailerSend PHP SDK
         * [Add an SMS inbound route](#create-sms-inbound)
         * [Update an inbound route](#update-sms-inbound)
         * [Delete an SMS inbound route](#delete-sms-inbound)
+    * [Sender Identities](#sender-identity-routing)
+        * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
+        * [Get a single Sender Identity](#get-a-single-sender-identity-route)
+        * [Add a Sender_Identity](#add-a-sender-identity-route)
+        * [Update a Sender Identity](#update-a-sender-identity-route)
+        * [Delete a Sender Identity](#delete-a-sender-identity-route)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -1826,6 +1832,103 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 
 $smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
 ```
+
+<a name="sender-identity-routing"></a>
+
+## Sender identities
+
+<a name="get-a-list-of-sender-identity-routes"></a>
+
+### Get a list of Sender Identities
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->getAll($domainId = 'domainId', $page = 1, $limit = 10);
+```
+
+<a name="get-a-single-sender-identity-route"></a>
+
+### Get a single Sender Identity
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->find('identityId');
+```
+
+<a name="add-a-sender-identity-route"></a>
+
+### Add a Sender Identity
+
+Example using only classes:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SenderIdentity;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->create(
+    (new SenderIdentity('domainId', 'name', 'email'))
+);
+```
+
+Example using all options:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SenderIdentity;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->create(
+    (new SenderIdentity('domainId', 'name', 'email'))
+        ->setReplyToName("John Doe")
+        ->setReplyToEmail("john@test.com"))
+        ->setAddNote(true)
+        ->setPersonalNote("Hi John, please use this token")
+);
+```
+
+<a name="update-a-sender-identity-route"></a>
+
+### Update a Sender Identity
+
+The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity' also apply in here.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SenderIdentity;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->update(
+    'identityId',
+    (new SenderIdentity('domainId', 'name', 'email'))
+        ->setReplyToName("John Doe")
+        ->setReplyToEmail("john@test.com"))
+        ->setAddNote(true)
+        ->setPersonalNote("Hi John, please use this token")
+);
+```
+
+<a name="delete-a-sender-identity-route"></a>
+
+### Delete a Sender Identity
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->delete('identityId');
+```
+
 
 <a name="debugging-validation-errors"></a>
 # Debugging validation errors
