@@ -88,8 +88,8 @@ class ActivityAnalyticsParams
             'date_from' => $this->getDateFrom(),
             'date_to' => $this->getDateTo(),
             'group_by' => $this->getGroupBy(),
-            'tags' => $this->getTags(),
-            'event' => $this->getEvent(),
+            'tags[]' => $this->getTags(),
+            'event[]' => $this->getEvent(),
         ];
     }
 }

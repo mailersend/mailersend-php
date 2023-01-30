@@ -17,7 +17,7 @@ class BuildUri
 
         foreach ($params as $key => $value) {
             if (is_array($value)) {
-                $value = implode(',', $value);
+                $value = implode("&$key=", $value);
             }
 
             $paramsArray[] = $key.'='.$value;
