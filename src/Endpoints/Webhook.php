@@ -61,7 +61,7 @@ class Webhook extends AbstractEndpoint
             array_filter([
                 'url' => $url,
                 'name' => $name,
-                'events' => $events,
+                'events[]' => $events,
                 'enabled' => $enabled,
             ])
         );

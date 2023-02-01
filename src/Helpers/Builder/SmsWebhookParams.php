@@ -146,7 +146,7 @@ class SmsWebhookParams implements Arrayable, \JsonSerializable
         return [
             'url' => $this->getUrl(),
             'name' => $this->getName(),
-            'events' => $this->getEvents(),
+            'events[]' => $this->getEvents(),
             'enabled' => $this->getEnabled(),
             'sms_number_id' => $this->getSmsNumberId(),
         ];

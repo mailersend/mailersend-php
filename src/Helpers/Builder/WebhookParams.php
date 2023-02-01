@@ -150,7 +150,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
         return [
             'url' => $this->getUrl(),
             'name' => $this->getName(),
-            'events' => $this->getEvents(),
+            'events[]' => $this->getEvents(),
             'enabled' => $this->getEnabled(),
             'domain_id' => $this->getDomainId(),
         ];

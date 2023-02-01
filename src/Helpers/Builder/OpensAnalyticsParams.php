@@ -67,7 +67,7 @@ class OpensAnalyticsParams
             'domain_id' => $this->getDomainId(),
             'date_from' => $this->getDateFrom(),
             'date_to' => $this->getDateTo(),
-            'tags' => $this->getTags(),
+            'tags[]' => $this->getTags(),
         ];
     }
 }
