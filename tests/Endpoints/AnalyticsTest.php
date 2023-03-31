@@ -78,29 +78,29 @@ class AnalyticsTest extends TestCase
         return [
             'basic request' => [
                 (new ActivityAnalyticsParams(100, 101))
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
             'complete request' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
                     ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
             'with domain id' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
             'with group by' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setGroupBy('days')
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
             'with tag' => [
                 (new ActivityAnalyticsParams(100, 101))
                     ->setTags(['tag'])
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
         ];
     }

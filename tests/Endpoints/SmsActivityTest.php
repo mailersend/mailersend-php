@@ -101,7 +101,7 @@ class SmsActivityTest extends TestCase
             ],
             'with events' => [
                 (new SmsActivityParams())
-                    ->setStatus(['processed', 'sent']),
+                    ->setStatus(['queued', 'sent']),
             ],
             'with all' => [
                 (new SmsActivityParams())
@@ -110,7 +110,7 @@ class SmsActivityTest extends TestCase
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setStatus(['processed', 'sent']),
+                    ->setStatus(['queued', 'sent']),
             ]
         ];
     }
@@ -133,7 +133,7 @@ class SmsActivityTest extends TestCase
             ],
             'status is not a possible type' => [
                 (new SmsActivityParams())
-                    ->setStatus(['invalid_type', 'processed']),
+                    ->setStatus(['invalid_type', 'queued']),
             ],
         ];
     }

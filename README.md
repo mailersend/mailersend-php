@@ -708,7 +708,7 @@ $activityParams = (new ActivityParams())
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setEvent(['processed', 'sent']);
+                    ->setEvent(['queued', 'sent']);
 
 $mailersend->activity->getAll('domainId', $activityParams);
 ```
@@ -732,7 +732,7 @@ $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
                     ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
-                    ->setEvent(['processed', 'sent']);
+                    ->setEvent(['queued', 'sent']);
 
 $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 ```
@@ -1629,7 +1629,7 @@ $smsActivityParams = (new SmsActivityParams())
     ->setSmsNumberId('sms_number_id')
     ->setDateFrom(1623073576)
     ->setDateTo(1623074976)
-    ->setStatus(['processed', 'queued'])
+    ->setStatus(['queued'])
     ->setPage(3)
     ->setLimit(15);
 

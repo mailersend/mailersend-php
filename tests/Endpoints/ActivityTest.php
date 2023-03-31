@@ -96,7 +96,7 @@ class ActivityTest extends TestCase
             ],
             'with events' => [
                 (new ActivityParams())
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ],
             'with all' => [
                 (new ActivityParams())
@@ -104,7 +104,7 @@ class ActivityTest extends TestCase
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setEvent(['processed', 'sent']),
+                    ->setEvent(['queued', 'sent']),
             ]
         ];
     }
@@ -136,7 +136,7 @@ class ActivityTest extends TestCase
             'event is not a possible type' => [
                 'domainId',
                 (new ActivityParams())
-                    ->setEvent(['invalid_type', 'processed']),
+                    ->setEvent(['invalid_type', 'queued']),
             ],
         ];
     }
