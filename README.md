@@ -474,16 +474,14 @@ use MailerSend\Helpers\Builder\EmailParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$recipients = [
-    new Recipient('your@client.com', 'Your Client'),
-];
-
 $bulkEmailParams = [];
 
 $bulkEmailParams[] = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
-    ->setRecipients($recipients)
+    ->setRecipients([
+        new Recipient('recipient1@client.com', 'Your Client'),
+    ])
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
     ->setText('This is the text content');
@@ -491,7 +489,9 @@ $bulkEmailParams[] = (new EmailParams())
 $bulkEmailParams[] = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
-    ->setRecipients($recipients)
+    ->setRecipients([
+        new Recipient('recipient2@client.com', 'Your Client'),
+    ])
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
     ->setText('This is the text content');
