@@ -110,6 +110,8 @@ MailerSend PHP SDK
         * [Add a Sender_Identity](#add-a-sender-identity-route)
         * [Update a Sender Identity](#update-a-sender-identity-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
+    * [Other endpoints](#other-endpoints)
+        * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -1929,6 +1931,21 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->senderIdentity->delete('identityId');
 ```
 
+<a name="other-endpoints"></a>
+
+## Other endpoints
+
+<a name="get-api-quota"></a>
+
+### Get API quota
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->apiQuota->get();
+```
 
 <a name="debugging-validation-errors"></a>
 # Debugging validation errors

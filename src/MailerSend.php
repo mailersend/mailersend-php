@@ -5,6 +5,7 @@ namespace MailerSend;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
+use MailerSend\Endpoints\ApiQuota;
 use MailerSend\Endpoints\Blocklist;
 use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Endpoints\Domain;
@@ -75,6 +76,7 @@ class MailerSend
     public SmsWebhook $smsWebhook;
     public SmsInbound $smsInbound;
     public SenderIdentity $senderIdentity;
+    public ApiQuota $apiQuota;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -115,6 +117,7 @@ class MailerSend
         $this->smsWebhook = new SmsWebhook($this->httpLayer, $this->options);
         $this->smsInbound = new SmsInbound($this->httpLayer, $this->options);
         $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
+        $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
