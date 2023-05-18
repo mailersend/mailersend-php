@@ -59,9 +59,6 @@
     ]
   },
   "config": {
-    "platform-check": false,
-    "allow-plugins": {
-      "php-http/discovery": true
-    }
+    "platform-check": false
   }
 }
