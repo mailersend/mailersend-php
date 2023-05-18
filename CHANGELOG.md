@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Updated psr/http-message to include version v.2.0
+- Updated guzzlehttp/psr7 to v.2.5.0
+
 ### Fixed
 
 ### Removed
@@ -50,7 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade PHPCSFixer to v3
-- Allow overriding tracking domain defaults 
+- Allow overriding tracking domain defaults
 
 ### Fixed
 
@@ -210,7 +213,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PHPUnit tests
 - Documentation
 
-[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.10.0...HEAD
+[unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.10.0...HEAD
 [0.10.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.10.0
 [0.9.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.9.1
 [0.9.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.9.0
