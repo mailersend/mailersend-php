@@ -107,6 +107,7 @@ MailerSend PHP SDK
     * [Sender Identities](#sender-identity-routing)
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
+        * [Get a single Sender Identity by email](#get-a-single-sender-identity-by-email-route)
         * [Add a Sender_Identity](#add-a-sender-identity-route)
         * [Update a Sender Identity](#update-a-sender-identity-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
@@ -1861,6 +1862,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->senderIdentity->find('identityId');
+```
+
+<a name="get-a-single-sender-identity-by-email-route"></a>
+
+### Get a single Sender Identity by email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->findByEmail('email');
 ```
 
 <a name="add-a-sender-identity-route"></a>
