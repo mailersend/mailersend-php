@@ -93,4 +93,20 @@ class SenderIdentity extends AbstractEndpoint
             $this->buildUri("$this->endpoint/$identityId")
         );
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function findByEmail(string $email): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::email($email, 'Valid email is required')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("$this->endpoint/email/$email")
+        );
+    }
 }

@@ -254,4 +254,16 @@ class SenderIdentityTest extends TestCase
             ]
         ];
     }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_find_by_email_requires_valid_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->senderIdentityRouting->findByEmail('test@mail');
+    }
 }
