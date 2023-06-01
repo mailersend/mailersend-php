@@ -117,7 +117,7 @@ class SenderIdentity extends AbstractEndpoint
     public function updateByEmail(string $email, SenderIdentityBuilder $params): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::email($email,  'Valid email is required.')
+            fn () => Assertion::email($email, 'Valid email is required.')
         );
 
         return $this->httpLayer->put(
@@ -134,7 +134,7 @@ class SenderIdentity extends AbstractEndpoint
     public function deleteByEmail(string $email): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::email($email,  'Valid email is required.')
+            fn () => Assertion::email($email, 'Valid email is required.')
         );
 
         return $this->httpLayer->delete(
