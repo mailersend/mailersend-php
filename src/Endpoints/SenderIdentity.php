@@ -109,4 +109,36 @@ class SenderIdentity extends AbstractEndpoint
             $this->buildUri("$this->endpoint/email/$email")
         );
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function updateByEmail(string $email, SenderIdentityBuilder $params): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::email($email,  'Valid email is required.')
+        );
+
+        return $this->httpLayer->put(
+            $this->buildUri("$this->endpoint/email/$email/update"),
+            $params->toArray(),
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function deleteByEmail(string $email): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::email($email,  'Valid email is required.')
+        );
+
+        return $this->httpLayer->delete(
+            $this->buildUri("$this->endpoint/email/$email/delete")
+        );
+    }
 }
