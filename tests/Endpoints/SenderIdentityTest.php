@@ -284,7 +284,7 @@ class SenderIdentityTest extends TestCase
         $request = $this->client->getLastRequest();
 
         self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/identities/email/test@identity.com/delete', $request->getUri()->getPath());
+        self::assertEquals('/v1/identities/email/test@identity.com', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
@@ -312,7 +312,7 @@ class SenderIdentityTest extends TestCase
         $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/identities/email/test@identity.com/update', $request->getUri()->getPath());
+        self::assertEquals('/v1/identities/email/test@identity.com', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
         self::assertSame('Test User', Arr::get($request_body, 'name'));
