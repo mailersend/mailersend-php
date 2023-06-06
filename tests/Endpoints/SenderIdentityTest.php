@@ -254,4 +254,69 @@ class SenderIdentityTest extends TestCase
             ]
         ];
     }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_find_by_email_requires_valid_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->senderIdentityRouting->findByEmail('test@mail');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     */
+    public function test_delete_by_email(): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $response = $this->senderIdentityRouting->deleteByEmail('test@identity.com');
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('DELETE', $request->getMethod());
+        self::assertEquals('/v1/identities/email/test@identity.com', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_update_by_email(): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $params = (new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'))
+            ->setAddNote(true)
+            ->setPersonalNote('Hi, please use this note');
+
+        $response = $this->senderIdentityRouting->updateByEmail(
+            'test@identity.com',
+            $params,
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertEquals('PUT', $request->getMethod());
+        self::assertEquals('/v1/identities/email/test@identity.com', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
+        self::assertSame('Test User', Arr::get($request_body, 'name'));
+        self::assertSame('Hi, please use this note', Arr::get($request_body, 'personal_note'));
+        self::assertTrue(Arr::get($request_body, 'add_note'));
+    }
 }

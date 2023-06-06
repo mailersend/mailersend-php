@@ -107,9 +107,12 @@ MailerSend PHP SDK
     * [Sender Identities](#sender-identity-routing)
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
+        * [Get a single Sender Identity by email](#get-a-single-sender-identity-by-email-route)
         * [Add a Sender_Identity](#add-a-sender-identity-route)
         * [Update a Sender Identity](#update-a-sender-identity-route)
+        * [Update a Sender Identity by email](#update-a-sender-identity-by-email-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
+        * [Delete a Sender Identity by email](#delete-a-sender-identity-by-email-route)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -1863,6 +1866,18 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->senderIdentity->find('identityId');
 ```
 
+<a name="get-a-single-sender-identity-by-email-route"></a>
+
+### Get a single Sender Identity by email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->findByEmail('email');
+```
+
 <a name="add-a-sender-identity-route"></a>
 
 ### Add a Sender Identity
@@ -1919,6 +1934,28 @@ $mailersend->senderIdentity->update(
 );
 ```
 
+<a name="update-a-sender-identity-by-email-route"></a>
+
+### Update a Sender Identity by email
+
+The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity' also apply in here.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\SenderIdentity;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->updateByEmail(
+    'identityId',
+    (new SenderIdentity('domainId', 'name', 'email'))
+        ->setReplyToName("John Doe")
+        ->setReplyToEmail("john@test.com"))
+        ->setAddNote(true)
+        ->setPersonalNote("Hi John, please use this token")
+);
+```
+
 <a name="delete-a-sender-identity-route"></a>
 
 ### Delete a Sender Identity
@@ -1929,6 +1966,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->senderIdentity->delete('identityId');
+```
+
+<a name="delete-a-sender-identity-by-email-route"></a>
+
+### Delete a Sender Identity by email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->senderIdentity->deleteByEmail('email');
 ```
 
 <a name="other-endpoints"></a>
