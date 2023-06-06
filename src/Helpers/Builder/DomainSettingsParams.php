@@ -13,6 +13,8 @@ class DomainSettingsParams
     protected ?string $track_unsubscribe_plain = null;
     protected ?bool $custom_tracking_enabled = null;
     protected ?string $custom_tracking_subdomain = null;
+    protected ?bool $precedence_bulk = null;
+    protected ?bool $ignore_duplicated_recipients = null;
 
     public function getSendPaused(): ?bool
     {
@@ -113,6 +115,28 @@ class DomainSettingsParams
         return $this;
     }
 
+    public function getPrecedenceBulk(): ?bool
+    {
+        return $this->precedence_bulk;
+    }
+
+    public function setPrecedenceBulk(?bool $precedence_bulk): DomainSettingsParams
+    {
+        $this->precedence_bulk = $precedence_bulk;
+        return $this;
+    }
+
+    public function getIgnoreDuplicatedRecipients(): ?bool
+    {
+        return $this->ignore_duplicated_recipients;
+    }
+
+    public function setIgnoreDuplicatedRecipients(?bool $ignore_duplicated_recipients): DomainSettingsParams
+    {
+        $this->ignore_duplicated_recipients = $ignore_duplicated_recipients;
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -125,6 +149,8 @@ class DomainSettingsParams
              'track_unsubscribe_plain' => $this->getTrackUnsubscribePlain(),
              'custom_tracking_enabled' => $this->getCustomTrackingEnabled(),
              'custom_tracking_subdomain' => $this->getCustomTrackingSubdomain(),
+             'precedence_bulk' => $this->getPrecedenceBulk(),
+             'ignore_duplicated_recipients' => $this->getIgnoreDuplicatedRecipients(),
         ];
     }
 }
