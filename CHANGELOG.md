@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.11.0] - 2023 06 07
+
+### Added
+
+- Find Sender Identity by email
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.10.0] - 2023 04 19
 
 ### Added
