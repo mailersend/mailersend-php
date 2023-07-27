@@ -20,15 +20,26 @@ class WebhookParams implements Arrayable, \JsonSerializable
     public const ACTIVITY_SOFT_BOUNCED = 'activity.soft_bounced';
     public const ACTIVITY_HARD_BOUNCED = 'activity.hard_bounced';
     public const ACTIVITY_OPENED = 'activity.opened';
+    public const ACTIVITY_OPENED_UNIQUE = 'activity.opened_unique';
     public const ACTIVITY_CLICKED = 'activity.clicked';
+    public const ACTIVITY_CLICKED_UNIQUE = 'activity.clicked_unique';
     public const ACTIVITY_UNSUBSCRIBED = 'activity.unsubscribed';
     public const ACTIVITY_SPAM_COMPLAINT = 'activity.spam_complaint';
+    public const ACTIVITY_SURVEY_OPENED = 'activity.survey_opened';
+    public const ACTIVITY_SURVEY_SUBMITTED = 'activity.survey_submitted';
+    public const ACTIVITY_IDENTITY_VERIFIED = 'sender_identity.verified';
+    public const ACTIVITY_MAINTENANCE_START = 'maintenance.start';
+    public const ACTIVITY_MAINTENANCE_END = 'maintenance.end';
 
     public const ALL_ACTIVITIES = [
         self::ACTIVITY_SENT, self::ACTIVITY_DELIVERED,
         self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED,
-        self::ACTIVITY_OPENED, self::ACTIVITY_CLICKED,
+        self::ACTIVITY_OPENED, self::ACTIVITY_OPENED_UNIQUE,
+        self::ACTIVITY_CLICKED, self::ACTIVITY_CLICKED_UNIQUE,
         self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT,
+        self::ACTIVITY_SURVEY_OPENED, self::ACTIVITY_SURVEY_SUBMITTED,
+        self::ACTIVITY_IDENTITY_VERIFIED, self::ACTIVITY_MAINTENANCE_START,
+        self::ACTIVITY_MAINTENANCE_END,
     ];
 
     /**
