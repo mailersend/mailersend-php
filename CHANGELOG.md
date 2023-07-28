@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.12.0] - 2023 07 28
+
+### Added
+
+- Added new webhook events
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.11.0] - 2023 06 07
 
 ### Added
