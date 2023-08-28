@@ -652,7 +652,6 @@ class EmailTest extends TestCase
                         ]
                     ])
                     ->setSubject('Subject')
-                    ->setHtml('HTML')
             ],
         ];
     }
