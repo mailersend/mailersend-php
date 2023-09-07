@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.13.0] - 2023 09 07
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Sending email with only html param should work 
+
+### Removed
+
 ## [0.12.0] - 2023 07 28
 
 ### Added
