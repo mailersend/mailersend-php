@@ -812,7 +812,6 @@ class BulkEmailTest extends TestCase
                             ]
                         ])
                         ->setSubject('Subject')
-                        ->setHtml('HTML')
                 ]
             ],
         ];

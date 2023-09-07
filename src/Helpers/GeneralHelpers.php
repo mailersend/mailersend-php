@@ -31,8 +31,8 @@ class GeneralHelpers
     public static function validateEmailParams(EmailParams $params): void
     {
         self::assert(fn () => Assertion::notEmpty(array_filter([
-            $params->getTemplateId(), $params->getText()
-        ], fn ($v) => $v !== null), 'One of template_id or text must be supplied'));
+            $params->getTemplateId(), $params->getText(), $params->getHtml()
+        ], fn ($v) => $v !== null), 'One of template_id, html or text must be supplied'));
 
         if (!$params->getTemplateId()) {
             self::assert(
