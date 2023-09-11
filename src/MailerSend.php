@@ -14,6 +14,7 @@ use MailerSend\Endpoints\EmailVerification;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
 use MailerSend\Endpoints\Message;
+use MailerSend\Endpoints\OnHoldList;
 use MailerSend\Endpoints\ScheduleMessages;
 use MailerSend\Endpoints\SenderIdentity;
 use MailerSend\Endpoints\Sms;
@@ -77,6 +78,7 @@ class MailerSend
     public SmsInbound $smsInbound;
     public SenderIdentity $senderIdentity;
     public ApiQuota $apiQuota;
+    public OnHoldList $onHoldList;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -118,6 +120,7 @@ class MailerSend
         $this->smsInbound = new SmsInbound($this->httpLayer, $this->options);
         $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
         $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
+        $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void

@@ -1228,6 +1228,20 @@ $mailersend->unsubscribe->delete(null, true);
 $mailersend->unsubscribe->delete(['id'], false, 'domain_id');
 ```
 
+**On Hold List**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+// Delete specific instances
+$mailersend->onHoldList->delete(['id_one', 'id_two']);
+
+// or delete all
+$mailersend->onHoldList->delete(null, true);
+```
+
 <a name="get-recipients-from-a-suppression-list"></a>
 
 ### Get recipients from a suppression list
@@ -1270,6 +1284,16 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->unsubscribe->getAll('domain_id', 15);
+```
+
+**On Hold List**
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->onHoldList->getAll('domain_id', 15);
 ```
 
 <a name="webhooks"></a>
