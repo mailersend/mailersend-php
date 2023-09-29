@@ -15,6 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.14.0] - 2023 09 29
+
+### Added
+
+- Add the On Hold list to the api endpoint
+
+### Changed
+
+- Update to use symfony v6 as a dependency
+
+### Fixed
+
+### Removed
+
 ## [0.13.0] - 2023 09 07
 
 ### Added
