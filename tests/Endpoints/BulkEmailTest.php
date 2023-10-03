@@ -493,7 +493,7 @@ class BulkEmailTest extends TestCase
                         ->setPrecedenceBulkHeader(true),
                 ],
             ],
-            'with in-reply-to header' => [
+            'with in_reply_to header' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')

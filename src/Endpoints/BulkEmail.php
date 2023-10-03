@@ -60,7 +60,7 @@ class BulkEmail extends AbstractEndpoint
                     'personalization' => $personalization_mapped,
                     'send_at' => $params->getSendAt(),
                     'precedence_bulk' => $params->getPrecedenceBulkHeader(),
-                    'in-reply-to' => $params->getInReplyToHeader(),
+                    'in_reply_to' => $params->getInReplyToHeader(),
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             );
