@@ -170,7 +170,7 @@ class EmailTest extends TestCase
         }
         self::assertEquals($emailParams->getSendAt(), Arr::get($request_body, 'send_at'));
         self::assertEquals($emailParams->getPrecedenceBulkHeader(), Arr::get($request_body, 'precedence_bulk'));
-        self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, 'in-reply-to'));
+        self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, 'in_reply_to'));
         self::assertEquals($emailParams->trackClicks(), Arr::get($request_body, 'settings.track_clicks'));
         self::assertEquals($emailParams->trackOpens(), Arr::get($request_body, 'settings.track_opens'));
         self::assertEquals($emailParams->trackContent(), Arr::get($request_body, 'settings.track_content'));
@@ -377,7 +377,7 @@ class EmailTest extends TestCase
                     ])
                     ->setPrecedenceBulkHeader(true),
             ],
-            'with in-reply-to header' => [
+            'with in_reply_to header' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
                     ->setFromName('Sender')
