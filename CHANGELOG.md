@@ -13,6 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Removed
+
+## [0.15.0] - 2023 10 03
+
+### Added
+
+### Changed
+
+### Fixed
+
 - Fixed in_reply_to parameter name
 
 ### Removed
