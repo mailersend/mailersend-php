@@ -39,7 +39,7 @@ class Activity extends AbstractEndpoint
             );
         }
 
-        if (! empty($activityParams->getEvent())) {
+        if (!empty($activityParams->getEvent())) {
             $diff = array_diff($activityParams->getEvent(), Constants::POSSIBLE_EVENT_TYPES);
             GeneralHelpers::assert(
                 fn () => Assertion::count($diff, 0, 'The following types are invalid: ' . implode(', ', $diff))

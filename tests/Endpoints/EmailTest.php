@@ -118,19 +118,19 @@ class EmailTest extends TestCase
         self::assertEquals($emailParams->getReplyToName(), Arr::get($request_body, 'reply_to.name'));
         self::assertCount(count($emailParams->getRecipients()), Arr::get($request_body, 'to'));
         foreach ($emailParams->getRecipients() as $key => $recipient) {
-            $recipient = ! is_array($recipient) ? $recipient->toArray() : $recipient;
+            $recipient = !is_array($recipient) ? $recipient->toArray() : $recipient;
             self::assertEquals($recipient['name'], Arr::get($request_body, "to.$key.name"));
             self::assertEquals($recipient['email'], Arr::get($request_body, "to.$key.email"));
         }
         self::assertCount(count($emailParams->getCc()), Arr::get($request_body, 'cc') ?? []);
         foreach ($emailParams->getCc() as $key => $cc) {
-            $cc = ! is_array($cc) ? $cc->toArray() : $cc;
+            $cc = !is_array($cc) ? $cc->toArray() : $cc;
             self::assertEquals($cc['name'], Arr::get($request_body, "cc.$key.name"));
             self::assertEquals($cc['email'], Arr::get($request_body, "cc.$key.email"));
         }
         self::assertCount(count($emailParams->getBcc()), Arr::get($request_body, 'bcc') ?? []);
         foreach ($emailParams->getBcc() as $key => $bcc) {
-            $bcc = ! is_array($bcc) ? $bcc->toArray() : $bcc;
+            $bcc = !is_array($bcc) ? $bcc->toArray() : $bcc;
             self::assertEquals($bcc['name'], Arr::get($request_body, "bcc.$key.name"));
             self::assertEquals($bcc['email'], Arr::get($request_body, "bcc.$key.email"));
         }
@@ -144,7 +144,7 @@ class EmailTest extends TestCase
         self::assertEquals($emailParams->getTemplateId(), Arr::get($request_body, 'template_id'));
         self::assertCount(count($emailParams->getVariables()), Arr::get($request_body, 'variables') ?? []);
         foreach ($emailParams->getVariables() as $variableKey => $variable) {
-            $variable = ! is_array($variable) ? $variable->toArray() : $variable;
+            $variable = !is_array($variable) ? $variable->toArray() : $variable;
             self::assertEquals($variable['email'], Arr::get($request_body, "variables.$variableKey.email"));
             foreach ($variable['substitutions'] as $substitutionKey => $substitution) {
                 self::assertEquals($substitution['var'], Arr::get($request_body, "variables.$variableKey.substitutions.$substitutionKey.var"));
@@ -153,7 +153,7 @@ class EmailTest extends TestCase
         }
         self::assertCount(count($emailParams->getAttachments()), Arr::get($request_body, 'attachments') ?? []);
         foreach ($emailParams->getAttachments() as $key => $attachment) {
-            $attachment = ! is_array($attachment) ? $attachment->toArray() : $attachment;
+            $attachment = !is_array($attachment) ? $attachment->toArray() : $attachment;
             self::assertEquals($attachment['content'], Arr::get($request_body, "attachments.$key.content"));
             self::assertEquals($attachment['filename'], Arr::get($request_body, "attachments.$key.filename"));
             self::assertEquals($attachment['disposition'], Arr::get($request_body, "attachments.$key.disposition"));
@@ -162,7 +162,7 @@ class EmailTest extends TestCase
 
         self::assertCount(count($emailParams->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
         foreach ($emailParams->getPersonalization() as $key => $personalization) {
-            $personalization = ! is_array($personalization) ? $personalization->toArray() : $personalization;
+            $personalization = !is_array($personalization) ? $personalization->toArray() : $personalization;
             self::assertEquals($personalization['email'], Arr::get($request_body, "personalization.$key.email"));
             foreach ($personalization['data'] as $variableKey => $variableValue) {
                 self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));

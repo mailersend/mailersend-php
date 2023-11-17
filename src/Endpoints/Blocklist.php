@@ -47,7 +47,7 @@ class Blocklist extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
-                array_filter([$params->getRecipients(), $params->getPatterns()], fn ($v) => ! empty($v)),
+                array_filter([$params->getRecipients(), $params->getPatterns()], fn ($v) => !empty($v)),
                 'Either recipients or patterns must be provided.'
             )
             && Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
@@ -68,7 +68,7 @@ class Blocklist extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
-                array_filter([$ids, $all], fn ($v) => $v !== null && ! empty($v)),
+                array_filter([$ids, $all], fn ($v) => $v !== null && !empty($v)),
                 'Either ids or all must be provided.'
             )
         );

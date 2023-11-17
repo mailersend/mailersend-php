@@ -48,7 +48,7 @@ class GeneralHelpers
         if (count($params->getCc()) > 0) {
             self::assert(fn () => Assertion::maxCount($params->getCc(), 10));
             foreach ($params->getCc() as $key => $cc) {
-                $cc = ! is_array($cc) ? $cc->toArray() : $cc;
+                $cc = !is_array($cc) ? $cc->toArray() : $cc;
                 self::assert(
                     fn () => Assertion::keyExists($cc, 'email', "The element with index $key in CC array does not contain the email parameter.")
                 );
@@ -62,7 +62,7 @@ class GeneralHelpers
         if (count($params->getBcc()) > 0) {
             self::assert(fn () => Assertion::maxCount($params->getBcc(), 10));
             foreach ($params->getBcc() as $key => $bcc) {
-                $bcc = ! is_array($bcc) ? $bcc->toArray() : $bcc;
+                $bcc = !is_array($bcc) ? $bcc->toArray() : $bcc;
                 self::assert(
                     fn () => Assertion::keyExists($bcc, 'email', "The element with index $key in BCC array does not contain the email parameter.")
                 );

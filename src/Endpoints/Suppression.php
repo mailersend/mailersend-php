@@ -71,7 +71,7 @@ class Suppression extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty(
-                array_filter([$ids, $all], fn ($v) => $v !== null && ! empty($v)),
+                array_filter([$ids, $all], fn ($v) => $v !== null && !empty($v)),
                 'Either ids or all must be provided.'
             )
         );
