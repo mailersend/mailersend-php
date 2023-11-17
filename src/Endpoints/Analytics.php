@@ -48,7 +48,7 @@ class Analytics extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/date", $activityAnalyticsParams->toArray())
+            $this->url("$this->endpoint/date", $activityAnalyticsParams->toArray())
         );
     }
 
@@ -83,7 +83,7 @@ class Analytics extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri($path, $opensAnalyticsParams->toArray())
+            $this->url($path, $opensAnalyticsParams->toArray())
         );
     }
 }

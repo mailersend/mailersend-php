@@ -55,7 +55,7 @@ class ActivityTest extends TestCase
         self::assertEquals($activityParams->getLimit(), Arr::get($query, 'limit'));
         self::assertEquals($activityParams->getDateFrom(), Arr::get($query, 'date_from'));
         self::assertEquals($activityParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertEquals(implode(',', $activityParams->getEvent()), Arr::get($query, 'event'));
+        self::assertCount(count($activityParams->getEvent()), Arr::get($query, 'event') ?? []);
     }
 
     /**

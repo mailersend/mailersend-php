@@ -47,6 +47,6 @@ class Activity extends AbstractEndpoint
         }
 
 
-        return $this->httpLayer->get($this->buildUri("$this->endpoint/$domainId", $activityParams->toArray()));
+        return $this->httpLayer->get($this->url("$this->endpoint/$domainId", $activityParams->toArray()));
     }
 }
