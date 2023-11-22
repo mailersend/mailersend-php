@@ -60,7 +60,7 @@ class SmsTest extends TestCase
         self::assertCount(count($smsParams->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
 
         foreach ($smsParams->getPersonalization() as $key => $personalization) {
-            $personalization = ! is_array($personalization) ? $personalization->toArray() : $personalization;
+            $personalization = !is_array($personalization) ? $personalization->toArray() : $personalization;
             self::assertEquals($personalization['phone_number'], Arr::get($request_body, "personalization.$key.phone_number"));
             foreach ($personalization['data'] as $variableKey => $variableValue) {
                 self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));

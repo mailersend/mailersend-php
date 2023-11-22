@@ -42,7 +42,7 @@ class SmsActivity extends AbstractEndpoint
             );
         }
 
-        if (! empty($smsActivityParams->getStatus())) {
+        if (!empty($smsActivityParams->getStatus())) {
             $diff = array_diff($smsActivityParams->getStatus(), Constants::POSSIBLE_SMS_STATUSES);
             GeneralHelpers::assert(
                 fn () => Assertion::count($diff, 0, 'The following statuses are invalid: ' . implode(', ', $diff))
