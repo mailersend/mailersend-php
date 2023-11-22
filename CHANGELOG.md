@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.16.0] - 2023 11 22
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Fetching analytics and activities with event and tag array does not work
+
+### Removed
+
 ## [0.15.0] - 2023 10 03
 
 ### Added
