@@ -17,6 +17,7 @@ MailerSend PHP SDK
         * [Send an email with attachment](#attachments)
         * [Send a scheduled message](#send-a-scheduled-message)
         * [Send email with precedence bulk header](#precedence-bulk-header)
+        * [Send email with custom headers](#custom-headers)
     * [Bulk emails API](#bulk-email-api)
         * [Send bulk email](#send-bulk-email)
         * [Get bulk email status](#get-bulk-email-status)
@@ -462,6 +463,38 @@ $emailParams = (new EmailParams())
     ->setTrackClicks(true)
     ->setTrackOpens(true)
     ->setTrackContent(true);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="custom-headers"></a>
+### Send an email with custom headers
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+use MailerSend\Helpers\Builder\Header;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$headers = [
+    new Header('Custom-Header-1', 'Value 1')
+    new Header('Custom-Header-2', 'Value 2')
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content')
+    ->setHeaders($headers);
 
 $mailersend->email->send($emailParams);
 ```
