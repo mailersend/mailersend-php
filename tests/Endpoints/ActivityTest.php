@@ -75,6 +75,18 @@ class ActivityTest extends TestCase
         (new Activity($httpLayer, self::OPTIONS))->getAll($domainId, $activityParams);
     }
 
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_find_requires_activity_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->activity->find('');
+    }
+
     public function validActivityParamsProvider(): array
     {
         return [
