@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.17.0] - 2023 12 12
+
+### Added
+
+- Allow user to send custom headers
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.16.0] - 2023 11 22
 
 ### Added
