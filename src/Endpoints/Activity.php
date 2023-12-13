@@ -49,4 +49,20 @@ class Activity extends AbstractEndpoint
 
         return $this->httpLayer->get($this->url("$this->endpoint/$domainId", $activityParams->toArray()));
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function find(string $activityId): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($activityId, 1, 'Activity id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("activities/$activityId")
+        );
+    }
 }

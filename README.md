@@ -29,6 +29,7 @@ MailerSend PHP SDK
         * [Delete an inbound route](#delete-an-inbound-route)
     * [Activity API](#activity)
         * [Get a list of activities](#get-a-list-of-activities)
+        * [Get a single activity](#get-a-single-activity)
     * [Analytics API](#analytics)
         * [Get activity data by date](#get-activity-data-by-date)
         * [Opens by country](#opens-by-country)
@@ -749,6 +750,19 @@ $activityParams = (new ActivityParams())
                     ->setEvent(['queued', 'sent']);
 
 $mailersend->activity->getAll('domainId', $activityParams);
+```
+
+<a name="#get-a-single-activity"></a>
+
+### Get a single activity
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\ActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->activity->find('activity_id');
 ```
 
 <a name="analytics"></a>
