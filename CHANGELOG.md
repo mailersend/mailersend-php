@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.19.0] - 2023 12 19
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+- Remove symfony dependency
+
 ## [0.18.0] - 2023 12 13
 
 ### Added
