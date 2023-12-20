@@ -25,6 +25,7 @@ class EmailParams
     protected ?bool $trackClicks = null;
     protected ?bool $trackOpens = null;
     protected ?bool $trackContent = null;
+    protected array $headers = [];
 
     public function getFrom(): ?string
     {
@@ -260,6 +261,17 @@ class EmailParams
     {
         $this->trackContent = $trackContent;
 
+        return $this;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    public function setHeaders(array $headers): EmailParams
+    {
+        $this->headers = $headers;
         return $this;
     }
 }

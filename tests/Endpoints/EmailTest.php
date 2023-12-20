@@ -168,6 +168,12 @@ class EmailTest extends TestCase
                 self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));
             }
         }
+        self::assertCount(count($emailParams->getHeaders()), Arr::get($request_body, 'headers') ?? []);
+        foreach ($emailParams->getHeaders() as $key => $header) {
+            $header = !is_array($header) ? $header->toArray() : $header;
+            self::assertEquals($header['name'], Arr::get($request_body, "headers.$key.name"));
+            self::assertEquals($header['value'], Arr::get($request_body, "headers.$key.value"));
+        }
         self::assertEquals($emailParams->getSendAt(), Arr::get($request_body, 'send_at'));
         self::assertEquals($emailParams->getPrecedenceBulkHeader(), Arr::get($request_body, 'precedence_bulk'));
         self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, 'in_reply_to'));
@@ -415,6 +421,28 @@ class EmailTest extends TestCase
                     ->setTrackClicks(true)
                     ->setTrackOpens(true)
                     ->setTrackContent(true)
+            ],
+            'with custom headers' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setHeaders([
+                        [
+                          'name' => 'Custom-Header-1',
+                          'value' => 'Value 1',
+                        ]
+                    ])
             ],
         ];
     }
