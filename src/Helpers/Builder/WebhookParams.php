@@ -30,6 +30,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
     public const ACTIVITY_IDENTITY_VERIFIED = 'sender_identity.verified';
     public const ACTIVITY_MAINTENANCE_START = 'maintenance.start';
     public const ACTIVITY_MAINTENANCE_END = 'maintenance.end';
+    public const ACTIVITY_INBOUND_FORWARD_FAILED = 'inbound_forward.failed';
 
     public const ALL_ACTIVITIES = [
         self::ACTIVITY_SENT, self::ACTIVITY_DELIVERED,
@@ -39,7 +40,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
         self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT,
         self::ACTIVITY_SURVEY_OPENED, self::ACTIVITY_SURVEY_SUBMITTED,
         self::ACTIVITY_IDENTITY_VERIFIED, self::ACTIVITY_MAINTENANCE_START,
-        self::ACTIVITY_MAINTENANCE_END,
+        self::ACTIVITY_MAINTENANCE_END, self::ACTIVITY_INBOUND_FORWARD_FAILED,
     ];
 
     /**
