@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.20.0] - 2023 12 28
+
+### Added
+
+- Add the inbound_forward.failed as a webhook event 
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.19.0] - 2023 12 19
 
 ### Added
