@@ -13,7 +13,7 @@ class TokenParams implements Arrayable, JsonSerializable
     private string $name;
     private string $domainId;
     private array $scopes;
-    private bool $restricted = false;
+    private bool $restricted;
 
     public const EMAIL_FULL = 'email_full';
     public const DOMAINS_READ = 'domains_read';
@@ -53,7 +53,8 @@ class TokenParams implements Arrayable, JsonSerializable
     {
         $this->setName($name)
             ->setDomainId($domainId)
-            ->setScopes($scopes);
+            ->setScopes($scopes)
+            ->setRestricted($restricted);
     }
 
     /**
