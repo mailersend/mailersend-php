@@ -89,11 +89,6 @@ class TokenParams implements Arrayable, JsonSerializable
      */
     public function setDomainId(mixed $domainId): TokenParams
     {
-        GeneralHelpers::assert(
-            fn () =>  Assertion::string($domainId, 'Domain id must be a string or an array.') ||
-                Assertion::isArray($domainId, 'Domain id must be a string or an array.')
-        );
-
         $this->domainId = $domainId;
 
         return $this;
