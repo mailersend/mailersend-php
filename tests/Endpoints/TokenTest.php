@@ -143,6 +143,6 @@ class TokenTest extends TestCase
 
     private function validTokenParams(): TokenParams
     {
-        return new TokenParams('name', 'domainId', TokenParams::ALL_SCOPES);
+        return new TokenParams('name', 'domainId', TokenParams::ALL_SCOPES, true);
     }
 }

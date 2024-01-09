@@ -29,15 +29,15 @@ class Token extends AbstractEndpoint
                 Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );
 
+        $body = $tokenParams->toArray();
+
+        if (!$tokenParams->getRestricted() && isset($body['restricted'])) {
+            unset($body['restricted']);
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter(
-                [
-                    'name' => $tokenParams->getName(),
-                    'domain_id' => $tokenParams->getDomainId(),
-                    'scopes' => $tokenParams->getScopes(),
-                ],
-            ),
+            array_filter($body),
         );
     }
 

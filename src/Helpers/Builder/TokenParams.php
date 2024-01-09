@@ -13,6 +13,7 @@ class TokenParams implements Arrayable, JsonSerializable
     private string $name;
     private string $domainId;
     private array $scopes;
+    private bool $restricted = false;
 
     public const EMAIL_FULL = 'email_full';
     public const DOMAINS_READ = 'domains_read';
@@ -45,9 +46,10 @@ class TokenParams implements Arrayable, JsonSerializable
      * @param string $name
      * @param string $domainId
      * @param array $scopes
+     * @param bool $restricted optional
      * @throws MailerSendAssertException
      */
-    public function __construct(string $name, string $domainId, array $scopes)
+    public function __construct(string $name, string $domainId, array $scopes, bool $restricted = false)
     {
         $this->setName($name)
             ->setDomainId($domainId)
@@ -82,10 +84,10 @@ class TokenParams implements Arrayable, JsonSerializable
     }
 
     /**
-     * @param string $domainId
+     * @param string|array $domainId
      * @return TokenParams
      */
-    public function setDomainId(string $domainId): TokenParams
+    public function setDomainId(string|array $domainId): TokenParams
     {
         $this->domainId = $domainId;
 
@@ -117,6 +119,25 @@ class TokenParams implements Arrayable, JsonSerializable
     }
 
     /**
+     * @return bool
+     */
+    public function getRestricted(): bool
+    {
+        return $this->restricted;
+    }
+
+    /**
+     * @param bool $restricted
+     * @return TokenParams
+     */
+    public function setRestricted(bool $restricted): TokenParams
+    {
+        $this->restricted = $restricted;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toArray(): array
@@ -125,6 +146,7 @@ class TokenParams implements Arrayable, JsonSerializable
             'name' => $this->getName(),
             'domain_id' => $this->getDomainId(),
             'scopes' => $this->getScopes(),
+            'restricted' => $this->getRestricted(),
         ]);
     }
 
