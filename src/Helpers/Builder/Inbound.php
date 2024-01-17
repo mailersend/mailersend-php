@@ -13,6 +13,8 @@ class Inbound implements Arrayable, \JsonSerializable
     protected $catchFilter = null;
     protected $matchFilter = null;
     protected array $forwards = [];
+    protected ?string $catchType = null;
+    protected ?string $matchType = null;
 
     public function __construct(string $domainId, string $name, bool $domainEnabled)
     {
@@ -120,6 +122,30 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this;
     }
 
+    public function getCatchType(): ?string
+    {
+        return $this->catchType;
+    }
+
+    public function setCatchType(string $catchType): self
+    {
+        $this->catchType = $catchType;
+
+        return $this;
+    }
+
+    public function getMatchType(): ?string
+    {
+        return $this->matchType;
+    }
+
+    public function setMatchType(string $matchType): self
+    {
+        $this->matchType = $matchType;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -130,6 +156,8 @@ class Inbound implements Arrayable, \JsonSerializable
             'catch_filter' => $this->getCatchFilter(),
             'match_filter' => $this->getMatchFilter(),
             'forwards' => $this->getForwards(),
+            'catch_type' => $this->getCatchType(),
+            'match_type' => $this->getMatchType()
         ];
     }
 

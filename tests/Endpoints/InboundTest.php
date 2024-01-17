@@ -464,6 +464,83 @@ class InboundTest extends TestCase
                     ],
                 ],
             ],
+            'enabled, catch all, match sender, match one' => [
+                'params' => (new InboundBuilder('domainId', 'name', true))
+                    ->setInboundDomain('inboundDomain')
+                    ->setCatchFilter(
+                        (new CatchFilter(Constants::TYPE_CATCH_ALL))
+                    )
+                    ->setMatchFilter(
+                        (new MatchFilter(Constants::TYPE_MATCH_SENDER))
+                            ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'value', 'key'))
+                    )
+                    ->setMatchType(Constants::MATCH_TYPE_ONE)
+                    ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value')),
+                'expected' => [
+                    'domain_id' => 'domainId',
+                    'name' => 'name',
+                    'domain_enabled' => true,
+                    'inbound_domain' => 'inboundDomain',
+                    'match_type' => 'one',
+                    'catch_filter' => [
+                        'type' => Constants::TYPE_CATCH_ALL,
+                    ],
+                    'match_filter' => [
+                        'type' => Constants::TYPE_MATCH_SENDER,
+                        'filters' => [
+                            [
+                                'comparer' => Constants::COMPARER_EQUAL,
+                                'value' => 'value',
+                                'key' => 'key',
+                            ],
+                        ],
+                    ],
+                    'forwards' => [
+                        [
+                            'type' => Constants::TYPE_WEBHOOK,
+                            'value' => 'value',
+                        ],
+                    ],
+                ],
+            ],
+            'enabled, catch recipient, catch one, match all' => [
+                'params' => (new InboundBuilder('domainId', 'name', true))
+                    ->setInboundDomain('inboundDomain')
+                    ->setCatchFilter(
+                        (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))
+                            ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'value'))
+                    )
+                    ->setCatchType(Constants::CATCH_TYPE_ONE)
+                    ->setMatchFilter(
+                        (new MatchFilter(Constants::TYPE_MATCH_ALL))
+                    )
+                    ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value')),
+                'expected' => [
+                    'domain_id' => 'domainId',
+                    'name' => 'name',
+                    'domain_enabled' => true,
+                    'inbound_domain' => 'inboundDomain',
+                    'catch_type' => 'one',
+                    'catch_filter' => [
+                        'type' => Constants::TYPE_CATCH_RECIPIENT,
+                        'filters' => [
+                            [
+                                'comparer' => Constants::COMPARER_EQUAL,
+                                'value' => 'value',
+                            ]
+                        ]
+                    ],
+                    'match_filter' => [
+                        'type' => Constants::TYPE_MATCH_ALL,
+                    ],
+                    'forwards' => [
+                        [
+                            'type' => Constants::TYPE_WEBHOOK,
+                            'value' => 'value',
+                        ],
+                    ],
+                ],
+            ],
             'multiple filters, multiple forwards' => [
                 'params' => (new InboundBuilder('domainId', 'name', true))
                     ->setInboundDomain('inboundDomain')
