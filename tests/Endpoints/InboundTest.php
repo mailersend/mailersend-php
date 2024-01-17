@@ -121,6 +121,8 @@ class InboundTest extends TestCase
         self::assertSame(Arr::get($expected, 'catch_filter'), Arr::get($request_body, 'catch_filter'));
         self::assertSame(Arr::get($expected, 'match_filter'), Arr::get($request_body, 'match_filter'));
         self::assertSame(Arr::get($expected, 'forwards'), Arr::get($request_body, 'forwards'));
+        self::assertSame(Arr::get($expected, 'catch_type'), Arr::get($request_body, 'catch_type'));
+        self::assertSame(Arr::get($expected, 'match_type'), Arr::get($request_body, 'match_type'));
     }
 
     /**
