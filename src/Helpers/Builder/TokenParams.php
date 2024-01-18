@@ -44,12 +44,12 @@ class TokenParams implements Arrayable, JsonSerializable
     /**
      * TokenParams constructor.
      * @param string $name
-     * @param mixed $domainId string or array
+     * @param string $domainId
      * @param array $scopes
      * @param bool $restricted optional
      * @throws MailerSendAssertException
      */
-    public function __construct(string $name, mixed $domainId, array $scopes, bool $restricted = false)
+    public function __construct(string $name, string $domainId, array $scopes, bool $restricted = false)
     {
         $this->setName($name)
             ->setDomainId($domainId)
@@ -85,10 +85,10 @@ class TokenParams implements Arrayable, JsonSerializable
     }
 
     /**
-     * @param mixed $domainId string or array
+     * @param string $domainId
      * @return TokenParams
      */
-    public function setDomainId(mixed $domainId): TokenParams
+    public function setDomainId(string $domainId): TokenParams
     {
         $this->domainId = $domainId;
 
