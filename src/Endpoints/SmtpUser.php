@@ -9,7 +9,6 @@ use MailerSend\Helpers\GeneralHelpers;
 
 class SmtpUser extends AbstractEndpoint
 {
-
     protected string $endpoint = 'smtp-users';
 
     /**
