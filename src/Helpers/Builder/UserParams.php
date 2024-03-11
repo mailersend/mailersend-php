@@ -23,7 +23,7 @@ class UserParams implements Arrayable, \JsonSerializable
         $this->role = $role;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -34,7 +34,7 @@ class UserParams implements Arrayable, \JsonSerializable
         return $this;
     }
 
-    public function getRole(): string
+    public function getRole(): ?string
     {
         return $this->role;
     }
