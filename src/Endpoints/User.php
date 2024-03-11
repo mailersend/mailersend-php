@@ -4,7 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Helpers\GeneralHelpers;
-use MailerSend\Helpers\Builder\User as UserBuilder;
+use MailerSend\Helpers\Builder\UserParams;
 
 class User extends AbstractEndpoint
 {
@@ -43,7 +43,7 @@ class User extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function create(UserBuilder $params): array
+    public function create(UserParams $params): array
     {
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
@@ -55,7 +55,7 @@ class User extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function update(string $userId, UserBuilder $params): array
+    public function update(string $userId, UserParams $params): array
     {
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$userId"),

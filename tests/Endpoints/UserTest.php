@@ -6,6 +6,7 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\User;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Tightenco\Collect\Support\Arr;
@@ -74,7 +75,7 @@ class UserTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->user->create(
-            (new \MailerSend\Helpers\Builder\User('test@user.com', 'Admin'))
+            (new UserParams('test@user.com', 'Admin'))
         );
 
         $request = $this->client->getLastRequest();
@@ -85,7 +86,7 @@ class UserTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertSame('test@user.com', Arr::get($request_body, 'email'));
         self::assertSame('Admin', Arr::get($request_body, 'role'));
-        self::assertSame(false, Arr::get($request_body, 'requires_periodic_password_change'));
+        self::assertNull(Arr::get($request_body, 'requires_periodic_password_change'));
     }
 
     /**
@@ -99,7 +100,7 @@ class UserTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new \MailerSend\Helpers\Builder\User('test@user.com', 'Admin'))
+        $params = (new UserParams('test@user.com', 'Admin'))
             ->setRequiresPeriodicPasswordChange(true);
 
         $response = $this->user->update(

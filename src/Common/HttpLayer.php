@@ -153,7 +153,7 @@ class HttpLayer
         $contentTypePlugin = new ContentTypePlugin();
 
         $headerDefaultsPlugin = new HeaderDefaultsPlugin([
-            'User-Agent' => 'mailersend-php/'.Constants::SDK_VERSION
+            'UserParams-Agent' => 'mailersend-php/'.Constants::SDK_VERSION
         ]);
 
         $httpErrorPlugin = new HttpErrorHelper();

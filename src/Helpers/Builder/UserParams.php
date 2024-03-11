@@ -4,7 +4,7 @@ namespace MailerSend\Helpers\Builder;
 
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class User implements Arrayable, \JsonSerializable
+class UserParams implements Arrayable, \JsonSerializable
 {
     protected ?string $email = null;
     protected ?string $role = null;
@@ -91,14 +91,14 @@ class User implements Arrayable, \JsonSerializable
 
     public function toArray()
     {
-        return [
-            'email' => $this->getEmail(),
-            'role' => $this->getRole(),
-            'permissions' => $this->getPermissions(),
-            'domains' => $this->getDomains(),
-            'templates' => $this->getDomains(),
-            'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
-        ];
+        return array_filter([
+                'email' => $this->getEmail(),
+                'role' => $this->getRole(),
+                'permissions' => $this->getPermissions(),
+                'domains' => $this->getDomains(),
+                'templates' => $this->getDomains(),
+                'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
+            ]);
     }
 
     #[\ReturnTypeWillChange]
