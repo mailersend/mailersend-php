@@ -6,30 +6,16 @@ use Tightenco\Collect\Contracts\Support\Arrayable;
 
 class SmtpUser implements Arrayable, \JsonSerializable
 {
-    protected string $domainId;
     protected string $name;
     protected ?bool $enabled = true;
 
     /**
-     * @param string $domainId
      * @param string $name
      * @param bool $enabled
      */
-    public function __construct(string $domainId, string $name)
+    public function __construct(string $name)
     {
-        $this->domainId = $domainId;
         $this->name = $name;
-    }
-
-    public function getDomainId(): string
-    {
-        return $this->domainId;
-    }
-
-    public function setDomainId(string $domainId): self
-    {
-        $this->domainId = $domainId;
-        return $this;
     }
 
     public function getName(): string
@@ -60,7 +46,6 @@ class SmtpUser implements Arrayable, \JsonSerializable
     public function toArray()
     {
         return [
-            'domain_id' => $this->getDomainId(),
             'name' => $this->getName(),
             'enabled' => $this->getEnabled(),
         ];

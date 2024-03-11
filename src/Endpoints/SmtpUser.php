@@ -9,14 +9,14 @@ use MailerSend\Helpers\GeneralHelpers;
 
 class SmtpUser extends AbstractEndpoint
 {
-    protected string $endpoint = 'smtp-users';
+    protected string $endpoint = 'domains';
 
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function getAll(?string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
         if ($limit) {
             GeneralHelpers::assert(
@@ -30,10 +30,7 @@ class SmtpUser extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint, [
-                'domain_id' => $domainId,
-                'limit' => $limit,
-            ])
+            $this->buildUri("$this->endpoint/$domainId/smtp-users", ['limit' => $limit])
         );
     }
 
@@ -42,14 +39,18 @@ class SmtpUser extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function find(string $smtpUserId): array
+    public function find(string $domainId, string $smtpUserId): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         GeneralHelpers::assert(
             fn () => Assertion::minLength($smtpUserId, 1, 'Smtp user id is required.')
         );
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$smtpUserId")
+            $this->buildUri("$this->endpoint/$domainId/smtp-users/$smtpUserId")
         );
     }
 
@@ -57,10 +58,14 @@ class SmtpUser extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function create(SmtpUserBuilder $params): array
+    public function create(string $domainId, SmtpUserBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         return $this->httpLayer->post(
-            $this->buildUri($this->endpoint),
+            $this->buildUri("$this->endpoint/$domainId/smtp-users"),
             $params->toArray(),
         );
     }
@@ -69,10 +74,18 @@ class SmtpUser extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function update(string $smtpUserId, SmtpUserBuilder $params): array
+    public function update(string $domainId, string $smtpUserId, SmtpUserBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($smtpUserId, 1, 'Smtp user id is required.')
+        );
+
         return $this->httpLayer->put(
-            $this->buildUri("$this->endpoint/$smtpUserId"),
+            $this->buildUri("$this->endpoint/$domainId/smtp-users/$smtpUserId"),
             $params->toArray(),
         );
     }
@@ -82,14 +95,18 @@ class SmtpUser extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function delete(string $smtpUserId): array
+    public function delete(string $domainId, string $smtpUserId): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($smtpUserId, 1, 'Smtp user id is required.')
         );
 
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         return $this->httpLayer->delete(
-            $this->buildUri("$this->endpoint/$smtpUserId")
+            $this->buildUri("$this->endpoint/$domainId/smtp-users/$smtpUserId")
         );
     }
 

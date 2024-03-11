@@ -30,7 +30,7 @@ class SmtpUserTest extends TestCase
     }
 
     /**
-     * @dataProvider validSenderIdentityRoutingListDataProvider
+     * @dataProvider validSmtpUserRoutingListDataProvider
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
@@ -50,12 +50,12 @@ class SmtpUserTest extends TestCase
         $request = $this->client->getLastRequest();
 
         parse_str($request->getUri()->getQuery(), $query);
+        $domainId = Arr::get($params, 'domain_id');
 
         self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/smtp-users', $request->getUri()->getPath());
+        self::assertEquals("/v1/domains/$domainId/smtp-users", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals(Arr::get($expected, 'domain_id'), Arr::get($query, 'domain_id'));
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
     }
 
@@ -84,7 +84,7 @@ class SmtpUserTest extends TestCase
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->smtpUser->find('');
+        $this->smtpUser->find('domainId', '');
     }
 
     /**
@@ -97,18 +97,18 @@ class SmtpUserTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
-
+        $domainId = 'domainId';
         $response = $this->smtpUser->create(
-            (new \MailerSend\Helpers\Builder\SmtpUser('domainId', 'Test Smtp'))
+            $domainId,
+            (new \MailerSend\Helpers\Builder\SmtpUser('Test Smtp'))
         );
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/smtp-users', $request->getUri()->getPath());
+        self::assertEquals("/v1/domains/$domainId/smtp-users", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
         self::assertSame('Test Smtp', Arr::get($request_body, 'name'));
         self::assertSame(true, Arr::get($request_body, 'enabled'));
     }
@@ -124,10 +124,11 @@ class SmtpUserTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new \MailerSend\Helpers\Builder\SmtpUser('domainId', 'Test Smtp New'))
+        $params = (new \MailerSend\Helpers\Builder\SmtpUser('Test Smtp New'))
                         ->setEnabled(true);
 
         $response = $this->smtpUser->update(
+            'domainId',
             'smtpUserId',
             $params,
         );
@@ -136,9 +137,8 @@ class SmtpUserTest extends TestCase
         $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/smtp-users/smtpUserId', $request->getUri()->getPath());
+        self::assertEquals('/v1/domains/domainId/smtp-users/smtpUserId', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
         self::assertSame('Test Smtp New', Arr::get($request_body, 'name'));
         self::assertTrue(Arr::get($request_body, 'enabled'));
     }
@@ -155,12 +155,12 @@ class SmtpUserTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $response = $this->smtpUser->delete('smtpUserId');
+        $response = $this->smtpUser->delete('domainId', 'smtpUserId');
 
         $request = $this->client->getLastRequest();
 
         self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/smtp-users/smtpUserId', $request->getUri()->getPath());
+        self::assertEquals('/v1/domains/domainId/smtp-users/smtpUserId', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
@@ -172,10 +172,10 @@ class SmtpUserTest extends TestCase
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->smtpUser->delete('');
+        $this->smtpUser->delete('domainId', '');
     }
 
-    public function validSenderIdentityRoutingListDataProvider(): array
+    public function validSmtpUserRoutingListDataProvider(): array
     {
         return [
             'empty request' => [
