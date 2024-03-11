@@ -96,7 +96,7 @@ class UserParams implements Arrayable, \JsonSerializable
                 'role' => $this->getRole(),
                 'permissions' => $this->getPermissions(),
                 'domains' => $this->getDomains(),
-                'templates' => $this->getDomains(),
+                'templates' => $this->getTemplates(),
                 'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
             ]);
     }
