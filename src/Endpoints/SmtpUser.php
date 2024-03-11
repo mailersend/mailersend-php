@@ -4,7 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
-use MailerSend\Helpers\Builder\SmtpUser as SmtpUserBuilder;
+use MailerSend\Helpers\Builder\SmtpUserParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class SmtpUser extends AbstractEndpoint
@@ -58,7 +58,7 @@ class SmtpUser extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function create(string $domainId, SmtpUserBuilder $params): array
+    public function create(string $domainId, SmtpUserParams $params): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
@@ -74,7 +74,7 @@ class SmtpUser extends AbstractEndpoint
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function update(string $domainId, string $smtpUserId, SmtpUserBuilder $params): array
+    public function update(string $domainId, string $smtpUserId, SmtpUserParams $params): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')

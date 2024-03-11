@@ -4,7 +4,7 @@ namespace MailerSend\Helpers\Builder;
 
 use Tightenco\Collect\Contracts\Support\Arrayable;
 
-class SmtpUser implements Arrayable, \JsonSerializable
+class SmtpUserParams implements Arrayable, \JsonSerializable
 {
     protected string $name;
     protected ?bool $enabled = true;

@@ -60,7 +60,7 @@ class SmtpUserTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidSenderIdentityRoutingListDataProvider
+     * @dataProvider invalidSmtpUserRoutingListDataProvider
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
@@ -100,7 +100,7 @@ class SmtpUserTest extends TestCase
         $domainId = 'domainId';
         $response = $this->smtpUser->create(
             $domainId,
-            (new \MailerSend\Helpers\Builder\SmtpUser('Test Smtp'))
+            (new \MailerSend\Helpers\Builder\SmtpUserParams('Test Smtp'))
         );
 
         $request = $this->client->getLastRequest();
@@ -124,7 +124,7 @@ class SmtpUserTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new \MailerSend\Helpers\Builder\SmtpUser('Test Smtp New'))
+        $params = (new \MailerSend\Helpers\Builder\SmtpUserParams('Test Smtp New'))
                         ->setEnabled(true);
 
         $response = $this->smtpUser->update(
@@ -216,7 +216,7 @@ class SmtpUserTest extends TestCase
         ];
     }
 
-    public function invalidSenderIdentityRoutingListDataProvider(): array
+    public function invalidSmtpUserRoutingListDataProvider(): array
     {
         return [
             'with limit under 10' => [
