@@ -2061,7 +2061,7 @@ $mailersend->senderIdentity->deleteByEmail('email');
 
 ## SMTP Users
 
-<a name="get-a-list-of-users"></a>
+<a name="get-a-list-of-smtp-users"></a>
 
 ### Get a list of SMTP Users
 
@@ -2082,7 +2082,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->user->find('domainId', 'smtpUserId');
+$mailersend->smtpUser->find('domainId', 'smtpUserId');
 ```
 
 <a name="add-smtp-user"></a>
