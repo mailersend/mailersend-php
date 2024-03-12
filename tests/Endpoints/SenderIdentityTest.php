@@ -130,7 +130,7 @@ class SenderIdentityTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new SenderIdentityBuilder('domainId', 'Test UserParams', 'test@test.com'))
+        $params = (new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'))
                         ->setAddNote(true)
                         ->setPersonalNote('Hi, please use this note');
 
@@ -146,7 +146,7 @@ class SenderIdentityTest extends TestCase
         self::assertEquals('/v1/identities/identityId', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
-        self::assertSame('Test UserParams', Arr::get($request_body, 'name'));
+        self::assertSame('Test User', Arr::get($request_body, 'name'));
         self::assertSame('Hi, please use this note', Arr::get($request_body, 'personal_note'));
         self::assertTrue(Arr::get($request_body, 'add_note'));
     }
@@ -299,7 +299,7 @@ class SenderIdentityTest extends TestCase
 
         $this->client->addResponse($response);
 
-        $params = (new SenderIdentityBuilder('domainId', 'Test UserParams', 'test@test.com'))
+        $params = (new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'))
             ->setAddNote(true)
             ->setPersonalNote('Hi, please use this note');
 
@@ -315,7 +315,7 @@ class SenderIdentityTest extends TestCase
         self::assertEquals('/v1/identities/email/test@identity.com', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame('domainId', Arr::get($request_body, 'domain_id'));
-        self::assertSame('Test UserParams', Arr::get($request_body, 'name'));
+        self::assertSame('Test User', Arr::get($request_body, 'name'));
         self::assertSame('Hi, please use this note', Arr::get($request_body, 'personal_note'));
         self::assertTrue(Arr::get($request_body, 'add_note'));
     }
