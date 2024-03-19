@@ -142,6 +142,10 @@ class MailerSend
         }
 
         if (empty(Arr::get($this->options, 'api_key'))) {
+            Arr::set($this->options, 'api_key', getenv('MAILERSEND_API_KEY'));
+        }
+
+        if (empty(Arr::get($this->options, 'api_key'))) {
             throw new MailerSendException('Please set "api_key" in SDK options.');
         }
     }
