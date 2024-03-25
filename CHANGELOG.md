@@ -15,6 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.21.0] - 2024 03 20
+
+### Added
+
+### Changed
+
+- Suggest to add token as .env variable instead of explicit declaration
+
+### Fixed
+
+- Fix composer packages cache
+
+### Removed
+
 ## [0.20.0] - 2023 12 28
 
 ### Added

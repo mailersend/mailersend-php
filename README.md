@@ -121,6 +121,12 @@ MailerSend PHP SDK
         * [Add SMTP User](#add-smtp-user)
         * [Update SMTP User](#update-smtp-user)
         * [Delete SMTP User](#delete-smtp-user)
+    * [Users](#users-routing)
+        * [Get a list of Users](#get-a-list-of-users)
+        * [Get a single User](#get-a-single-user)
+        * [Add a User](#add-a-user)
+        * [Update a User](#update-a-user)
+        * [Delete a User](#delete-a-user)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -153,6 +159,16 @@ After that you can install the SDK.
 composer require mailersend/mailersend
 ```
 
+Finally, add an environment variable called `MAILERSEND_API_KEY` with the appropriate API key.
+
+Optionally, although not recommended, you can manually add the API key when instantiating the `MailerSend` class, like so:
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'your_api_key']);
+```
+
 <a name="usage"></a>
 
 # Usage
@@ -170,7 +186,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -196,7 +212,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -223,7 +239,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -260,7 +276,7 @@ use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -294,7 +310,7 @@ use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -340,7 +356,7 @@ use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -372,7 +388,7 @@ use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -402,7 +418,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -429,7 +445,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -454,7 +470,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
@@ -517,7 +533,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $bulkEmailParams = [];
 
@@ -550,7 +566,7 @@ $mailersend->bulkEmail->send($bulkEmailParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->bulkEmail->getStatus('bulk_email_id');
 ```
@@ -566,7 +582,7 @@ $mailersend->bulkEmail->getStatus('bulk_email_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->getAll($domainId = 'domainId', $page = 1, $limit = 10);
 ```
@@ -578,7 +594,7 @@ $mailersend->inbound->getAll($domainId = 'domainId', $page = 1, $limit = 10);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->find('inboundId');
 ```
@@ -598,7 +614,7 @@ use \MailerSend\Helpers\Builder\Forward;
 use \MailerSend\Helpers\Builder\Filter;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->create(
     (new Inbound('domainId', 'name', true))
@@ -623,7 +639,7 @@ use \MailerSend\Helpers\Builder\MatchFilter;
 use \MailerSend\Helpers\Builder\Forward;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->create(
     (new Inbound('domainId', 'name', true))
@@ -661,7 +677,7 @@ use \MailerSend\Helpers\Builder\MatchFilter;
 use \MailerSend\Helpers\Builder\Forward;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->create(
     (new Inbound('domainId', 'name', true))
@@ -708,7 +724,7 @@ use \MailerSend\Helpers\Builder\MatchFilter;
 use \MailerSend\Helpers\Builder\Forward;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->update(
     'inboundId',
@@ -729,7 +745,7 @@ $mailersend->inbound->update(
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->inbound->delete('inboundId');
 ```
@@ -746,7 +762,7 @@ $mailersend->inbound->delete('inboundId');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\ActivityParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $activityParams = (new ActivityParams())
                     ->setPage(3)
@@ -784,7 +800,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
 use MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
@@ -803,7 +819,7 @@ $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
@@ -820,7 +836,7 @@ $mailersend->analytics->opensByCountry($opensAnalyticsParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
@@ -837,7 +853,7 @@ $mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
@@ -857,7 +873,7 @@ $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
 ```
@@ -869,7 +885,7 @@ $mailersend->domain->getAll($page = 1, $limit = 10, $verified = true);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->find('domain_id');
 ```
@@ -882,7 +898,7 @@ $mailersend->domain->find('domain_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\DomainParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $domainParams = (new DomainParams('domainName'))
                     ->setReturnPathSubdomain('returnPath')
@@ -899,7 +915,7 @@ $mailersend->domain->create($domainParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->delete('domain_id');
 ```
@@ -911,7 +927,7 @@ $mailersend->domain->delete('domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->recipients($domainId = 'domain_id', $page = 1, $limit = 10);
 ```
@@ -926,7 +942,7 @@ Here you can set as many properties as you need, one or multiple.
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\DomainSettingsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $domainSettingsParam = (new DomainSettingsParams())
                             ->setSendPaused(true)
@@ -949,7 +965,7 @@ $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsPara
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->verify('domain_id');
 ```
@@ -961,7 +977,7 @@ $mailersend->domain->verify('domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->domain->getDnsRecords('domain_id');
 ```
@@ -977,7 +993,7 @@ $mailersend->domain->getDnsRecords('domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->messages->get($limit = 100, $page = 3);
 ```
@@ -989,7 +1005,7 @@ $mailersend->messages->get($limit = 100, $page = 3);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->messages->find('message_id');
 ```
@@ -1006,7 +1022,7 @@ $mailersend->messages->find('message_id');
 use MailerSend\MailerSend;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->scheduleMessages->getAll(
     'domain_id',
@@ -1023,7 +1039,7 @@ $mailersend->scheduleMessages->getAll(
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->scheduleMessages->find('message_id');
 ```
@@ -1036,7 +1052,7 @@ $mailersend->scheduleMessages->find('message_id');
 use MailerSend\MailerSend;
 use \MailerSend\Common\Constants;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->scheduleMessages->delete('message_id');
 ```
@@ -1053,7 +1069,7 @@ $mailersend->scheduleMessages->delete('message_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\TokenParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->token->create(
     new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
@@ -1066,7 +1082,7 @@ Because of security reasons, we only allow access token appearance once during c
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\TokenParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $response = $mailersend->token->create(
     new TokenParams('token name', 'domainId', TokenParams::ALL_SCOPES)
@@ -1083,7 +1099,7 @@ echo $response['body']['data']['accessToken'];
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\TokenParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->token->update('token_id', TokenParams::STATUS_PAUSE); // PAUSE
 $mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
@@ -1097,7 +1113,7 @@ $mailersend->token->update('token_id', TokenParams::STATUS_UNPAUSE); // UNPAUSE
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\TokenParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->token->delete('token_id');
 ```
@@ -1113,7 +1129,7 @@ $mailersend->token->delete('token_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->recipients->get(null, $limit = 100, $page = 3);
 // Or for a specific domain
@@ -1127,7 +1143,7 @@ $mailersend->recipients->get('domain_id', $limit = 100, $page = 3);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->recipients->find('recipient_id');
 ```
@@ -1139,7 +1155,7 @@ $mailersend->recipients->find('recipient_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->recipients->delete('recipient_id');
 ```
@@ -1154,7 +1170,7 @@ $mailersend->recipients->delete('recipient_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\BlocklistParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $params = (new BlocklistParams())
     ->setDomainId('domain_id')
@@ -1170,7 +1186,7 @@ $mailersend->blocklist->create($params);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SuppressionParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
@@ -1185,7 +1201,7 @@ $mailersend->hardBounce->create($params);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SuppressionParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
@@ -1200,7 +1216,7 @@ $mailersend->spamComplaint->create($params);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SuppressionParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
@@ -1218,7 +1234,7 @@ $mailersend->unsubscribe->create($params);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 // Delete specific instances
 $mailersend->blocklist->delete(['id_one', 'id_two']);
@@ -1235,7 +1251,7 @@ $mailersend->blocklist->delete(['id'], false, 'domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 // Delete specific instances
 $mailersend->hardBounce->delete(['id_one', 'id_two']);
@@ -1252,7 +1268,7 @@ $mailersend->hardBounce->delete(['id'], false, 'domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 // Delete specific instances
 $mailersend->spamComplaint->delete(['id_one', 'id_two']);
@@ -1269,7 +1285,7 @@ $mailersend->spamComplaint->delete(['id'], false, 'domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 // Delete specific instances
 $mailersend->unsubscribe->delete(['id_one', 'id_two']);
@@ -1304,7 +1320,7 @@ $mailersend->onHoldList->delete(null, true);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->blocklist->getAll('domain_id', 15);
 ```
@@ -1314,7 +1330,7 @@ $mailersend->blocklist->getAll('domain_id', 15);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->hardBounce->getAll('domain_id', 15);
 ```
@@ -1324,7 +1340,7 @@ $mailersend->hardBounce->getAll('domain_id', 15);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->spamComplaint->getAll('domain_id', 15);
 ```
@@ -1334,7 +1350,7 @@ $mailersend->spamComplaint->getAll('domain_id', 15);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->unsubscribe->getAll('domain_id', 15);
 ```
@@ -1360,7 +1376,7 @@ $mailersend->onHoldList->getAll('domain_id', 15);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->webhooks->get('domain_id');
 ```
@@ -1372,7 +1388,7 @@ $mailersend->webhooks->get('domain_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->webhooks->find('webhook_id');
 ```
@@ -1385,7 +1401,7 @@ $mailersend->webhooks->find('webhook_id');
 use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
@@ -1406,7 +1422,7 @@ $mailersend->webhooks->create(
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\WebhookParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
 
@@ -1424,7 +1440,7 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->webhooks->delete('webhook_id');
 ```
@@ -1442,7 +1458,7 @@ $mailersend->webhooks->delete('webhook_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 // Get all templates of an account
 $mailersend->template->getAll();
@@ -1461,7 +1477,7 @@ $mailersend->template->getAll('domain_id', 2, 20);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->template->find('template_id');
 ```
@@ -1473,7 +1489,7 @@ $mailersend->template->find('template_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->template->delete('template_id');
 ```
@@ -1489,7 +1505,7 @@ $mailersend->template->delete('template_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->emailVerification->getAll($page = 1, $limit = 10);
 ```
@@ -1501,7 +1517,7 @@ $mailersend->emailVerification->getAll($page = 1, $limit = 10);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->emailVerification->find('email_verification_id');
 ```
@@ -1514,7 +1530,7 @@ $mailersend->emailVerification->find('email_verification_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\EmailVerificationParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $emailVerificationParams = (new EmailVerificationParams('file.csv'))
     ->setEmailAddresses(['test@mail.com']);
@@ -1529,7 +1545,7 @@ $mailersend->emailVerification->create($emailVerificationParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->emailVerification->verify('email_verification_id');
 ```
@@ -1542,7 +1558,7 @@ $mailersend->emailVerification->verify('email_verification_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\EmailVerificationParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->emailVerification->getResults(
         $emailVerificationId = 'email_verification_id',
@@ -1567,7 +1583,7 @@ $mailersend->emailVerification->getResults(
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsParams = (new SmsParams())
     ->setFrom('+12065550101')
@@ -1586,7 +1602,7 @@ $sms = $mailersend->sms->send($smsParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsParams = (new SmsParams())
     ->setFrom('+12065550101')
@@ -1624,7 +1640,7 @@ $sms = $mailersend->sms->send($smsParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $sms = $mailersend->smsNumber->getAll($page = 1, $limit = 10, $paused = true);
 ```
@@ -1636,7 +1652,7 @@ $sms = $mailersend->smsNumber->getAll($page = 1, $limit = 10, $paused = true);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $sms = $mailersend->smsNumber->find('sms_number_id');
 ```
@@ -1648,7 +1664,7 @@ $sms = $mailersend->smsNumber->find('sms_number_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $sms = $mailersend->smsNumber->update('sms_number_id', $paused = true);
 ```
@@ -1660,7 +1676,7 @@ $sms = $mailersend->smsNumber->update('sms_number_id', $paused = true);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $sms = $mailersend->smsNumber->delete('sms_number_id');
 ```
@@ -1676,7 +1692,7 @@ $sms = $mailersend->smsNumber->delete('sms_number_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsMessages = $mailersend->smsMessage->getAll($page = 1, $limit = 10);
 ```
@@ -1688,7 +1704,7 @@ $smsMessages = $mailersend->smsMessage->getAll($page = 1, $limit = 10);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsMessage = $mailersend->smsMessage->find('sms_message_id');
 ```
@@ -1705,7 +1721,7 @@ $smsMessage = $mailersend->smsMessage->find('sms_message_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsActivityParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsActivityParams = (new SmsActivityParams())
     ->setSmsNumberId('sms_number_id')
@@ -1730,7 +1746,7 @@ $smsActivity = $mailersend->smsActivity->getAll($smsActivityParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsRecipientParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipientParams = (new SmsRecipientParams())
     ->setSmsNumberId('sms_number_id')
@@ -1748,7 +1764,7 @@ $smsRecipients = $mailersend->smsRecipient->getAll($smsRecipientParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsRecipient->find('sms_recipient_id');
 ```
@@ -1760,7 +1776,7 @@ $smsRecipients = $mailersend->smsRecipient->find('sms_recipient_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsRecipient->update('sms_recipient_id', $status = 'opt_out');
 ```
@@ -1776,7 +1792,7 @@ $smsRecipients = $mailersend->smsRecipient->update('sms_recipient_id', $status =
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsWebhook->get('sms_number_id');
 ```
@@ -1788,7 +1804,7 @@ $smsRecipients = $mailersend->smsWebhook->get('sms_number_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsWebhook->find('sms_webhook_id');
 ```
@@ -1801,7 +1817,7 @@ $smsRecipients = $mailersend->smsWebhook->find('sms_webhook_id');
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsWebhookParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsWebhookParams = (new SmsWebhookParams())
     ->setSmsNumberId('sms_number_id')
@@ -1821,7 +1837,7 @@ $smsRecipients = $mailersend->smsWebhook->create($smsWebhookParams);
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsWebhookParams;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsWebhookParams = (new SmsWebhookParams())
     ->setSmsNumberId('sms_number_id')
@@ -1844,7 +1860,7 @@ $smsRecipients = $mailersend->smsWebhook->update($smsWebhookParams);
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsInbound->getAll($smsNumberId = 'sms_number_id', $enabled = true, $page = 3, $limit = 15);
 ```
@@ -1856,7 +1872,7 @@ $smsRecipients = $mailersend->smsInbound->getAll($smsNumberId = 'sms_number_id',
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsInbound->find('sms_inbound_id');
 ```
@@ -1870,7 +1886,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsInbound;
 use MailerSend\Helpers\Builder\SmsInboundFilter;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsInboundParams = (new SmsInbound())
     ->setSmsNumberId('sms_number_id')
@@ -1891,7 +1907,7 @@ use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsInbound;
 use MailerSend\Helpers\Builder\SmsInboundFilter;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsInboundParams = (new SmsInbound())
     ->setSmsNumberId('sms_number_id')
@@ -1910,7 +1926,7 @@ $smsRecipients = $mailersend->smsInbound->update('sms_inbound_id', $smsInboundPa
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
 ```
@@ -1926,7 +1942,7 @@ $smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->getAll($domainId = 'domainId', $page = 1, $limit = 10);
 ```
@@ -1938,7 +1954,7 @@ $mailersend->senderIdentity->getAll($domainId = 'domainId', $page = 1, $limit = 
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->find('identityId');
 ```
@@ -1965,7 +1981,7 @@ Example using only classes:
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SenderIdentity;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->create(
     (new SenderIdentity('domainId', 'name', 'email'))
@@ -1978,7 +1994,7 @@ Example using all options:
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SenderIdentity;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->create(
     (new SenderIdentity('domainId', 'name', 'email'))
@@ -1999,7 +2015,7 @@ The examples on building the `Sender Identity` object portrayed in the 'Add a Se
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SenderIdentity;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->update(
     'identityId',
@@ -2040,7 +2056,7 @@ $mailersend->senderIdentity->updateByEmail(
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->senderIdentity->delete('identityId');
 ```
@@ -2076,7 +2092,6 @@ $mailersend->smtpUser->getAll('domainId', 25);
 <a name="get-a-single-smtp-user"></a>
 
 ### Get a single SMTP User
-
 ```php
 use MailerSend\MailerSend;
 
@@ -2088,7 +2103,6 @@ $mailersend->smtpUser->find('domainId', 'smtpUserId');
 <a name="add-smtp-user"></a>
 
 ### Add SMTP User
-
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\UserParams;
@@ -2105,10 +2119,9 @@ $mailersend->smtpUser->create(
 
 <a name="update-smtp-user"></a>
 
-### Update a User
+### Update SMTP User
 
 The examples on building the `SMTP User` object portrayed in the 'Add SMTP User' also apply in here.
-
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\UserParams;
@@ -2126,7 +2139,6 @@ $mailersend->smtpUser->update(
 <a name="delete-smtp-user"></a>
 
 ### Delete SMTP User
-
 ```php
 use MailerSend\MailerSend;
 
@@ -2135,6 +2147,107 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->smtpUser->delete('domainId', 'smtpUserId');
 ```
 
+<a name="user-routing"></a>
+
+## Users
+
+<a name="get-a-list-of-users"></a>
+
+### Get a list of Users
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->getAll();
+```
+
+<a name="get-a-single-user"></a>
+
+### Get a single User
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->find('userId');
+```
+
+<a name="add-a-user"></a>
+
+### Add a User
+
+Example using only classes:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->create(
+    (new UserParams('email', Roles::ADMIN))
+);
+```
+
+Example using all options:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+use MailerSend\Common\Permissions;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->create(
+    (new UserParams('email', Roles::CUSTOM_USER))
+        ->setDomains(['domainId', 'anotherDomainId'])
+        ->setTemplates(['templateId', 'anotherTemplateId'])
+        ->setPermissions([Permissions::READ_OWN_TEMPLATES])
+        ->setRequiresPeriodicPasswordChange(true)
+);
+```
+
+<a name="update-a-user"></a>
+
+### Update a User
+
+The examples on building the `User` object portrayed in the 'Add a User' also apply in here.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+use MailerSend\Common\Permissions;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->update(
+    'userId',
+    (new UserParams())
+        ->setRole(Roles::CUSTOM_USER)
+        ->setDomains(['domainId', 'anotherDomainId'])
+        ->setTemplates(['templateId', 'anotherTemplateId'])
+        ->setPermissions([Permissions::READ_OWN_TEMPLATES])
+        ->setRequiresPeriodicPasswordChange(true)
+);
+```
+
+<a name="delete-a-user"></a>
+
+### Delete a User
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->delete('userId');
+```
 
 <a name="other-endpoints"></a>
 
@@ -2147,7 +2260,7 @@ $mailersend->smtpUser->delete('domainId', 'smtpUserId');
 ```php
 use MailerSend\MailerSend;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $mailersend->apiQuota->get();
 ```
@@ -2163,7 +2276,7 @@ use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Exceptions\MailerSendRateLimitException;
 
-$mailersend = new MailerSend(['api_key' => 'key']);
+$mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),

@@ -28,6 +28,7 @@ use MailerSend\Endpoints\SmtpUser;
 use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
+use MailerSend\Endpoints\User;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
@@ -81,6 +82,7 @@ class MailerSend
     public ApiQuota $apiQuota;
     public OnHoldList $onHoldList;
     public SmtpUser $smtpUser;
+    public User $user;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -124,6 +126,7 @@ class MailerSend
         $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
         $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
         $this->smtpUser = new SmtpUser($this->httpLayer, $this->options);
+        $this->user = new User($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
@@ -142,6 +145,10 @@ class MailerSend
             if (array_key_exists($option, $this->options)) {
                 $this->options[$option] = $value;
             }
+        }
+
+        if (empty(Arr::get($this->options, 'api_key'))) {
+            Arr::set($this->options, 'api_key', getenv('MAILERSEND_API_KEY'));
         }
 
         if (empty(Arr::get($this->options, 'api_key'))) {
