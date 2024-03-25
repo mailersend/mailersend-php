@@ -115,6 +115,12 @@ MailerSend PHP SDK
         * [Update a Sender Identity by email](#update-a-sender-identity-by-email-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
         * [Delete a Sender Identity by email](#delete-a-sender-identity-by-email-route)
+    * [Users](#users-routing)
+        * [Get a list of Users](#get-a-list-of-users)
+        * [Get a single User](#get-a-single-user)
+        * [Add a User](#add-a-user)
+        * [Update a User](#update-a-user)
+        * [Delete a User](#delete-a-user)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -2059,6 +2065,108 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->senderIdentity->deleteByEmail('email');
+```
+
+<a name="user-routing"></a>
+
+## Users
+
+<a name="get-a-list-of-users"></a>
+
+### Get a list of Users
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->getAll();
+```
+
+<a name="get-a-single-user"></a>
+
+### Get a single User
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->find('userId');
+```
+
+<a name="add-a-user"></a>
+
+### Add a User
+
+Example using only classes:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->create(
+    (new UserParams('email', Roles::ADMIN))
+);
+```
+
+Example using all options:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+use MailerSend\Common\Permissions;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->create(
+    (new UserParams('email', Roles::CUSTOM_USER))
+        ->setDomains(['domainId', 'anotherDomainId'])
+        ->setTemplates(['templateId', 'anotherTemplateId'])
+        ->setPermissions([Permissions::READ_OWN_TEMPLATES])
+        ->setRequiresPeriodicPasswordChange(true)
+);
+```
+
+<a name="update-a-user"></a>
+
+### Update a User
+
+The examples on building the `User` object portrayed in the 'Add a User' also apply in here.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Common\Roles;
+use MailerSend\Common\Permissions;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->update(
+    'userId',
+    (new UserParams())
+        ->setRole(Roles::CUSTOM_USER)
+        ->setDomains(['domainId', 'anotherDomainId'])
+        ->setTemplates(['templateId', 'anotherTemplateId'])
+        ->setPermissions([Permissions::READ_OWN_TEMPLATES])
+        ->setRequiresPeriodicPasswordChange(true)
+);
+```
+
+<a name="delete-a-user"></a>
+
+### Delete a User
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->user->delete('userId');
 ```
 
 <a name="other-endpoints"></a>

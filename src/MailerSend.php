@@ -27,6 +27,7 @@ use MailerSend\Endpoints\SmsWebhook;
 use MailerSend\Endpoints\Template;
 use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
+use MailerSend\Endpoints\User;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
@@ -79,6 +80,7 @@ class MailerSend
     public SenderIdentity $senderIdentity;
     public ApiQuota $apiQuota;
     public OnHoldList $onHoldList;
+    public User $user;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -121,6 +123,7 @@ class MailerSend
         $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
         $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
         $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
+        $this->user = new User($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
