@@ -2,7 +2,6 @@
 
 namespace MailerSend\Endpoints;
 
-
 use MailerSend\Helpers\Builder\SmsParams;
 use MailerSend\Helpers\Builder\SmsPersonalization;
 use MailerSend\Helpers\GeneralHelpers;
