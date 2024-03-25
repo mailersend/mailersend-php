@@ -15,6 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.22.0] - 2024 03 25
+
+### Added
+
+- Add the manage user endpoints
+- Add the SMTP user endpoints
+- Add the catch_type and match_type paramter to inbound
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.21.0] - 2024 03 20
 
 ### Added
