@@ -25,6 +25,12 @@ class Constants
     public const TYPE_MATCH_DOMAIN = 'match_domain';
     public const TYPE_MATCH_HEADER = 'match_header';
 
+    // Inbound Types
+    public const CATCH_TYPE_ALL = 'all';
+    public const CATCH_TYPE_ONE = 'one';
+    public const MATCH_TYPE_ALL = 'all';
+    public const MATCH_TYPE_ONE = 'one';
+
     // Comparison Operators
     public const COMPARER_EQUAL = 'equal';
     public const COMPARER_NOT_EQUQL = 'not-equal';
