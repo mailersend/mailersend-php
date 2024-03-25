@@ -4,10 +4,10 @@ namespace MailerSend\Helpers;
 
 use Assert\Assertion;
 use Assert\AssertionFailedException;
+use Illuminate\Support\Collection;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\SmsParams;
-use Tightenco\Collect\Support\Collection;
 
 class GeneralHelpers
 {

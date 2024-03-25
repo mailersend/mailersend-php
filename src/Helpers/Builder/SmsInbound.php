@@ -2,7 +2,8 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Tightenco\Collect\Contracts\Support\Arrayable;
+
+use Illuminate\Contracts\Support\Arrayable;
 
 class SmsInbound implements Arrayable, \JsonSerializable
 {

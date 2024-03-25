@@ -2,10 +2,10 @@
 
 namespace MailerSend\Tests\Helpers\Builder;
 
+use Illuminate\Support\Arr;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Tests\TestCase;
-use Tightenco\Collect\Support\Arr;
 
 class VariableTest extends TestCase
 {
