@@ -115,6 +115,12 @@ MailerSend PHP SDK
         * [Update a Sender Identity by email](#update-a-sender-identity-by-email-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
         * [Delete a Sender Identity by email](#delete-a-sender-identity-by-email-route)
+    * [SMTP Users](#smtp-users-routing)
+        * [Get a list of SMTP Users](#get-a-list-of-smtp-users)
+        * [Get a single SMTP User](#get-a-single-smtp-user)
+        * [Add SMTP User](#add-smtp-user)
+        * [Update SMTP User](#update-smtp-user)
+        * [Delete SMTP User](#delete-smtp-user)
     * [Users](#users-routing)
         * [Get a list of Users](#get-a-list-of-users)
         * [Get a single User](#get-a-single-user)
@@ -2065,6 +2071,80 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->senderIdentity->deleteByEmail('email');
+```
+
+<a name="smtp-user-routing"></a>
+
+## SMTP Users
+
+<a name="get-a-list-of-smtp-users"></a>
+
+### Get a list of SMTP Users
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->smtpUser->getAll('domainId', 25);
+```
+
+<a name="get-a-single-smtp-user"></a>
+
+### Get a single SMTP User
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->smtpUser->find('domainId', 'smtpUserId');
+```
+
+<a name="add-smtp-user"></a>
+
+### Add SMTP User
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Helpers\Builder\SmtpUserParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->smtpUser->create(
+    'domainId',
+    (new SmtpUserParams('name'))
+        ->setEnabled(false)
+);
+```
+
+<a name="update-smtp-user"></a>
+
+### Update SMTP User
+
+The examples on building the `SMTP User` object portrayed in the 'Add SMTP User' also apply in here.
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->smtpUser->update(
+    'domainId',
+    'smtpUserId',
+    (new SmtpUserParams('New name'))
+        ->setEnabled(false)
+);
+```
+
+<a name="delete-smtp-user"></a>
+
+### Delete SMTP User
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->smtpUser->delete('domainId', 'smtpUserId');
 ```
 
 <a name="user-routing"></a>
