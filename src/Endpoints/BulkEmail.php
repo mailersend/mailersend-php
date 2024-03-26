@@ -3,14 +3,11 @@
 namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
-use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\Attachment;
-use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
-use Tightenco\Collect\Support\Collection;
 
 class BulkEmail extends AbstractEndpoint
 {

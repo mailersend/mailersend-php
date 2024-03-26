@@ -2,6 +2,7 @@
 
 namespace MailerSend\Tests\Endpoints;
 
+use Illuminate\Support\Arr;
 use MailerSend\Common\Constants;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;
@@ -11,7 +12,6 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Analytics;
 use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
 use Psr\Http\Message\ResponseInterface;
-use Tightenco\Collect\Support\Arr;
 
 class AnalyticsTest extends TestCase
 {

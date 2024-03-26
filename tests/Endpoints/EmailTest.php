@@ -3,6 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Email;
 use MailerSend\Exceptions\MailerSendAssertException;
@@ -16,7 +17,6 @@ use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Tightenco\Collect\Support\Arr;
 
 class EmailTest extends TestCase
 {

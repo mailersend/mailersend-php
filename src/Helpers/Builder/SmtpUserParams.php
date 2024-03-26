@@ -2,7 +2,7 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Tightenco\Collect\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Arrayable;
 
 class SmtpUserParams implements Arrayable, \JsonSerializable
 {

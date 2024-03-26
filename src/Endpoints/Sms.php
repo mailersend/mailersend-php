@@ -2,16 +2,9 @@
 
 namespace MailerSend\Endpoints;
 
-use Assert\Assertion;
-use MailerSend\Helpers\Builder\Attachment;
-use MailerSend\Helpers\Builder\EmailParams;
-use MailerSend\Helpers\Builder\Personalization;
-use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\SmsParams;
 use MailerSend\Helpers\Builder\SmsPersonalization;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
-use Tightenco\Collect\Support\Collection;
 
 class Sms extends AbstractEndpoint
 {

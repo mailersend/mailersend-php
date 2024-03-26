@@ -3,11 +3,11 @@
 namespace MailerSend\Tests\Common;
 
 use Http\Mock\Client;
+use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Tightenco\Collect\Support\Arr;
 
 class HttpLayerTest extends TestCase
 {

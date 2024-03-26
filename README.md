@@ -146,6 +146,8 @@ MailerSend PHP SDK
 
 ## Setup
 
+This library, after version v0.22.0 is not compatible with Laravel 8.0 or lower. Please use older versions of SDK, or update your Laravel version.
+
 This library is built atop of [PSR-7](https://www.php-fig.org/psr/psr-7/) and
 [PSR-18](https://www.php-fig.org/psr/psr-18/). You will need to install some implementations for those interfaces.
 

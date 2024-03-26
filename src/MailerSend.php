@@ -2,6 +2,7 @@
 
 namespace MailerSend;
 
+use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
@@ -33,7 +34,6 @@ use MailerSend\Endpoints\Webhook;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
 use MailerSend\Exceptions\MailerSendException;
-use Tightenco\Collect\Support\Arr;
 
 /**
  * This is the PHP SDK for MailerSend

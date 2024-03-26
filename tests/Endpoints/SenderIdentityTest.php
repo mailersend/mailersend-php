@@ -3,13 +3,13 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SenderIdentity;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SenderIdentity as SenderIdentityBuilder;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Tightenco\Collect\Support\Arr;
 
 class SenderIdentityTest extends TestCase
 {

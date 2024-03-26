@@ -3,9 +3,9 @@
 namespace MailerSend\Helpers\Builder;
 
 use Assert\Assertion;
+use Illuminate\Contracts\Support\Arrayable;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\GeneralHelpers;
-use Tightenco\Collect\Contracts\Support\Arrayable;
 
 class Personalization implements Arrayable, \JsonSerializable
 {

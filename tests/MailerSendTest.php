@@ -2,11 +2,11 @@
 
 namespace MailerSend\Tests;
 
+use Illuminate\Support\Arr;
 use MailerSend\Endpoints\Email;
 use MailerSend\Exceptions\MailerSendException;
 use MailerSend\MailerSend;
 use ReflectionClass;
-use Tightenco\Collect\Support\Arr;
 
 class MailerSendTest extends TestCase
 {

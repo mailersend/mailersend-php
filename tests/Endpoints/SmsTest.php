@@ -3,16 +3,14 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Sms;
 use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Builder\SmsParams;
 use MailerSend\Helpers\Builder\SmsPersonalization;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
-use Tightenco\Collect\Support\Arr;
 
 class SmsTest extends TestCase
 {

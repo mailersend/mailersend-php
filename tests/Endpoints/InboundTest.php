@@ -3,6 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use Illuminate\Support\Arr;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Inbound;
@@ -14,7 +15,6 @@ use MailerSend\Helpers\Builder\Inbound as InboundBuilder;
 use MailerSend\Helpers\Builder\MatchFilter;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
-use Tightenco\Collect\Support\Arr;
 
 class InboundTest extends TestCase
 {
