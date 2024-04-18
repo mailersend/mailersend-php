@@ -52,7 +52,10 @@ MailerSend PHP SDK
         * [Get a single scheduled message](#get-a-single-scheduled-message)
         * [Delete a scheduled message](#delete-a-scheduled-message)
     * [Tokens API](#tokens)
+        * [Get all tokens](#get-all-tokens)
+        * [Find a tokens](#find-a-token )
         * [Create a token](#create-a-token)
+        * [Change a token name](#change-a-token-name)
         * [Update token](#update-token)
         * [Delete token](#delete-token)
     * [Recipients API](#recipients)
@@ -1063,6 +1066,34 @@ $mailersend->scheduleMessages->delete('message_id');
 
 ## Tokens
 
+<a name="get_all_tokens"></a>
+
+### Get all tokens
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->token->getAll();
+```
+
+<a name="find-a-token"></a>
+
+### Find a token
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->token->find('token_id'); 
+```
+
+<a name="delete-token"></a>
+
 <a name="create_a_token"></a>
 
 ### Create a token
@@ -1091,6 +1122,19 @@ $response = $mailersend->token->create(
 );
 
 echo $response['body']['data']['accessToken'];
+```
+
+<a name="change-a-token-name"></a>
+
+### Change a token name
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TokenParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->token->changeName('token_id', 'new name'); 
 ```
 
 <a name="update-token"></a>

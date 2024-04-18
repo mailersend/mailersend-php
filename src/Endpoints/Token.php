@@ -13,6 +13,19 @@ class Token extends AbstractEndpoint
 {
     protected string $endpoint = 'token';
 
+    /**
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     */
+    public function getAll(): array
+    {
+
+        return $this->httpLayer->get(
+            $this->buildUri($this->endpoint)
+        );
+    }
+
 
     /**
      * @param TokenParams $tokenParams
@@ -68,6 +81,31 @@ class Token extends AbstractEndpoint
 
     /**
      * @param string $id
+     * @param string $name
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     * @throws MailerSendAssertException
+     */
+    public function changeName(string $id, string $name): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($id, 'Token id is required.') &&
+                Assertion::notEmpty($name, 'Token name is required.')
+        );
+
+        return $this->httpLayer->put(
+            $this->buildUri($this->endpoint . '/' . $id . ''),
+            array_filter(
+                [
+                    'name' => $name,
+                ],
+            ),
+        );
+    }
+
+    /**
+     * @param string $id
      * @return array
      * @throws ClientExceptionInterface
      * @throws JsonException
@@ -80,6 +118,25 @@ class Token extends AbstractEndpoint
         );
 
         return $this->httpLayer->delete(
+            $this->buildUri($this->endpoint . '/' . $id),
+            []
+        );
+    }
+
+    /**
+     * @param string $id
+     * @return array
+     * @throws ClientExceptionInterface
+     * @throws JsonException
+     * @throws MailerSendAssertException
+     */
+    public function find(string $id): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($id, 'Token id is required.')
+        );
+
+        return $this->httpLayer->get(
             $this->buildUri($this->endpoint . '/' . $id),
             []
         );

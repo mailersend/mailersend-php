@@ -84,6 +84,35 @@ class TokenTest extends TestCase
         self::assertSame($this->validTokenParams()->getScopes(), Arr::get($request_body, 'scopes'));
     }
 
+    public function test_update_token_with_empty_name_throws_errors(): void
+    {
+        $this->expectExceptionMessage('Token name is required.');
+
+        $response = $this->token->changeName(
+            'random_id',
+            ''
+        );
+    }
+
+
+    public function test_update_token_name(): void
+    {
+        $response = $this->token->changeName(
+            'random_id',
+            'changed_name'
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('PUT', $request->getMethod());
+        self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        self::assertSame('changed_name', Arr::get($request_body, 'name'));
+    }
+
+
     public function test_pause_token()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -138,6 +167,36 @@ class TokenTest extends TestCase
 
         self::assertEquals('DELETE', $request->getMethod());
         self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_find_token()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->token->find('random_id');
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_get_all_token()
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->token->getAll();
+
+        $request = $this->client->getLastRequest();
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/token', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
