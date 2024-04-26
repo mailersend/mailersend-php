@@ -31,18 +31,22 @@ class InviteTest extends TestCase
     }
 
     /**
+     * @dataProvider validInviteRoutingListDataProvider
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_get_all(): void
+    public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
 
-        $response = $this->invite->getAll();
+        $response = $this->invite->getAll(
+            Arr::get($params, 'page'),
+            Arr::get($params, 'limit'),
+        );
 
         $request = $this->client->getLastRequest();
 
@@ -51,6 +55,25 @@ class InviteTest extends TestCase
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/invites', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
+
+        self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
+        self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+    }
+
+    /**
+     * @dataProvider invalidInviteRoutingListDataProvider
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_get_all_with_errors(array $params): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->invite->getAll(
+            Arr::get($params, 'page'),
+            Arr::get($params, 'limit'),
+        );
     }
 
     /**
@@ -105,7 +128,7 @@ class InviteTest extends TestCase
     public function test_cancel(): void
     {
         $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $response->method('getStatusCode')->willReturn(204);
 
         $this->client->addResponse($response);
 
@@ -114,8 +137,8 @@ class InviteTest extends TestCase
         $request = $this->client->getLastRequest();
 
         self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/invites/inviteId/cancel', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
+        self::assertEquals('/v1/invites/inviteId', $request->getUri()->getPath());
+        self::assertEquals(204, $response['status_code']);
     }
 
     /**
@@ -127,5 +150,62 @@ class InviteTest extends TestCase
         $this->expectException(MailerSendAssertException::class);
 
         $this->invite->cancel('');
+    }
+
+    public function validInviteRoutingListDataProvider(): array
+    {
+        return [
+            'empty request' => [
+                'params' => [],
+                'expected' => [
+                    'page' => null,
+                    'limit' => null,
+                ],
+            ],
+            'with page' => [
+                [
+                    'page' => 1,
+                ],
+                [
+                    'page' => 1,
+                    'limit' => null,
+                ],
+            ],
+            'with limit' => [
+                [
+                    'limit' => 10,
+                ],
+                [
+                    'page' => null,
+                    'limit' => 10,
+                ],
+            ],
+            'complete request' => [
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                ],
+                [
+                    'page' => 1,
+                    'limit' => 10,
+                ],
+            ],
+        ];
+    }
+
+    public function invalidInviteRoutingListDataProvider(): array
+    {
+        return [
+            'with limit under 10' => [
+                [
+                    'limit' => 9,
+                ],
+            ],
+            'with limit over 100' => [
+                [
+                    'limit' => 101,
+                ],
+            ]
+        ];
     }
 }
