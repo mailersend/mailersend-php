@@ -130,7 +130,7 @@ MailerSend PHP SDK
         * [Get a list of Invites](#get-a-list-of-invites)
         * [Get a single Invite](#get-a-single-invite)
         * [Resend an Invite](#resend-an-invite)
-        * [Cancel and Invite](#cancel-an-invite)
+        * [Cancel an Invite](#cancel-an-invite)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
