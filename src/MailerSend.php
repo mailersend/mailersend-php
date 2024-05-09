@@ -14,6 +14,7 @@ use MailerSend\Endpoints\Email;
 use MailerSend\Endpoints\EmailVerification;
 use MailerSend\Endpoints\HardBounce;
 use MailerSend\Endpoints\Inbound;
+use MailerSend\Endpoints\Invite;
 use MailerSend\Endpoints\Message;
 use MailerSend\Endpoints\OnHoldList;
 use MailerSend\Endpoints\ScheduleMessages;
@@ -83,6 +84,7 @@ class MailerSend
     public OnHoldList $onHoldList;
     public SmtpUser $smtpUser;
     public User $user;
+    public Invite $invite;
 
     /**
      * @param  array  $options  Additional options for the SDK
@@ -127,6 +129,7 @@ class MailerSend
         $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
         $this->smtpUser = new SmtpUser($this->httpLayer, $this->options);
         $this->user = new User($this->httpLayer, $this->options);
+        $this->invite = new Invite($this->httpLayer, $this->options);
     }
 
     protected function setHttpLayer(?HttpLayer $httpLayer = null): void
