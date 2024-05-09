@@ -127,6 +127,10 @@ MailerSend PHP SDK
         * [Add a User](#add-a-user)
         * [Update a User](#update-a-user)
         * [Delete a User](#delete-a-user)
+        * [Get a list of Invites](#get-a-list-of-invites)
+        * [Get a single Invite](#get-a-single-invite)
+        * [Resend an Invite](#resend-an-invite)
+        * [Cancel and Invite](#cancel-an-invite)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -2250,6 +2254,56 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->user->delete('userId');
 ```
+
+<a name="get-a-list-of-invites></a>
+
+### Get a list of Invites
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->invite->getAll();
+```
+
+<a name="get-a-single-invite"></a>
+
+### Get a single Invite
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->invite->find('inviteId');
+```
+
+<a name="resend-an-invite"></a>
+
+### Resend an Invite
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->invite->resend('inviteId');
+```
+
+
+<a name="cancel-an-invite></a>
+
+### Cancel an Invite
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->invite->cancel('inviteId');
+```
+
 
 <a name="other-endpoints"></a>
 
