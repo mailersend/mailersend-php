@@ -53,7 +53,7 @@ MailerSend PHP SDK
         * [Delete a scheduled message](#delete-a-scheduled-message)
     * [Tokens API](#tokens)
         * [Get all tokens](#get-all-tokens)
-        * [Find a tokens](#find-a-token)
+        * [Find a token](#find-a-token)
         * [Create a token](#create-a-token)
         * [Change a token name](#change-a-token-name)
         * [Update token](#update-token)
@@ -1072,7 +1072,6 @@ $mailersend->scheduleMessages->delete('message_id');
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\TokenParams;
 
 $mailersend = new MailerSend();
 
@@ -1085,7 +1084,6 @@ $mailersend->token->getAll($page = 1, $limit = 10);
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\TokenParams;
 
 $mailersend = new MailerSend();
 
