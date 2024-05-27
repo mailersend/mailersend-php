@@ -15,6 +15,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.25.0] - 2024 05 27
+
+### Added
+
+- Add show all tokens, show single token, and change token name api endpoints
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
 ## [0.24.0] - 2024 05 09
 
 ### Added
