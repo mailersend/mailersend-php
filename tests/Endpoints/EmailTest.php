@@ -444,6 +444,30 @@ class EmailTest extends TestCase
                         ]
                     ])
             ],
+            'with references header' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setReplyTo('reply-to@mailersend.com')
+                    ->setReplyToName('Reply To')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text')
+                    ->setTags([
+                        'tag'
+                    ])
+                    ->setInReplyToHeader('test@mailersend.com')
+                    ->setReferencesHeader([
+                        '<test@mailersend.com>',
+                        '<test2@mailersend.com>'
+                    ]),
+            ],
         ];
     }
 
