@@ -12,8 +12,7 @@ MailerSend PHP SDK
         * [Send an email](#send-an-email)
         * [Add CC, BCC recipients](#cc-bcc-recipients)
         * [Send a template-based email](#template)
-        * [Advanced personalization](#personalization)
-        * [Simple personalization](#variables)
+        * [Personalization](#personalization)
         * [Send an email with attachment](#attachments)
         * [Send a scheduled message](#send-a-scheduled-message)
         * [Send email with precedence bulk header](#precedence-bulk-header)
@@ -281,7 +280,6 @@ $mailersend->email->send($emailParams);
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 
@@ -289,10 +287,6 @@ $mailersend = new MailerSend();
 
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
-];
-
-$variables = [
-    new Variable('your@client.com', ['var' => 'value'])
 ];
 
 $tags = ['tag'];
@@ -303,7 +297,6 @@ $emailParams = (new EmailParams())
     ->setRecipients($recipients)
     ->setSubject('Subject')
     ->setTemplateId('ss243wdasd')
-    ->setVariables($variables)
     ->setTags($tags);
 
 $mailersend->email->send($emailParams);
@@ -351,38 +344,6 @@ $emailParams = (new EmailParams())
     ->setHtml('This is the html version with a {$var}.')
     ->setText('This is the text versions with a {$var}.')
     ->setPersonalization($personalization);
-
-$mailersend->email->send($emailParams);
-```
-
-<a name="variables"></a>
-
-### Simple personalization
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
-use MailerSend\Helpers\Builder\Recipient;
-use MailerSend\Helpers\Builder\EmailParams;
-
-$mailersend = new MailerSend();
-
-$recipients = [
-    new Recipient('your@client.com', 'Your Client'),
-];
-
-$variables = [
-    new Variable('your@client.com', ['var' => 'value'])
-];
-
-$emailParams = (new EmailParams())
-    ->setFrom('your@domain.com')
-    ->setFromName('Your Name')
-    ->setRecipients($recipients)
-    ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
 
 $mailersend->email->send($emailParams);
 ```
@@ -2368,7 +2329,6 @@ $mailersend->apiQuota->get();
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Exceptions\MailerSendValidationException;
@@ -2380,19 +2340,13 @@ $recipients = [
     new Recipient('your@client.com', 'Your Client'),
 ];
 
-// This should be your@client.com, as in $recipients
-$variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
-];
-
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
     ->setRecipients($recipients)
     ->setSubject('Subject {$var}')
     ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
+    ->setText('This is the text versions with a {$var}.');
 
 try{
     $mailersend->email->send($emailParams);

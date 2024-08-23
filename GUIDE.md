@@ -8,8 +8,7 @@ Some more advanced usages of our SDK.
 
 * [Available Helpers](#helpers)
 * [Sending and email with CC and BCC](#cc_and_bcc)
-* [Sending an email with variables (simple personalisation)](#variables)
-* [Sending an email with personalization (advanced personalisation)](#personalization)
+* [Sending an email with personalization](#personalization)
 * [Sending a templated email](#templated)
 * [Sending an email with attachment](#attachments)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -19,17 +18,11 @@ Some more advanced usages of our SDK.
 
 ```php
 use MailerSend\Helpers\Builder\Attachment;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 
 // This will help you build the recipient array
 $recipients = [
     new Recipient('your@client.com', 'Your Client'),
-];
-
-// This will help you build the variable array
-$variables = [
-    new Variable('your@client.com', ['var' => 'value'])
 ];
 
 // This will help you build the attachments array and will encode the contents of attachments
@@ -75,39 +68,8 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
-<a name="variables"></a>
-# Sending an email with variables (simple personalization)
-
-```php
-use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
-use MailerSend\Helpers\Builder\Recipient;
-use MailerSend\Helpers\Builder\EmailParams;
-
-$mailersend = new MailerSend(['api_key' => 'key']);
-
-$recipients = [
-    new Recipient('your@client.com', 'Your Client'),
-];
-
-$variables = [
-    new Variable('your@client.com', ['var' => 'value'])
-];
-
-$emailParams = (new EmailParams())
-    ->setFrom('your@domain.com')
-    ->setFromName('Your Name')
-    ->setRecipients($recipients)
-    ->setSubject('Subject {$var}')
-    ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
-
-$mailersend->email->send($emailParams);
-```
-
 <a name="personalization"></a>
-# Sending an email with personalization (advanced personalization)
+# Sending an email with personalization
 
 ```php
 use MailerSend\MailerSend;
@@ -166,10 +128,6 @@ $recipients = [
     new Recipient('your@client.com', 'Your Client'),
 ];
 
-$variables = [
-    new Variable('your@client.com', ['var' => 'value'])
-];
-
 $tags = ['tag'];
 
 $emailParams = (new EmailParams())
@@ -177,8 +135,7 @@ $emailParams = (new EmailParams())
     ->setFromName('Your Name')
     ->setRecipients($recipients)
     ->setSubject('Subject')
-    ->setTemplateId('ss243wdasd')
-    ->setVariables($variables);
+    ->setTemplateId('ss243wdasd');
 
 $mailersend->email->send($emailParams);
 ```
@@ -219,7 +176,6 @@ $mailersend->email->send($emailParams);
 
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Exceptions\MailerSendValidationException;
@@ -230,19 +186,13 @@ $recipients = [
     new Recipient('your@client.com', 'Your Client'),
 ];
 
-// This should be your@client.com, as in $recipients
-$variables = [
-    new Variable('your@domain.com', ['var' => 'value'])
-];
-
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
     ->setRecipients($recipients)
     ->setSubject('Subject {$var}')
     ->setHtml('This is the html version with a {$var}.')
-    ->setText('This is the text versions with a {$var}.')
-    ->setVariables($variables);
+    ->setText('This is the text versions with a {$var}.');
 
 try{
     $mailersend->email->send($emailParams);

@@ -16,7 +16,6 @@ class EmailParams
     protected ?string $text = null;
     protected ?string $template_id = null;
     protected array $tags = [];
-    protected array $variables = [];
     protected array $attachments = [];
     protected array $personalization = [];
     protected ?int $send_at = null;
@@ -156,17 +155,6 @@ class EmailParams
     public function setTags(array $tags): EmailParams
     {
         $this->tags = $tags;
-        return $this;
-    }
-
-    public function getVariables(): array
-    {
-        return $this->variables;
-    }
-
-    public function setVariables(array $variables): EmailParams
-    {
-        $this->variables = $variables;
         return $this;
     }
 
