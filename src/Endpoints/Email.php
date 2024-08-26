@@ -61,6 +61,7 @@ class Email extends AbstractEndpoint
                         'track_content' => $params->trackContent(),
                     ],
                     'headers' => $params->getHeaders(),
+                    'references' => $params->getReferencesHeader(),
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             )

@@ -26,6 +26,7 @@ class EmailParams
     protected ?bool $trackOpens = null;
     protected ?bool $trackContent = null;
     protected array $headers = [];
+    protected array $referencesHeader = [];
 
     public function getFrom(): ?string
     {
@@ -272,6 +273,17 @@ class EmailParams
     public function setHeaders(array $headers): EmailParams
     {
         $this->headers = $headers;
+        return $this;
+    }
+
+    public function getReferencesHeader(): array
+    {
+        return $this->referencesHeader;
+    }
+
+    public function setReferencesHeader(array $referencesHeader): EmailParams
+    {
+        $this->referencesHeader = $referencesHeader;
         return $this;
     }
 }
