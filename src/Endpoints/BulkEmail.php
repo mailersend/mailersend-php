@@ -6,7 +6,6 @@ use Assert\Assertion;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
-use MailerSend\Helpers\Builder\Variable;
 use MailerSend\Helpers\GeneralHelpers;
 
 class BulkEmail extends AbstractEndpoint
@@ -31,7 +30,6 @@ class BulkEmail extends AbstractEndpoint
             $cc_mapped = GeneralHelpers::mapToArray($params->getCc(), Recipient::class);
             $bcc_mapped = GeneralHelpers::mapToArray($params->getBcc(), Recipient::class);
             $attachments_mapped = GeneralHelpers::mapToArray($params->getAttachments(), Attachment::class);
-            $variables_mapped = GeneralHelpers::mapToArray($params->getVariables(), Variable::class);
             $personalization_mapped = GeneralHelpers::mapToArray($params->getPersonalization(), Personalization::class);
 
             $requestData[] = array_filter(
@@ -53,7 +51,6 @@ class BulkEmail extends AbstractEndpoint
                     'html' => $params->getHtml(),
                     'tags' => $params->getTags(),
                     'attachments' => $attachments_mapped,
-                    'variables' => $variables_mapped,
                     'personalization' => $personalization_mapped,
                     'send_at' => $params->getSendAt(),
                     'precedence_bulk' => $params->getPrecedenceBulkHeader(),

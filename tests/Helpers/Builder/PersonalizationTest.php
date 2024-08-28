@@ -4,7 +4,7 @@ namespace MailerSend\Tests\Helpers\Builder;
 
 use Illuminate\Support\Arr;
 use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\Builder\Variable;
+use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Tests\TestCase;
 
 class PersonalizationTest extends TestCase
@@ -13,14 +13,14 @@ class PersonalizationTest extends TestCase
     {
         $this->expectException(MailerSendAssertException::class);
 
-        new Variable('testmailersend.com', []);
+        new Personalization('testmailersend.com', []);
     }
 
     public function test_personalization_validates_substitutions_length(): void
     {
         $this->expectException(MailerSendAssertException::class);
 
-        new Variable('test@mailersend.com', []);
+        new Personalization('test@mailersend.com', []);
     }
 
     public function test_creates_personalization(): void
