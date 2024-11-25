@@ -15,6 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.28.0] - 2024 11 25
+
+### Added
+
+- Add opened_unique, clicked_unique to analytics event list
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.27.0] - 2024 08 28
 
 ### Added
