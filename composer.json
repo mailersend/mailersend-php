@@ -35,7 +35,7 @@
     "php-http/mock-client": "^1.0",
     "php-http/message": "^1.0",
     "mockery/mockery": "^0.9.4",
-    "guzzlehttp/psr7": "^1.5.2",
+    "guzzlehttp/psr7": "^2.0.0",
     "http-interop/http-factory-guzzle": "^1.0",
     "php-http/guzzle7-adapter": "^0.1 || ^1.0",
     "friendsofphp/php-cs-fixer": "^3.4.0"
