@@ -34,7 +34,7 @@ class SmsWebhookParams implements Arrayable, \JsonSerializable
      * @param bool|null $enabled
      * @throws MailerSendAssertException
      */
-    public function __construct(string $url = null, string $name = null, array $events = null, string $smsNumberId = null, ?bool $enabled = null)
+    public function __construct(?string $url = null, ?string $name = null, ?array $events = null, ?string $smsNumberId = null, ?bool $enabled = null)
     {
         $this->setUrl($url)
             ->setName($name)

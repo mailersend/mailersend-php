@@ -9,10 +9,10 @@ class SmsInbound implements Arrayable, \JsonSerializable
     protected ?string $smsNumberId = null;
     protected ?string $name = null;
     protected ?string $forward_url = null;
-    protected $filter = null;
+    protected ?SmsInboundFilter $filter = null;
     protected ?bool $enabled = true;
 
-    public function __construct(string $smsNumberId = null, string $name = null, string $forward_url = null, $filter = null, bool $enabled = null)
+    public function __construct(?string $smsNumberId = null, ?string $name = null, ?string $forward_url = null, ?SmsInboundFilter $filter = null, ?bool $enabled = null)
     {
         $this->smsNumberId = $smsNumberId;
         $this->name = $name;
