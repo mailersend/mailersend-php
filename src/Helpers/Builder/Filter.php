@@ -11,7 +11,7 @@ class Filter implements Arrayable, \JsonSerializable
     protected string $value;
     protected ?string $key;
 
-    public function __construct(string $comparer, string $value, string $key = null)
+    public function __construct(string $comparer, string $value, ?string $key = null)
     {
         $this->comparer = $comparer;
         $this->value = $value;

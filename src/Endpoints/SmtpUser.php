@@ -16,7 +16,7 @@ class SmtpUser extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function getAll(string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(?string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT): array
     {
         if ($limit) {
             GeneralHelpers::assert(
