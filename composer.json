@@ -26,7 +26,7 @@
     "php-http/httplug": "^2.1",
     "psr/http-client-implementation": "^1.0",
     "psr/http-message": "^1.0 || ^2.0",
-    "illuminate/collections": "^8.0 || ^9.0 || ^10.0 || ^11.0",
+    "illuminate/collections": "^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0",
     "beberlei/assert": "^3.2",
     "symfony/options-resolver": "^4.0.15 || ~4.1.9 || ^4.2.1 || ^5.0 || ^6.0 || ^7.0"
   },
