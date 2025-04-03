@@ -445,6 +445,7 @@ class EmailTest extends TestCase
             'with list unsubscribe' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
                     ->setRecipients([
                         [
                             'name' => 'Recipient',
