@@ -59,6 +59,7 @@ class Email extends AbstractEndpoint
                     ],
                     'headers' => $params->getHeaders(),
                     'references' => $params->getReferencesHeader(),
+                    'list_unsubscribe' => $params->getListUnsubscribe(),
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             )

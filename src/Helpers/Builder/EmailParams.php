@@ -26,6 +26,7 @@ class EmailParams
     protected ?bool $trackContent = null;
     protected array $headers = [];
     protected array $referencesHeader = [];
+    protected ?string $listUnsubscribe = null;
 
     public function getFrom(): ?string
     {
@@ -272,6 +273,17 @@ class EmailParams
     public function setReferencesHeader(array $referencesHeader): EmailParams
     {
         $this->referencesHeader = $referencesHeader;
+        return $this;
+    }
+
+    public function getListUnsubscribe(): ?string
+    {
+        return $this->listUnsubscribe;
+    }
+
+    public function setListUnsubscribe(string $listUnsubscribe): EmailParams
+    {
+        $this->listUnsubscribe = $listUnsubscribe;
         return $this;
     }
 }
