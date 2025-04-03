@@ -20,7 +20,7 @@
   ],
   "require": {
     "ext-json": "*",
-    "php": "^7.4 || ^8.0 <8.4",
+    "php": "^7.4 || ^8.0 <8.5",
     "php-http/client-common": "^2.2",
     "php-http/discovery": "^1.9",
     "php-http/httplug": "^2.1",
