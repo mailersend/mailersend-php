@@ -15,17 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.32.0] - 2025 04 03
+
+### Changed
+
+- php version 8.3 support
+
 ## [0.31.0] - 2025 04 03
 
 ### Added
 
 - `list_unsubscribe` support
-
-### Changed
-
-### Fixed
-
-### Removed
 
 ## [0.28.0] - 2024 11 25
 
