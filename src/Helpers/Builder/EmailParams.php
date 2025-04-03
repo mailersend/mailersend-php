@@ -276,7 +276,7 @@ class EmailParams
         return $this;
     }
 
-    public function getListUnsubscribe(): string
+    public function getListUnsubscribe(): ?string
     {
         return $this->listUnsubscribe;
     }
