@@ -264,7 +264,7 @@ class EmailVerificationTest extends TestCase
                 'expected' => [
                     'page' => null,
                     'limit' => null,
-                    'results' => 'typo,catch_all',
+                    'results' => [EmailVerificationParams::TYPO, EmailVerificationParams::CATCH_ALL],
                 ],
             ],
             'complete request' => [
@@ -276,7 +276,7 @@ class EmailVerificationTest extends TestCase
                 'expected' => [
                     'page' => 1,
                     'limit' => 10,
-                    'results' => 'typo,catch_all',
+                    'results' => [EmailVerificationParams::TYPO, EmailVerificationParams::CATCH_ALL],
                 ],
             ],
         ];

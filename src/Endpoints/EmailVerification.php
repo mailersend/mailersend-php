@@ -108,7 +108,7 @@ class EmailVerification extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$emailVerificationId/results", [
+            $this->url("$this->endpoint/$emailVerificationId/results", [
                 'page' => $page,
                 'limit' => $limit,
                 'results' => $results,
