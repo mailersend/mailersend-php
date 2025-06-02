@@ -104,7 +104,7 @@ class EmailVerificationTest extends TestCase
         self::assertEquals('/v1/email-verification', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame('file.csv', Arr::get($request_body, 'name'));
-        self::assertEquals(['test@mail.com'], Arr::get($request_body, 'emailAddresses'));
+        self::assertEquals(['test@mail.com'], Arr::get($request_body, 'emails'));
     }
 
     /**
