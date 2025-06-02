@@ -15,6 +15,7 @@ class Inbound implements Arrayable, \JsonSerializable
     protected array $forwards = [];
     protected ?string $catchType = null;
     protected ?string $matchType = null;
+    protected ?int $inboundPriority = null;
 
     public function __construct(string $domainId, string $name, bool $domainEnabled)
     {
@@ -146,6 +147,18 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this;
     }
 
+    public function getInboundPriority(): ?int
+    {
+        return $this->inboundPriority;
+    }
+
+    public function setInboundPriority(?int $inboundPriority): self
+    {
+        $this->inboundPriority = $inboundPriority;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -157,7 +170,8 @@ class Inbound implements Arrayable, \JsonSerializable
             'match_filter' => $this->getMatchFilter(),
             'forwards' => $this->getForwards(),
             'catch_type' => $this->getCatchType(),
-            'match_type' => $this->getMatchType()
+            'match_type' => $this->getMatchType(),
+            'inbound_priority' => $this->getInboundPriority()
         ];
     }
 

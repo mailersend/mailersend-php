@@ -288,6 +288,38 @@ class InboundTest extends TestCase
                             'value' => 'value',
                         ],
                     ],
+                    'inbound_priority' => null,
+                ],
+            ],
+            'enabled, catch all, match all, with priority' => [
+                'params' => (new InboundBuilder('domainId', 'name', true))
+                    ->setInboundDomain('inboundDomain')
+                    ->setCatchFilter(
+                        (new CatchFilter(Constants::TYPE_CATCH_ALL))
+                    )
+                    ->setMatchFilter(
+                        (new MatchFilter(Constants::TYPE_MATCH_ALL))
+                    )
+                    ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+                    ->setInboundPriority(50),
+                'expected' => [
+                    'domain_id' => 'domainId',
+                    'name' => 'name',
+                    'domain_enabled' => true,
+                    'inbound_domain' => 'inboundDomain',
+                    'catch_filter' => [
+                        'type' => Constants::TYPE_CATCH_ALL,
+                    ],
+                    'match_filter' => [
+                        'type' => Constants::TYPE_MATCH_ALL,
+                    ],
+                    'forwards' => [
+                        [
+                            'type' => Constants::TYPE_WEBHOOK,
+                            'value' => 'value',
+                        ],
+                    ],
+                    'inbound_priority' => 50,
                 ],
             ],
             'disabled, catch all, match all' => [
