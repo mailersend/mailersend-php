@@ -3,7 +3,7 @@
 namespace MailerSend\Helpers\Builder;
 
 use Assert\Assertion;
-use Illuminate\Contracts\Support\Arrayable;
+use MailerSend\Contracts\Arrayable;
 use JsonSerializable;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\GeneralHelpers;

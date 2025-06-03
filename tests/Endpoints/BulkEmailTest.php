@@ -3,11 +3,11 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Exceptions\MailerSendValidationException;
+use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Personalization;

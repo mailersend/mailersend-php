@@ -3,7 +3,6 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Domain;
 use MailerSend\Exceptions\MailerSendAssertException;
@@ -11,6 +10,7 @@ use MailerSend\Helpers\Builder\DomainParams;
 use MailerSend\Helpers\Builder\DomainSettingsParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class DomainTest extends TestCase
 {

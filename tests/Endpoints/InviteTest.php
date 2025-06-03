@@ -3,12 +3,12 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Common\Roles;
 use MailerSend\Endpoints\Invite;
 use MailerSend\Endpoints\User;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;

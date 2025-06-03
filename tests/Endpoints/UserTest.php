@@ -3,7 +3,6 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Common\Roles;
 use MailerSend\Endpoints\User;
@@ -11,6 +10,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class UserTest extends TestCase
 {
@@ -122,7 +122,6 @@ class UserTest extends TestCase
 
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws MailerSendAssertException
      * @throws \JsonException
      */
     public function test_delete(): void
