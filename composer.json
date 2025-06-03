@@ -54,7 +54,7 @@
       "@php vendor/bin/phpunit tests/"
     ],
     "phpcs": [
-      "@php vendor/bin/php-cs-fixer fix --verbose --diff"
+      "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix --verbose --diff"
     ]
   },
   "config": {
