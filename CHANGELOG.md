@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.33.0] - 2025 06 04
+
+### Added
+
+- Inbound priority support
+
+### Fixed
+
+- Email verification parameters
+
 ## [0.32.0] - 2025 04 03
 
 ### Changed
