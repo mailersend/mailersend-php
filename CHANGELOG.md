@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.34.0] - 2025 06 04
+
+### Changed
+
+- php version 8.4 support
+- PHPUnit 12 support
+
 ## [0.33.0] - 2025 06 04
 
 ### Added
