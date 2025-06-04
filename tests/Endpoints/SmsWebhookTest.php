@@ -3,12 +3,12 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SmsWebhook;
 use MailerSend\Helpers\Builder\SmsWebhookParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class SmsWebhookTest extends TestCase
 {

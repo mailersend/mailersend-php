@@ -3,7 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
+use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Template;
 use MailerSend\Exceptions\MailerSendAssertException;

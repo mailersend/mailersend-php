@@ -2,7 +2,7 @@
 
 namespace MailerSend\Tests\Helpers\Builder;
 
-use Illuminate\Support\Arr;
+use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Tests\TestCase;
 

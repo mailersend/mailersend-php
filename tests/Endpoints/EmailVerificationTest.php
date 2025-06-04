@@ -3,13 +3,13 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\EmailVerification;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailVerificationParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class EmailVerificationTest extends TestCase
 {

@@ -2,8 +2,8 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Arr;
+use MailerSend\Contracts\Arrayable;
+use MailerSend\Helpers\Arr;
 
 class Filter implements Arrayable, \JsonSerializable
 {

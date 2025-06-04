@@ -2,7 +2,7 @@
 
 namespace MailerSend\Tests\Endpoints;
 
-use Illuminate\Support\Arr;
+use MailerSend\Helpers\Arr;
 use MailerSend\Common\Constants;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\OpensAnalyticsParams;

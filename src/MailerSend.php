@@ -2,7 +2,7 @@
 
 namespace MailerSend;
 
-use Illuminate\Support\Arr;
+use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;

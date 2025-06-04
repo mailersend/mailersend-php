@@ -3,7 +3,6 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SpamComplaint;
@@ -11,6 +10,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class SpamComplaintTest extends TestCase
 {

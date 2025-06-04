@@ -2,7 +2,7 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Illuminate\Contracts\Support\Arrayable;
+use MailerSend\Contracts\Arrayable;
 
 class DomainParams implements Arrayable, \JsonSerializable
 {
