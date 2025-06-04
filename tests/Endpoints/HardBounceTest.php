@@ -3,7 +3,6 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use Illuminate\Support\Arr;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\HardBounce;
@@ -12,6 +11,7 @@ use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Arr;
 
 class HardBounceTest extends TestCase
 {

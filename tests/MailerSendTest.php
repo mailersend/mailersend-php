@@ -2,7 +2,7 @@
 
 namespace MailerSend\Tests;
 
-use Illuminate\Support\Arr;
+use MailerSend\Helpers\Arr;
 use MailerSend\Endpoints\Email;
 use MailerSend\Exceptions\MailerSendException;
 use MailerSend\MailerSend;
