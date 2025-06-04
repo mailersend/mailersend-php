@@ -75,7 +75,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
     {
         return [
             'name' => $this->getName(),
-            'emailAddresses' => $this->emailAddresses,
+            'emails' => $this->emailAddresses,
         ];
     }
 

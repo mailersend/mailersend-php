@@ -595,7 +595,8 @@ $mailersend->inbound->create(
         ->setMatchFilter(
             (new MatchFilter(Constants::TYPE_MATCH_SENDER))
                 ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'sender@mailersend.com', 'sender')))
-        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->setInboundPriority(50)
 );
 ```
 
@@ -633,7 +634,8 @@ $mailersend->inbound->create(
                     ]
                 ])
         )
-        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->setInboundPriority(50)
 );
 ```
 
@@ -673,10 +675,11 @@ $mailersend->inbound->create(
         ])
         ->setForwards([
             [
-                'type' => Constants::COMPARER_EQUAL,
+                'type' => Constants::TYPE_WEBHOOK,
                 'value' => 'value',
             ]
         ])
+        ->setInboundPriority(50)
 );
 ```
 
@@ -704,7 +707,7 @@ $mailersend->inbound->update(
             (new CatchFilter(Constants::TYPE_CATCH_ALL))
         )
         ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
-        ->addForward(new Forward(Constants::COMPARER_EQUAL, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
 );
 ```
 
