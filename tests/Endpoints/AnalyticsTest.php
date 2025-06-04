@@ -12,6 +12,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Analytics;
 use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
 use Psr\Http\Message\ResponseInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AnalyticsTest extends TestCase
 {
@@ -33,6 +34,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider validActivityAnalyticsProvider
      */
+    #[DataProvider('validActivityAnalyticsProvider')]
     public function test_get_activity_by_date(ActivityAnalyticsParams $activityAnalyticsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -67,6 +69,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider invalidActivityAnalyticsProvider
      */
+    #[DataProvider('invalidActivityAnalyticsProvider')]
     public function test_get_activities_by_date_with_errors(ActivityAnalyticsParams $activityAnalyticsParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -79,7 +82,7 @@ class AnalyticsTest extends TestCase
         (new Analytics($httpLayer, self::OPTIONS))->activityDataByDate($activityAnalyticsParams);
     }
 
-    public function validActivityAnalyticsProvider(): array
+    public static function validActivityAnalyticsProvider(): array
     {
         return [
             'basic request' => [
@@ -111,7 +114,7 @@ class AnalyticsTest extends TestCase
         ];
     }
 
-    public function invalidActivityAnalyticsProvider(): array
+    public static function invalidActivityAnalyticsProvider(): array
     {
         return [
             'event array is empty' => [
@@ -123,6 +126,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider validOpensAnalyticsProvider
      */
+    #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_country(OpensAnalyticsParams $opensAnalyticsParams)
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -152,6 +156,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider validOpensAnalyticsProvider
      */
+    #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_user_agent(OpensAnalyticsParams $opensAnalyticsParams)
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -181,6 +186,7 @@ class AnalyticsTest extends TestCase
     /**
      * @dataProvider validOpensAnalyticsProvider
      */
+    #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_reading_environment(OpensAnalyticsParams $opensAnalyticsParams)
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -207,7 +213,7 @@ class AnalyticsTest extends TestCase
         }
     }
 
-    public function validOpensAnalyticsProvider(): array
+    public static function validOpensAnalyticsProvider(): array
     {
         return [
             'basic request' => [

@@ -4,10 +4,12 @@ namespace MailerSend\Tests\Helpers;
 
 use MailerSend\Helpers\BuildUri;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BuildUriTest extends TestCase
 {
     /** @dataProvider build_uri_provider */
+    #[DataProvider('build_uri_provider')]
     public function test_execute_build_uri(array $options, string $path, array $params, string $expected): void
     {
         $build_uri = (new BuildUri($options))->execute($path, $params);
@@ -15,7 +17,7 @@ class BuildUriTest extends TestCase
         $this->assertEquals($expected, $build_uri);
     }
 
-    public function build_uri_provider(): array
+    public static function build_uri_provider(): array
     {
         return [
             [

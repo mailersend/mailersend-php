@@ -10,6 +10,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SmsInbound as SmsInboundBuilder;
 use MailerSend\Helpers\Builder\SmsInboundFilter;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SmsInboundTest extends TestCase
@@ -35,6 +36,7 @@ class SmsInboundTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsInboundListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -69,6 +71,7 @@ class SmsInboundTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSmsInboundListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -118,6 +121,7 @@ class SmsInboundTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsInboundCreateDataProvider')]
     public function test_create_sms_inbound(SmsInboundBuilder $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -209,7 +213,7 @@ class SmsInboundTest extends TestCase
         $this->smsInbound->delete('');
     }
 
-    public function validSmsInboundListDataProvider(): array
+    public static function validSmsInboundListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -282,7 +286,7 @@ class SmsInboundTest extends TestCase
         ];
     }
 
-    public function invalidSmsInboundListDataProvider(): array
+    public static function invalidSmsInboundListDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -298,7 +302,7 @@ class SmsInboundTest extends TestCase
         ];
     }
 
-    public function validSmsInboundCreateDataProvider(): array
+    public static function validSmsInboundCreateDataProvider(): array
     {
         return [
             'enabled, with filter' => [

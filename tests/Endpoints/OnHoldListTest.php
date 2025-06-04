@@ -9,6 +9,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\OnHoldList;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class OnHoldListTest extends TestCase
@@ -33,6 +34,7 @@ class OnHoldListTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -63,6 +65,7 @@ class OnHoldListTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $params, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -81,6 +84,7 @@ class OnHoldListTest extends TestCase
      * @throws \JsonException
      * @throws MailerSendAssertException
      */
+    #[DataProvider('validDeleteDataProvider')]
     public function test_delete(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -117,7 +121,7 @@ class OnHoldListTest extends TestCase
         $this->onHoldList->delete();
     }
 
-    public function validGetAllDataProvider(): array
+    public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
@@ -148,7 +152,7 @@ class OnHoldListTest extends TestCase
         ];
     }
 
-    public function invalidGetAllDataProvider(): array
+    public static function invalidGetAllDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -168,7 +172,7 @@ class OnHoldListTest extends TestCase
         ];
     }
 
-    public function validDeleteDataProvider(): array
+    public static function validDeleteDataProvider(): array
     {
         return [
             'with ids' => [

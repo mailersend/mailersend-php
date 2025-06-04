@@ -14,6 +14,7 @@ use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
@@ -95,6 +96,7 @@ class EmailTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validEmailParamsProvider')]
     public function test_send_email(EmailParams $emailParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -180,6 +182,7 @@ class EmailTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidEmailParamsProvider')]
     public function test_send_email_with_errors(EmailParams $emailParams)
     {
         $this->expectException(MailerSendAssertException::class);
@@ -192,7 +195,7 @@ class EmailTest extends TestCase
         (new Email($httpLayer, self::OPTIONS))->send($emailParams);
     }
 
-    public function validEmailParamsProvider(): array
+    public static function validEmailParamsProvider(): array
     {
         return [
             'simple request' => [
@@ -460,7 +463,7 @@ class EmailTest extends TestCase
         ];
     }
 
-    public function invalidEmailParamsProvider(): array
+    public static function invalidEmailParamsProvider(): array
     {
         return [
             'template id, html and text missing' => [

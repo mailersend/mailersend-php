@@ -15,6 +15,7 @@ use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BulkEmailTest extends TestCase
 {
@@ -68,6 +69,7 @@ class BulkEmailTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validEmailParamsProvider')]
     public function test_send_email(array $bulkEmailParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -146,6 +148,7 @@ class BulkEmailTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidEmailParamsProvider')]
     public function test_send_email_with_errors(array $bulkEmailParams)
     {
         $this->expectException(MailerSendAssertException::class);
@@ -158,7 +161,7 @@ class BulkEmailTest extends TestCase
         $this->bulkEmail->send($bulkEmailParams);
     }
 
-    public function validEmailParamsProvider()
+    public static function validEmailParamsProvider()
     {
         return [
             'simple request' => [
@@ -475,7 +478,7 @@ class BulkEmailTest extends TestCase
         ];
     }
 
-    public function invalidEmailParamsProvider()
+    public static function invalidEmailParamsProvider()
     {
         return [
             'no emails added' => [

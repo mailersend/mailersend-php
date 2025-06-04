@@ -9,6 +9,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\ScheduleMessages;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class ScheduleMessagesTest extends TestCase
@@ -34,6 +35,7 @@ class ScheduleMessagesTest extends TestCase
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
+    #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -68,6 +70,7 @@ class ScheduleMessagesTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -102,7 +105,7 @@ class ScheduleMessagesTest extends TestCase
         $this->scheduleMessages->delete('');
     }
 
-    public function validGetAllDataProvider(): array
+    public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
@@ -175,7 +178,7 @@ class ScheduleMessagesTest extends TestCase
         ];
     }
 
-    public function invalidGetAllDataProvider(): array
+    public static function invalidGetAllDataProvider(): array
     {
         return [
             'with limit under 10' => [

@@ -8,6 +8,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Template;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class TemplateTest extends TestCase
@@ -33,6 +34,7 @@ class TemplateTest extends TestCase
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
+    #[DataProvider('validTemplateListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -65,6 +67,7 @@ class TemplateTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidTemplateListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -100,7 +103,7 @@ class TemplateTest extends TestCase
         $this->template->delete('');
     }
 
-    public function validTemplateListDataProvider(): array
+    public static function validTemplateListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -156,7 +159,7 @@ class TemplateTest extends TestCase
         ];
     }
 
-    public function invalidTemplateListDataProvider(): array
+    public static function invalidTemplateListDataProvider(): array
     {
         return [
             'with limit under 10' => [

@@ -11,6 +11,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\BlocklistParams;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BlocklistTest extends TestCase
 {
@@ -34,6 +35,7 @@ class BlocklistTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -64,6 +66,7 @@ class BlocklistTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $params, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -127,6 +130,7 @@ class BlocklistTest extends TestCase
      * @throws \JsonException
      * @throws MailerSendAssertException
      */
+    #[DataProvider('validDeleteDataProvider')]
     public function test_delete(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -163,7 +167,7 @@ class BlocklistTest extends TestCase
         $this->blocklist->delete();
     }
 
-    public function validGetAllDataProvider(): array
+    public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
@@ -194,7 +198,7 @@ class BlocklistTest extends TestCase
         ];
     }
 
-    public function invalidGetAllDataProvider(): array
+    public static function invalidGetAllDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -214,7 +218,7 @@ class BlocklistTest extends TestCase
         ];
     }
 
-    public function validDeleteDataProvider(): array
+    public static function validDeleteDataProvider(): array
     {
         return [
             'with ids' => [

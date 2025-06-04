@@ -11,6 +11,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class InviteTest extends TestCase
@@ -36,6 +37,7 @@ class InviteTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validInviteRoutingListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -66,6 +68,7 @@ class InviteTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidInviteRoutingListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -152,7 +155,7 @@ class InviteTest extends TestCase
         $this->invite->cancel('');
     }
 
-    public function validInviteRoutingListDataProvider(): array
+    public static function validInviteRoutingListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -193,7 +196,7 @@ class InviteTest extends TestCase
         ];
     }
 
-    public function invalidInviteRoutingListDataProvider(): array
+    public static function invalidInviteRoutingListDataProvider(): array
     {
         return [
             'with limit under 10' => [

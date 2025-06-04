@@ -9,6 +9,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SmsParams;
 use MailerSend\Helpers\Builder\SmsPersonalization;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use MailerSend\Helpers\Arr;
 
@@ -36,6 +37,7 @@ class SmsTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsParamsProvider')]
     public function test_send_sms(SmsParams $smsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -73,6 +75,7 @@ class SmsTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSmsParamsProvider')]
     public function test_send_email_with_errors(SmsParams $smsParams)
     {
         $this->expectException(MailerSendAssertException::class);
@@ -85,7 +88,7 @@ class SmsTest extends TestCase
         (new Sms($httpLayer, self::OPTIONS))->send($smsParams);
     }
 
-    public function validSmsParamsProvider(): array
+    public static function validSmsParamsProvider(): array
     {
         return [
             'simple request' => [
@@ -129,7 +132,7 @@ class SmsTest extends TestCase
         ];
     }
 
-    public function invalidSmsParamsProvider(): array
+    public static function invalidSmsParamsProvider(): array
     {
         return [
             'from is required' => [

@@ -9,6 +9,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\ActivityParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class ActivityTest extends TestCase
@@ -34,6 +35,7 @@ class ActivityTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validActivityParamsProvider')]
     public function test_get_all(ActivityParams $activityParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -63,6 +65,7 @@ class ActivityTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
+    #[DataProvider('invalidActivityParamsProvider')]
     public function test_get_all_with_errors(string $domainId, ActivityParams $activityParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -87,7 +90,7 @@ class ActivityTest extends TestCase
         $this->activity->find('');
     }
 
-    public function validActivityParamsProvider(): array
+    public static function validActivityParamsProvider(): array
     {
         return [
             'no params' => [
@@ -121,7 +124,7 @@ class ActivityTest extends TestCase
         ];
     }
 
-    public function invalidActivityParamsProvider(): array
+    public static function invalidActivityParamsProvider(): array
     {
         return [
             'missing domain id' => [
