@@ -8,6 +8,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Tests\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class HttpLayerTest extends TestCase
 {
@@ -103,6 +104,7 @@ class HttpLayerTest extends TestCase
     /**
      * @dataProvider body_provider
      */
+    #[DataProvider('body_provider')]
     public function test_http_layer_builds_body($body, string $expected): void
     {
         /** @var StreamInterface $buildBodyResult */
@@ -111,7 +113,7 @@ class HttpLayerTest extends TestCase
         self::assertEquals($expected, $buildBodyResult->getContents());
     }
 
-    public function body_provider(): array
+    public static function body_provider(): array
     {
         return [
             [

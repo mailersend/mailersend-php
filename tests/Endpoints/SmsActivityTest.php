@@ -9,6 +9,7 @@ use MailerSend\Endpoints\SmsActivity;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SmsActivityParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SmsActivityTest extends TestCase
@@ -34,6 +35,7 @@ class SmsActivityTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsActivityParamsProvider')]
     public function test_get_all(SmsActivityParams $smsActivityParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -64,6 +66,7 @@ class SmsActivityTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
+    #[DataProvider('invalidSmsActivityParamsProvider')]
     public function test_get_all_with_errors(SmsActivityParams $smsActivityParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -76,7 +79,7 @@ class SmsActivityTest extends TestCase
         (new SmsActivity($httpLayer, self::OPTIONS))->getAll($smsActivityParams);
     }
 
-    public function validSmsActivityParamsProvider(): array
+    public static function validSmsActivityParamsProvider(): array
     {
         return [
             'no params' => [
@@ -115,7 +118,7 @@ class SmsActivityTest extends TestCase
         ];
     }
 
-    public function invalidSmsActivityParamsProvider(): array
+    public static function invalidSmsActivityParamsProvider(): array
     {
         return [
             'limit under 10' => [

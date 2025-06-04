@@ -14,6 +14,7 @@ use MailerSend\Helpers\Builder\Forward;
 use MailerSend\Helpers\Builder\Inbound as InboundBuilder;
 use MailerSend\Helpers\Builder\MatchFilter;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class InboundTest extends TestCase
@@ -39,6 +40,7 @@ class InboundTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validInboundRoutingListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -71,6 +73,7 @@ class InboundTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidInboundRoutingListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -99,6 +102,7 @@ class InboundTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validInboundRoutingCreateDataProvider')]
     public function test_create(InboundBuilder $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -186,7 +190,7 @@ class InboundTest extends TestCase
         $this->inboundRouting->delete('');
     }
 
-    public function validInboundRoutingListDataProvider(): array
+    public static function validInboundRoutingListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -242,7 +246,7 @@ class InboundTest extends TestCase
         ];
     }
 
-    public function invalidInboundRoutingListDataProvider(): array
+    public static function invalidInboundRoutingListDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -258,7 +262,7 @@ class InboundTest extends TestCase
         ];
     }
 
-    public function validInboundRoutingCreateDataProvider(): array
+    public static function validInboundRoutingCreateDataProvider(): array
     {
         return [
             'enabled, catch all, match all' => [

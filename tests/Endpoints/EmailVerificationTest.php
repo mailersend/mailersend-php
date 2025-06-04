@@ -9,6 +9,7 @@ use MailerSend\Endpoints\EmailVerification;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailVerificationParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class EmailVerificationTest extends TestCase
@@ -34,6 +35,7 @@ class EmailVerificationTest extends TestCase
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
+    #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $payload, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -64,6 +66,7 @@ class EmailVerificationTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $payload): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -124,6 +127,7 @@ class EmailVerificationTest extends TestCase
      * @throws MailerSendAssertException
      * @throws \JsonException
      */
+    #[DataProvider('validGetResultsDataProvider')]
     public function test_get_results(array $payload, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -169,7 +173,7 @@ class EmailVerificationTest extends TestCase
         self::assertEquals('test@mail.com', Arr::get($request_body, 'email'));
     }
 
-    public function validGetAllDataProvider(): array
+    public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
@@ -210,7 +214,7 @@ class EmailVerificationTest extends TestCase
         ];
     }
 
-    public function invalidGetAllDataProvider(): array
+    public static function invalidGetAllDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -226,7 +230,7 @@ class EmailVerificationTest extends TestCase
         ];
     }
 
-    public function validGetResultsDataProvider(): array
+    public static function validGetResultsDataProvider(): array
     {
         return [
             'empty request' => [

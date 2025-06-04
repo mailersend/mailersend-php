@@ -9,6 +9,7 @@ use MailerSend\Endpoints\SenderIdentity;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SenderIdentity as SenderIdentityBuilder;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SenderIdentityTest extends TestCase
@@ -34,6 +35,7 @@ class SenderIdentityTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSenderIdentityRoutingListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -66,6 +68,7 @@ class SenderIdentityTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSenderIdentityRoutingListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -183,7 +186,7 @@ class SenderIdentityTest extends TestCase
         $this->senderIdentityRouting->delete('');
     }
 
-    public function validSenderIdentityRoutingListDataProvider(): array
+    public static function validSenderIdentityRoutingListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -239,7 +242,7 @@ class SenderIdentityTest extends TestCase
         ];
     }
 
-    public function invalidSenderIdentityRoutingListDataProvider(): array
+    public static function invalidSenderIdentityRoutingListDataProvider(): array
     {
         return [
             'with limit under 10' => [

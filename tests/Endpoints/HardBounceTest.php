@@ -10,6 +10,7 @@ use MailerSend\Endpoints\HardBounce;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class HardBounceTest extends TestCase
@@ -34,6 +35,7 @@ class HardBounceTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -64,6 +66,7 @@ class HardBounceTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $params, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -121,6 +124,7 @@ class HardBounceTest extends TestCase
      * @throws \JsonException
      * @throws MailerSendAssertException
      */
+    #[DataProvider('validDeleteDataProvider')]
     public function test_delete(array $params): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -157,7 +161,7 @@ class HardBounceTest extends TestCase
         $this->hardBounce->delete();
     }
 
-    public function validGetAllDataProvider(): array
+    public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
@@ -188,7 +192,7 @@ class HardBounceTest extends TestCase
         ];
     }
 
-    public function invalidGetAllDataProvider(): array
+    public static function invalidGetAllDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -208,7 +212,7 @@ class HardBounceTest extends TestCase
         ];
     }
 
-    public function validDeleteDataProvider(): array
+    public static function validDeleteDataProvider(): array
     {
         return [
             'with ids' => [

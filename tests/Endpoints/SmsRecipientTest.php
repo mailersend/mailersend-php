@@ -9,6 +9,7 @@ use MailerSend\Endpoints\SmsRecipient;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SmsRecipientParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SmsRecipientTest extends TestCase
@@ -34,6 +35,7 @@ class SmsRecipientTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsRecipientListDataProvider')]
     public function test_get_all(SmsRecipientParams $smsRecipientParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -63,6 +65,7 @@ class SmsRecipientTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSmsRecipientListDataProvider')]
     public function test_get_all_with_errors(SmsRecipientParams $smsRecipientParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -114,7 +117,7 @@ class SmsRecipientTest extends TestCase
         self::assertSame('active', Arr::get($request_body, 'status'));
     }
 
-    public function validSmsRecipientListDataProvider(): array
+    public static function validSmsRecipientListDataProvider(): array
     {
         return [
             'no params' => [
@@ -146,7 +149,7 @@ class SmsRecipientTest extends TestCase
         ];
     }
 
-    public function invalidSmsRecipientListDataProvider(): array
+    public static function invalidSmsRecipientListDataProvider(): array
     {
         return [
             'limit under 10' => [

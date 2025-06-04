@@ -10,6 +10,7 @@ use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\DomainParams;
 use MailerSend\Helpers\Builder\DomainSettingsParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class DomainTest extends TestCase
@@ -35,6 +36,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validDomainListDataProvider')]
     public function test_get_all(array $domainParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -67,6 +69,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidDomainListDataProvider')]
     public function test_get_all_with_errors(array $domainParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -118,6 +121,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validDomainRecipientsDataProvider')]
     public function test_recipients(array $domainParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -151,6 +155,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidDomainRecipientsDataProvider')]
     public function test_recipients_with_errors(array $domainParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -167,6 +172,7 @@ class DomainTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('domainSettingsDataProvider')]
     public function test_domain_settings(DomainSettingsParams $domainSettingsParams): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -220,7 +226,7 @@ class DomainTest extends TestCase
         $this->domain->getDnsRecords('');
     }
 
-    public function validDomainListDataProvider(): array
+    public static function validDomainListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -286,7 +292,7 @@ class DomainTest extends TestCase
         ];
     }
 
-    public function validDomainRecipientsDataProvider(): array
+    public static function validDomainRecipientsDataProvider(): array
     {
         return [
             'empty request' => [
@@ -327,7 +333,7 @@ class DomainTest extends TestCase
         ];
     }
 
-    public function invalidDomainListDataProvider(): array
+    public static function invalidDomainListDataProvider(): array
     {
         return [
             'with limit under 10' => [
@@ -343,7 +349,7 @@ class DomainTest extends TestCase
         ];
     }
 
-    public function invalidDomainRecipientsDataProvider(): array
+    public static function invalidDomainRecipientsDataProvider(): array
     {
         return [
             'domain id missing' => [
@@ -366,7 +372,7 @@ class DomainTest extends TestCase
         ];
     }
 
-    public function domainSettingsDataProvider(): array
+    public static function domainSettingsDataProvider(): array
     {
         return [
             'complete request' => [

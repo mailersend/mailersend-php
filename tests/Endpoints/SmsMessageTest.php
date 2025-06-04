@@ -8,6 +8,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SmsMessage;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SmsMessageTest extends TestCase
@@ -33,6 +34,7 @@ class SmsMessageTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmsMessageListDataProvider')]
     public function test_get_all(array $smsMessageParams, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -63,6 +65,7 @@ class SmsMessageTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSmsMessageListDataProvider')]
     public function test_get_all_with_errors(array $smsMessageParams): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -80,7 +83,7 @@ class SmsMessageTest extends TestCase
         $this->smsMessage->find('');
     }
 
-    public function validSmsMessageListDataProvider(): array
+    public static function validSmsMessageListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -121,7 +124,7 @@ class SmsMessageTest extends TestCase
         ];
     }
 
-    public function invalidSmsMessageListDataProvider(): array
+    public static function invalidSmsMessageListDataProvider(): array
     {
         return [
             'with limit under 10' => [

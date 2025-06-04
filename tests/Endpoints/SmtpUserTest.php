@@ -8,6 +8,7 @@ use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SmtpUser;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class SmtpUserTest extends TestCase
@@ -33,6 +34,7 @@ class SmtpUserTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('validSmtpUserRoutingListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -63,6 +65,7 @@ class SmtpUserTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
+    #[DataProvider('invalidSmtpUserRoutingListDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -173,7 +176,7 @@ class SmtpUserTest extends TestCase
         $this->smtpUser->delete('domainId', '');
     }
 
-    public function validSmtpUserRoutingListDataProvider(): array
+    public static function validSmtpUserRoutingListDataProvider(): array
     {
         return [
             'empty request' => [
@@ -214,7 +217,7 @@ class SmtpUserTest extends TestCase
         ];
     }
 
-    public function invalidSmtpUserRoutingListDataProvider(): array
+    public static function invalidSmtpUserRoutingListDataProvider(): array
     {
         return [
             'with limit under 10' => [
