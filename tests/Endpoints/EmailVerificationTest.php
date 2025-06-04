@@ -104,7 +104,7 @@ class EmailVerificationTest extends TestCase
         self::assertEquals('/v1/email-verification', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
         self::assertSame('file.csv', Arr::get($request_body, 'name'));
-        self::assertEquals(['test@mail.com'], Arr::get($request_body, 'emailAddresses'));
+        self::assertEquals(['test@mail.com'], Arr::get($request_body, 'emails'));
     }
 
     /**
@@ -264,7 +264,7 @@ class EmailVerificationTest extends TestCase
                 'expected' => [
                     'page' => null,
                     'limit' => null,
-                    'results' => 'typo,catch_all',
+                    'results' => [EmailVerificationParams::TYPO, EmailVerificationParams::CATCH_ALL],
                 ],
             ],
             'complete request' => [
@@ -276,7 +276,7 @@ class EmailVerificationTest extends TestCase
                 'expected' => [
                     'page' => 1,
                     'limit' => 10,
-                    'results' => 'typo,catch_all',
+                    'results' => [EmailVerificationParams::TYPO, EmailVerificationParams::CATCH_ALL],
                 ],
             ],
         ];
