@@ -26,7 +26,8 @@ class Webhook extends AbstractEndpoint
                 Assertion::minLength($webhookParams->getName(), 1, 'Webhook name is required.') &&
                 Assertion::maxLength($webhookParams->getName(), 191, 'Webhook name cannot be longer than 191 character.') &&
                 Assertion::minCount($webhookParams->getEvents(), 1, 'Webhook events are required.') &&
-                Assertion::minLength($webhookParams->getDomainId(), 1, 'Webhook domain id is required.')
+                Assertion::minLength($webhookParams->getDomainId(), 1, 'Webhook domain id is required.') &&
+                Assertion::inArray($webhookParams->getVersion(), [null, 1, 2], 'Webhook version can only be 1 or 2.')
         );
 
         return $this->httpLayer->post(
@@ -46,14 +47,22 @@ class Webhook extends AbstractEndpoint
      * @throws JsonException
      * @throws MailerSendAssertException
      */
-    public function update(string $id, string $url, string $name, array $events, ?bool $enabled = null): array
+    public function update(
+        string $id,
+        string $url,
+        string $name,
+        array $events,
+        ?bool $enabled = null,
+        ?int $version = null
+    ): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.') &&
                 Assertion::url($url, 'Invalid URL.') &&
                 Assertion::minLength($name, 1, 'Webhook name is required.') &&
                 Assertion::minCount($events, 1, 'Webhook events are required.') &&
-                Assertion::allInArray($events, WebhookParams::ALL_ACTIVITIES, 'One or multiple invalid events.')
+                Assertion::allInArray($events, WebhookParams::ALL_ACTIVITIES, 'One or multiple invalid events.') &&
+                Assertion::inArray($version, [null, 1, 2], 'Webhook version can only be 1 or 2.')
         );
 
         return $this->httpLayer->put(
@@ -63,6 +72,7 @@ class Webhook extends AbstractEndpoint
                 'name' => $name,
                 'events' => $events,
                 'enabled' => $enabled,
+                'version' => $version,
             ])
         );
     }
