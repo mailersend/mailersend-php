@@ -61,8 +61,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
         string $domainId,
         ?bool $enabled = null,
         ?int $version = 1
-    )
-    {
+    ) {
         $this->setUrl($url)
             ->setName($name)
             ->setEvents($events)

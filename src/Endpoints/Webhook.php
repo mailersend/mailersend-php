@@ -54,8 +54,7 @@ class Webhook extends AbstractEndpoint
         array $events,
         ?bool $enabled = null,
         ?int $version = null
-    ): array
-    {
+    ): array {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.') &&
                 Assertion::url($url, 'Invalid URL.') &&
