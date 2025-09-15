@@ -1416,13 +1416,13 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->webhooks->create(
-    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id')
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', true, 2)
 );
 
 // Or a disabled webhook
 
 $mailersend->webhooks->create(
-    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false, 2)
 );
 ```
 
@@ -1436,13 +1436,13 @@ use MailerSend\Helpers\Builder\WebhookParams;
 
 $mailersend = new MailerSend();
 
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES);
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true, 2);
 
 // Enable webhook
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true);
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, true, 2);
 
 // Disable webhook
-$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false);
+$mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false, 2);
 ```
 
 <a name="delete-webhook"></a>

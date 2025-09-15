@@ -11,6 +11,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
 {
     private string $url;
     private string $name;
+    private int $version;
     private array $events;
     private ?bool $enabled;
     private string $domainId;
@@ -50,15 +51,23 @@ class WebhookParams implements Arrayable, \JsonSerializable
      * @param array $events
      * @param string $domainId
      * @param bool|null $enabled
+     * @param int $version
      * @throws MailerSendAssertException
      */
-    public function __construct(string $url, string $name, array $events, string $domainId, ?bool $enabled = null)
-    {
+    public function __construct(
+        string $url,
+        string $name,
+        array $events,
+        string $domainId,
+        ?bool $enabled = null,
+        ?int $version = 1
+    ) {
         $this->setUrl($url)
             ->setName($name)
             ->setEvents($events)
             ->setEnabled($enabled)
-            ->setDomainId($domainId);
+            ->setDomainId($domainId)
+            ->setVersion($version);
     }
 
     /**
@@ -156,12 +165,30 @@ class WebhookParams implements Arrayable, \JsonSerializable
         return $this;
     }
 
+    /**
+     * @param int $version
+     * @return WebhookParams
+     */
+    public function setVersion(int $version): WebhookParams
+    {
+        $this->version = $version;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVersion(): int
+    {
+        return $this->version;
+    }
 
     public function toArray()
     {
         return [
             'url' => $this->getUrl(),
             'name' => $this->getName(),
+            'version' => $this->getVersion(),
             'events' => $this->getEvents(),
             'enabled' => $this->getEnabled(),
             'domain_id' => $this->getDomainId(),
