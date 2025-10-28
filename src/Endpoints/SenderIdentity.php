@@ -2,10 +2,10 @@
 
 namespace MailerSend\Endpoints;
 
-use Assert\Assertion;
 use MailerSend\Common\Constants;
 use MailerSend\Helpers\Builder\SenderIdentity as SenderIdentityBuilder;
 use MailerSend\Helpers\GeneralHelpers;
+use MailerSend\Helpers\MailerSendAssertion as Assertion;
 
 class SenderIdentity extends AbstractEndpoint
 {

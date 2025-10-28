@@ -2,11 +2,11 @@
 
 namespace MailerSend\Helpers;
 
-use Assert\Assertion;
 use Assert\AssertionFailedException;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\SmsParams;
+use MailerSend\Helpers\MailerSendAssertion as Assertion;
 
 class GeneralHelpers
 {

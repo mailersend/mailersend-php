@@ -2,10 +2,10 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Assert\Assertion;
 use MailerSend\Contracts\Arrayable;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\GeneralHelpers;
+use MailerSend\Helpers\MailerSendAssertion as Assertion;
 
 class Recipient implements Arrayable, \JsonSerializable
 {

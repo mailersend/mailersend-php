@@ -475,6 +475,22 @@ class BulkEmailTest extends TestCase
                         ->setInReplyToHeader('test@mailersend.com'),
                 ],
             ],
+            'with unicode email' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('ügyfélszolgálat@mailersend.com')
+                        ->setFromName('Ügyfélszolgálat')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setText('Text'),
+                ],
+            ],
         ];
     }
 

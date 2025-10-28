@@ -460,6 +460,20 @@ class EmailTest extends TestCase
                     ->setText('Text')
                     ->setListUnsubscribe('https://www.mailersend.com/unsubscribe'),
             ],
+            'with unicode email' => [
+                (new EmailParams())
+                    ->setFrom('ügyfélszolgálat@mailersend.com')
+                    ->setFromName('Ügyfélszolgálat')
+                    ->setRecipients([
+                        [
+                            'name' => 'Recipient',
+                            'email' => 'recipient@mailersend.com',
+                        ]
+                    ])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setText('Text'),
+            ],
         ];
     }
 
