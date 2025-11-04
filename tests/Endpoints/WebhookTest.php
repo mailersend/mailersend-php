@@ -140,6 +140,22 @@ class WebhookTest extends TestCase
         );
     }
 
+    public function test_version_is_validated_when_creating_webhooks()
+    {
+        $this->expectExceptionMessage('Webhook version can only be 1 or 2.');
+
+        $this->webhooks->create(
+            new WebhookParams('https://link.com/webhook', 'webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', null, 3)
+        );
+    }
+
+    public function test_version_is_validated_when_updating_webhooks()
+    {
+        $this->expectExceptionMessage('Webhook version can only be 1 or 2.');
+
+        $this->webhooks->update('random_id', 'https://link.com/webhook', 'webhook name', WebhookParams::ALL_ACTIVITIES, null, 3);
+    }
+
     public function test_create_webhooks()
     {
         $response = $this->createMock(ResponseInterface::class);
@@ -162,6 +178,7 @@ class WebhookTest extends TestCase
         self::assertSame(WebhookParams::ALL_ACTIVITIES, Arr::get($request_body, 'events'));
         self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
         self::assertNull(Arr::get($request_body, 'enabled'));
+        self::assertSame(1, Arr::get($request_body, 'version'));
     }
 
     public function test_create_disabled_webhooks()
@@ -253,7 +270,7 @@ class WebhookTest extends TestCase
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
-        $response = $this->webhooks->update('random_id', 'https://link.com/webhook', 'Webhook name', [WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED]);
+        $response = $this->webhooks->update('random_id', 'https://link.com/webhook', 'Webhook name', [WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], null, 2);
 
         $request = $this->client->getLastRequest();
         $request_body = json_decode((string) $request->getBody(), true);
@@ -266,6 +283,7 @@ class WebhookTest extends TestCase
         self::assertSame('Webhook name', Arr::get($request_body, 'name'));
         self::assertSame([WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], Arr::get($request_body, 'events'));
         self::assertNull(Arr::get($request_body, 'enabled'));
+        self::assertSame(2, Arr::get($request_body, 'version'));
     }
 
     public function test_enable_webhooks()
