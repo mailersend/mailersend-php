@@ -129,10 +129,10 @@ class HttpLayerTest extends TestCase
 
     public function test_http_layer_builds_response_json(): void
     {
-        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody = $this->createStub(StreamInterface::class);
         $responseBody->method('getContents')->willReturn('{"test":"array"}');
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('hasHeader')->with('Content-Type')->willReturn(true);
         $response->method('getHeader')->with('Content-Type')->willReturn(['application/json']);
@@ -149,10 +149,10 @@ class HttpLayerTest extends TestCase
 
     public function test_http_layer_builds_response_text(): void
     {
-        $responseBody = $this->createMock(StreamInterface::class);
+        $responseBody = $this->createStub(StreamInterface::class);
         $responseBody->method('getContents')->willReturn('test');
 
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $response->method('hasHeader')->with('Content-Type')->willReturn(true);
         $response->method('getHeader')->with('Content-Type')->willReturn(['text/plain']);

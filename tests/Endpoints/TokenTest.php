@@ -22,7 +22,7 @@ class TokenTest extends TestCase
         $this->client = new Client();
 
         $this->token = new Token(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -64,7 +64,7 @@ class TokenTest extends TestCase
 
     public function test_create_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -115,7 +115,7 @@ class TokenTest extends TestCase
 
     public function test_pause_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -136,7 +136,7 @@ class TokenTest extends TestCase
 
     public function test_unpause_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -157,7 +157,7 @@ class TokenTest extends TestCase
 
     public function test_delete_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -172,7 +172,7 @@ class TokenTest extends TestCase
 
     public function test_find_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -187,7 +187,7 @@ class TokenTest extends TestCase
 
     public function test_get_all_token()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 

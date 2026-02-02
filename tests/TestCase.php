@@ -35,7 +35,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
         }
 
         $method = $reflection->getMethod($method);
-        $method->setAccessible(true);
+        if (PHP_VERSION_ID < 80100) {
+            $method->setAccessible(true);
+        }
 
         return $method->invokeArgs($object, $parameters);
     }

@@ -16,7 +16,7 @@ class MailerSendAssertion extends Assertion
      * @return bool
      * @throws AssertionFailedException
      */
-    public static function email($value, $message = null, string $propertyPath = null): bool
+    public static function email($value, $message = null, ?string $propertyPath = null): bool
     {
         if (filter_var($value, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE) === false) {
             $message = sprintf(

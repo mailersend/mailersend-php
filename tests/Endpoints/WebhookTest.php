@@ -22,7 +22,7 @@ class WebhookTest extends TestCase
         $this->client = new Client();
 
         $this->webhooks = new Webhook(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -49,7 +49,7 @@ class WebhookTest extends TestCase
 
     public function test_get_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -67,7 +67,7 @@ class WebhookTest extends TestCase
 
     public function test_find_webhook()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -82,7 +82,7 @@ class WebhookTest extends TestCase
 
     public function test_delete_webhook()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -142,7 +142,7 @@ class WebhookTest extends TestCase
 
     public function test_create_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -166,7 +166,7 @@ class WebhookTest extends TestCase
 
     public function test_create_disabled_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -190,7 +190,7 @@ class WebhookTest extends TestCase
 
     public function test_create_enabled_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -249,7 +249,7 @@ class WebhookTest extends TestCase
 
     public function test_update_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -270,7 +270,7 @@ class WebhookTest extends TestCase
 
     public function test_enable_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
@@ -291,7 +291,7 @@ class WebhookTest extends TestCase
 
     public function test_disable_webhooks()
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
         $this->client->addResponse($response);
 
