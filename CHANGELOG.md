@@ -15,11 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [0.35.0] - 2026 02 02
+## [0.36.0] - 2026 02 02
 
 ### Changed
 
 - PHP version 8.5 support
+
+## [0.35.0] - 2025 10 28
+
+### Fixed
+
+- Fix unicode email validation
 
 ## [0.34.0] - 2025 06 04
 
