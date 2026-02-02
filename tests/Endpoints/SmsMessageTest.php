@@ -24,7 +24,7 @@ class SmsMessageTest extends TestCase
 
         $this->smsMessage = new SmsMessage(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
 
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -37,7 +37,7 @@ class SmsMessageTest extends TestCase
     #[DataProvider('validSmsMessageListDataProvider')]
     public function test_get_all(array $smsMessageParams, array $expected): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);

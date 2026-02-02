@@ -27,7 +27,7 @@ class AnalyticsTest extends TestCase
 
         $this->analytics = new Analytics(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
 
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -37,7 +37,7 @@ class AnalyticsTest extends TestCase
     #[DataProvider('validActivityAnalyticsProvider')]
     public function test_get_activity_by_date(ActivityAnalyticsParams $activityAnalyticsParams): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -74,7 +74,7 @@ class AnalyticsTest extends TestCase
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $httpLayer = $this->createMock(HttpLayer::class);
+        $httpLayer = $this->createStub(HttpLayer::class);
         $httpLayer->method('get')
             ->withAnyParameters()
             ->willReturn([]);
@@ -129,7 +129,7 @@ class AnalyticsTest extends TestCase
     #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_country(OpensAnalyticsParams $opensAnalyticsParams)
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -159,7 +159,7 @@ class AnalyticsTest extends TestCase
     #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_user_agent(OpensAnalyticsParams $opensAnalyticsParams)
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -189,7 +189,7 @@ class AnalyticsTest extends TestCase
     #[DataProvider('validOpensAnalyticsProvider')]
     public function test_opens_by_reading_environment(OpensAnalyticsParams $opensAnalyticsParams)
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);

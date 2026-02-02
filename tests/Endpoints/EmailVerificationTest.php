@@ -25,7 +25,7 @@ class EmailVerificationTest extends TestCase
 
         $this->emailVerification = new EmailVerification(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
 
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -38,7 +38,7 @@ class EmailVerificationTest extends TestCase
     #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $payload, array $expected): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -90,7 +90,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_create(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -130,7 +130,7 @@ class EmailVerificationTest extends TestCase
     #[DataProvider('validGetResultsDataProvider')]
     public function test_get_results(array $payload, array $expected): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -157,7 +157,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_verify_single_email(): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);

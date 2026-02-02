@@ -25,7 +25,7 @@ class ActivityTest extends TestCase
 
         $this->activity = new Activity(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
 
-        $this->defaultResponse = $this->createMock(ResponseInterface::class);
+        $this->defaultResponse = $this->createStub(ResponseInterface::class);
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
@@ -38,7 +38,7 @@ class ActivityTest extends TestCase
     #[DataProvider('validActivityParamsProvider')]
     public function test_get_all(ActivityParams $activityParams): void
     {
-        $response = $this->createMock(ResponseInterface::class);
+        $response = $this->createStub(ResponseInterface::class);
         $response->method('getStatusCode')->willReturn(200);
 
         $this->client->addResponse($response);
@@ -70,7 +70,7 @@ class ActivityTest extends TestCase
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $httpLayer = $this->createMock(HttpLayer::class);
+        $httpLayer = $this->createStub(HttpLayer::class);
         $httpLayer->method('get')
             ->withAnyParameters()
             ->willReturn([]);
