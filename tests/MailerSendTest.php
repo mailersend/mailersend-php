@@ -34,7 +34,7 @@ class MailerSendTest extends TestCase
 
         $reflection = new ReflectionClass($sdk);
         $property = $reflection->getProperty('options');
-//        $property->setAccessible(true);
+        $property->setAccessible(true);
 
         self::assertEquals('test', Arr::get($property->getValue($sdk), 'api_key'));
     }
@@ -47,7 +47,7 @@ class MailerSendTest extends TestCase
 
         $reflection = new ReflectionClass($sdk);
         $property = $reflection->getProperty('options');
-//        $property->setAccessible(true);
+        $property->setAccessible(true);
 
         self::assertEquals('key', Arr::get($property->getValue($sdk), 'api_key'));
     }
