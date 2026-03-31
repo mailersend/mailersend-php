@@ -108,6 +108,9 @@ MailerSend PHP SDK
         * [Add an SMS inbound route](#create-sms-inbound)
         * [Update an inbound route](#update-sms-inbound)
         * [Delete an SMS inbound route](#delete-sms-inbound)
+    * [WhatsApp API](#whatsapp-api)
+        * [Send a WhatsApp message](#send-whatsapp)
+        * [Personalization](#whatsapp-personalization)
     * [Sender Identities](#sender-identity-routing)
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
@@ -1941,6 +1944,57 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsInbound->delete('sms_inbound_id');
+```
+
+<a name="whatsapp-api"></a>
+
+## WhatsApp
+
+<a name="send-whatsapp"></a>
+
+### Send a WhatsApp message
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappParams = (new WhatsappParams())
+    ->setFrom('12345678901')
+    ->setTo(['19191234567'])
+    ->setTemplateId('your_template_id');
+
+$whatsapp = $mailersend->whatsapp->send($whatsappParams);
+```
+
+<a name="whatsapp-personalization"></a>
+
+### Personalization
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappParams;
+use MailerSend\Helpers\Builder\WhatsappPersonalization;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappParams = (new WhatsappParams())
+    ->setFrom('12345678901')
+    ->setTo(['19191234567', '19199876543'])
+    ->setTemplateId('your_template_id')
+    ->setPersonalization([
+        (new WhatsappPersonalization('19191234567'))
+            ->setHeader(['John'])
+            ->setBody(['order #1234', 'tomorrow'])
+            ->setButtons(['https://example.com/track/1234']),
+        (new WhatsappPersonalization('19199876543'))
+            ->setHeader(['Jane'])
+            ->setBody(['order #5678', 'Friday'])
+            ->setButtons(['https://example.com/track/5678']),
+    ]);
+
+$whatsapp = $mailersend->whatsapp->send($whatsappParams);
 ```
 
 <a name="sender-identity-routing"></a>

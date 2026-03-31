@@ -6,6 +6,7 @@ use Assert\AssertionFailedException;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\SmsParams;
+use MailerSend\Helpers\Builder\WhatsappParams;
 use MailerSend\Helpers\MailerSendAssertion as Assertion;
 
 class GeneralHelpers
@@ -82,6 +83,14 @@ class GeneralHelpers
             self::assert(fn () => Assertion::startsWith($recipient, '+', 'Recipient phone number must start with +'));
         }
         self::assert(fn () => Assertion::minLength($params->getText(), 1, 'Text cannot be empty'));
+    }
+
+    public static function validateWhatsappParams(WhatsappParams $params): void
+    {
+        self::assert(fn () => Assertion::notEmpty($params->getFrom(), 'From phone number is required'));
+        self::assert(fn () => Assertion::notEmpty($params->getTo(), 'At least one recipient is required'));
+        self::assert(fn () => Assertion::maxCount($params->getTo(), 10, 'Maximum 10 recipients allowed'));
+        self::assert(fn () => Assertion::notEmpty($params->getTemplateId(), 'Template ID is required'));
     }
 
     public static function mapToArray(array $data, string $object): array
