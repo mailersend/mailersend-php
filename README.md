@@ -133,6 +133,16 @@ MailerSend PHP SDK
         * [Get a single Invite](#get-a-single-invite)
         * [Resend an Invite](#resend-an-invite)
         * [Cancel an Invite](#cancel-an-invite)
+    * [DMARC Monitoring API](#dmarc-monitoring)
+        * [Get a list of monitors](#get-a-list-of-monitors)
+        * [Create a monitor](#create-a-monitor)
+        * [Update a monitor](#update-a-monitor)
+        * [Delete a monitor](#delete-a-monitor)
+        * [Get aggregated reports](#get-aggregated-reports)
+        * [Get IP-specific reports](#get-ip-specific-reports)
+        * [Get report sources](#get-report-sources)
+        * [Mark IP as favorite](#mark-ip-as-favorite)
+        * [Remove IP from favorites](#remove-ip-from-favorites)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -2310,6 +2320,125 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->invite->cancel('inviteId');
 ```
 
+
+<a name="dmarc-monitoring"></a>
+
+## DMARC Monitoring
+
+<a name="get-a-list-of-monitors"></a>
+
+### Get a list of monitors
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->getAll($page = 1, $limit = 25);
+```
+
+<a name="create-a-monitor"></a>
+
+### Create a monitor
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\DmarcMonitoringParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->create(
+    (new DmarcMonitoringParams('domain-id'))
+);
+```
+
+<a name="update-a-monitor"></a>
+
+### Update a monitor
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\DmarcMonitoringUpdateParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->update(
+    'monitor-id',
+    (new DmarcMonitoringUpdateParams('v=DMARC1; p=reject; rua=mailto:dmarc@example.com;'))
+);
+```
+
+<a name="delete-a-monitor"></a>
+
+### Delete a monitor
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->delete('monitor-id');
+```
+
+<a name="get-aggregated-reports"></a>
+
+### Get aggregated reports
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->getAggregatedReports('monitor-id', $page = 1, $limit = 25);
+```
+
+<a name="get-ip-specific-reports"></a>
+
+### Get IP-specific reports
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->getIpReports('monitor-id', '1.2.3.4', $page = 1, $limit = 25);
+```
+
+<a name="get-report-sources"></a>
+
+### Get report sources
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->getReportSources('monitor-id');
+```
+
+<a name="mark-ip-as-favorite"></a>
+
+### Mark IP as favorite
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->markIpAsFavorite('monitor-id', '1.2.3.4');
+```
+
+<a name="remove-ip-from-favorites"></a>
+
+### Remove IP from favorites
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->dmarcMonitoring->removeIpFromFavorites('monitor-id', '1.2.3.4');
+```
 
 <a name="other-endpoints"></a>
 
