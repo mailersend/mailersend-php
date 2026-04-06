@@ -309,4 +309,58 @@ class WebhookTest extends TestCase
         self::assertSame([WebhookParams::ACTIVITY_OPENED, WebhookParams::ACTIVITY_CLICKED], Arr::get($request_body, 'events'));
         self::assertEquals(false, Arr::get($request_body, 'enabled'));
     }
+
+    public function test_create_webhook_with_email_verification_events()
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->webhooks->create(
+            new WebhookParams('https://link.com/webhook', 'webhook name', [WebhookParams::ACTIVITY_EMAIL_SINGLE_VERIFIED, WebhookParams::ACTIVITY_EMAIL_LIST_VERIFIED], 'domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame([WebhookParams::ACTIVITY_EMAIL_SINGLE_VERIFIED, WebhookParams::ACTIVITY_EMAIL_LIST_VERIFIED], Arr::get($request_body, 'events'));
+    }
+
+    public function test_create_webhook_with_bulk_email_completed_event()
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->webhooks->create(
+            new WebhookParams('https://link.com/webhook', 'webhook name', [WebhookParams::ACTIVITY_BULK_EMAIL_COMPLETED], 'domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame([WebhookParams::ACTIVITY_BULK_EMAIL_COMPLETED], Arr::get($request_body, 'events'));
+    }
+
+    public function test_create_webhook_with_on_hold_events()
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->webhooks->create(
+            new WebhookParams('https://link.com/webhook', 'webhook name', [WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_ADDED, WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED], 'domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame([WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_ADDED, WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED], Arr::get($request_body, 'events'));
+    }
 }
