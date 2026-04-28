@@ -18,12 +18,13 @@ class Message extends AbstractEndpoint
     /**
      * @param int|null $limit
      * @param int|null $page
+     * @param string|null $domainId
      * @return array
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function get(?int $limit = self::DEFAULT_LIMIT, ?int $page = null): array
+    public function get(?int $limit = self::DEFAULT_LIMIT, ?int $page = null, ?string $domainId = null): array
     {
         if ($limit) {
             GeneralHelpers::assert(
@@ -36,7 +37,8 @@ class Message extends AbstractEndpoint
             $this->buildUri($this->endpoint),
             array_filter([
                 'limit' => $limit,
-                'page' => $page
+                'page' => $page,
+                'domain_id' => $domainId,
             ])
         );
     }
