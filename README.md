@@ -74,6 +74,8 @@ MailerSend PHP SDK
     * [Templates API](#templates)
         * [Get a list of templates](#get-a-list-of-templates)
         * [Get a single template](#get-a-single-template)
+        * [Create a template](#create-a-template)
+        * [Update a template](#update-a-template)
         * [Delete a template](#delete-a-template)
     * [Email Verification API](#email-verification)
         * [Get all email verification lists](#get-all-email-verification-lists)
@@ -1570,6 +1572,46 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->template->find('template_id');
+```
+
+<a name="create-a-template"></a>
+
+### Create a template
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TemplateParams;
+
+$mailersend = new MailerSend();
+
+$params = (new TemplateParams())
+    ->setName('My Template')
+    ->setHtml('<p>Hello {{name}}</p>')
+    ->setText('Hello {{name}}')
+    ->setDomainId('domain_id')
+    ->setCategories(['category1', 'category2'])
+    ->setTags(['tag1', 'tag2'])
+    ->setAutoGenerate(true);
+
+$mailersend->template->create($params);
+```
+
+<a name="update-a-template"></a>
+
+### Update a template
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TemplateParams;
+
+$mailersend = new MailerSend();
+
+$params = (new TemplateParams())
+    ->setName('Updated Template Name')
+    ->setHtml('<p>Hello {{name}}</p>')
+    ->setText('Hello {{name}}');
+
+$mailersend->template->update('template_id', $params);
 ```
 
 <a name="delete-a-template"></a>
