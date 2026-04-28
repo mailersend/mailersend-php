@@ -2480,6 +2480,15 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getAll($page = 1, $limit = 25);
+
+// With search and ordering
+$mailersend->dmarcMonitoring->getAll(
+    $page = 1,
+    $limit = 25,
+    $query = 'example.com',
+    $sortBy = 'created_at',
+    $order = 'desc',
+);
 ```
 
 <a name="create-a-monitor"></a>
@@ -2535,6 +2544,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getAggregatedReports('monitor-id', $page = 1, $limit = 25);
+
+// With filters
+$mailersend->dmarcMonitoring->getAggregatedReports(
+    'monitor-id',
+    $page = 1,
+    $limit = 25,
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $search = 'example.com',
+    $category = 'dmarc',
+    $reportSource = 'google.com',
+);
 ```
 
 <a name="get-ip-specific-reports"></a>
@@ -2547,6 +2568,19 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getIpReports('monitor-id', '1.2.3.4', $page = 1, $limit = 25);
+
+// With filters
+$mailersend->dmarcMonitoring->getIpReports(
+    'monitor-id',
+    '1.2.3.4',
+    $page = 1,
+    $limit = 25,
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $search = 'example.com',
+    $category = 'dmarc',
+    $reportSource = 'google.com',
+);
 ```
 
 <a name="get-report-sources"></a>
@@ -2558,7 +2592,15 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->dmarcMonitoring->getReportSources('monitor-id');
+$mailersend->dmarcMonitoring->getReportSources('monitor-id', '2024-01-01', '2024-01-31');
+
+// With optional status filter
+$mailersend->dmarcMonitoring->getReportSources(
+    'monitor-id',
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $status = 'accepted', // accepted, rejected, quarantined
+);
 ```
 
 <a name="mark-ip-as-favorite"></a>
