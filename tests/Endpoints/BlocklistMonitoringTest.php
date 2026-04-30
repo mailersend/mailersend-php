@@ -30,6 +30,9 @@ class BlocklistMonitoringTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
+    /**
+     * @dataProvider validGetAllDataProvider
+     */
     #[DataProvider('validGetAllDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
@@ -58,6 +61,9 @@ class BlocklistMonitoringTest extends TestCase
         self::assertEquals(Arr::get($expected, 'order'), Arr::get($query, 'order'));
     }
 
+    /**
+     * @dataProvider invalidGetAllDataProvider
+     */
     #[DataProvider('invalidGetAllDataProvider')]
     public function test_get_all_with_errors(array $params): void
     {
