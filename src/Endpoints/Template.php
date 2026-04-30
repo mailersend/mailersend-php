@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Helpers\Builder\TemplateParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class Template extends AbstractEndpoint
@@ -50,6 +51,36 @@ class Template extends AbstractEndpoint
 
         return $this->httpLayer->get(
             $this->buildUri("$this->endpoint/$templateId")
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function create(TemplateParams $params): array
+    {
+        return $this->httpLayer->post(
+            $this->buildUri($this->endpoint),
+            $params->toArray()
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function update(string $templateId, TemplateParams $params): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($templateId, 1, 'Template id is required.')
+        );
+
+        return $this->httpLayer->put(
+            $this->buildUri("$this->endpoint/$templateId"),
+            $params->toArray()
         );
     }
 

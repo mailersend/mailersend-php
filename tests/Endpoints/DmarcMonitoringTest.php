@@ -45,7 +45,10 @@ class DmarcMonitoringTest extends TestCase
 
         $response = $this->dmarcMonitoring->getAll(
             $params['page'] ?? null,
-            $params['limit'] ?? null
+            $params['limit'] ?? null,
+            $params['query'] ?? null,
+            $params['sort_by'] ?? null,
+            $params['order'] ?? null
         );
 
         $request = $this->client->getLastRequest();
@@ -56,6 +59,9 @@ class DmarcMonitoringTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'query'), Arr::get($query, 'query'));
+        self::assertEquals(Arr::get($expected, 'sort_by'), Arr::get($query, 'sort_by'));
+        self::assertEquals(Arr::get($expected, 'order'), Arr::get($query, 'order'));
     }
 
     /**
@@ -68,7 +74,10 @@ class DmarcMonitoringTest extends TestCase
 
         $this->dmarcMonitoring->getAll(
             $params['page'] ?? null,
-            $params['limit'] ?? null
+            $params['limit'] ?? null,
+            $params['query'] ?? null,
+            $params['sort_by'] ?? null,
+            $params['order'] ?? null
         );
     }
 
@@ -91,6 +100,22 @@ class DmarcMonitoringTest extends TestCase
                 ['page' => 2, 'limit' => 25],
                 ['page' => '2', 'limit' => '25'],
             ],
+            'with query' => [
+                ['query' => 'example.com'],
+                ['query' => 'example.com'],
+            ],
+            'with sort_by' => [
+                ['sort_by' => 'created_at'],
+                ['sort_by' => 'created_at'],
+            ],
+            'with order' => [
+                ['order' => 'desc'],
+                ['order' => 'desc'],
+            ],
+            'with all filters' => [
+                ['page' => 1, 'limit' => 25, 'query' => 'example.com', 'sort_by' => 'updated_at', 'order' => 'asc'],
+                ['page' => '1', 'limit' => '25', 'query' => 'example.com', 'sort_by' => 'updated_at', 'order' => 'asc'],
+            ],
         ];
     }
 
@@ -99,6 +124,8 @@ class DmarcMonitoringTest extends TestCase
         return [
             'limit too low' => [['limit' => 9]],
             'limit too high' => [['limit' => 101]],
+            'invalid sort_by' => [['sort_by' => 'invalid_field']],
+            'invalid order' => [['order' => 'random']],
         ];
     }
 
@@ -209,7 +236,12 @@ class DmarcMonitoringTest extends TestCase
         $response = $this->dmarcMonitoring->getAggregatedReports(
             $monitorId,
             $params['page'] ?? null,
-            $params['limit'] ?? null
+            $params['limit'] ?? null,
+            $params['date_from'] ?? null,
+            $params['date_to'] ?? null,
+            $params['search'] ?? null,
+            $params['category'] ?? null,
+            $params['report_source'] ?? null
         );
 
         $request = $this->client->getLastRequest();
@@ -220,6 +252,39 @@ class DmarcMonitoringTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'date_from'), Arr::get($query, 'date_from'));
+        self::assertEquals(Arr::get($expected, 'date_to'), Arr::get($query, 'date_to'));
+        self::assertEquals(Arr::get($expected, 'search'), Arr::get($query, 'search'));
+        self::assertEquals(Arr::get($expected, 'category'), Arr::get($query, 'category'));
+        self::assertEquals(Arr::get($expected, 'report_source'), Arr::get($query, 'report_source'));
+    }
+
+    public function test_get_aggregated_reports_with_filters(): void
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $monitorId = 'monitor-id-123';
+        $this->dmarcMonitoring->getAggregatedReports(
+            $monitorId,
+            1,
+            25,
+            '2024-01-01',
+            '2024-01-31',
+            'example.com',
+            'dmarc',
+            'google.com'
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('2024-01-01', Arr::get($query, 'date_from'));
+        self::assertEquals('2024-01-31', Arr::get($query, 'date_to'));
+        self::assertEquals('example.com', Arr::get($query, 'search'));
+        self::assertEquals('dmarc', Arr::get($query, 'category'));
+        self::assertEquals('google.com', Arr::get($query, 'report_source'));
     }
 
     public function test_get_aggregated_reports_requires_monitor_id(): void
@@ -260,7 +325,12 @@ class DmarcMonitoringTest extends TestCase
             $monitorId,
             $ip,
             $params['page'] ?? null,
-            $params['limit'] ?? null
+            $params['limit'] ?? null,
+            $params['date_from'] ?? null,
+            $params['date_to'] ?? null,
+            $params['search'] ?? null,
+            $params['category'] ?? null,
+            $params['report_source'] ?? null
         );
 
         $request = $this->client->getLastRequest();
@@ -271,6 +341,41 @@ class DmarcMonitoringTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'date_from'), Arr::get($query, 'date_from'));
+        self::assertEquals(Arr::get($expected, 'date_to'), Arr::get($query, 'date_to'));
+        self::assertEquals(Arr::get($expected, 'search'), Arr::get($query, 'search'));
+        self::assertEquals(Arr::get($expected, 'category'), Arr::get($query, 'category'));
+        self::assertEquals(Arr::get($expected, 'report_source'), Arr::get($query, 'report_source'));
+    }
+
+    public function test_get_ip_reports_with_filters(): void
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $monitorId = 'monitor-id-123';
+        $ip = '1.2.3.4';
+        $this->dmarcMonitoring->getIpReports(
+            $monitorId,
+            $ip,
+            1,
+            25,
+            '2024-01-01',
+            '2024-01-31',
+            'example.com',
+            'dmarc',
+            'google.com'
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('2024-01-01', Arr::get($query, 'date_from'));
+        self::assertEquals('2024-01-31', Arr::get($query, 'date_to'));
+        self::assertEquals('example.com', Arr::get($query, 'search'));
+        self::assertEquals('dmarc', Arr::get($query, 'category'));
+        self::assertEquals('google.com', Arr::get($query, 'report_source'));
     }
 
     public function test_get_ip_reports_requires_monitor_id(): void
@@ -309,20 +414,60 @@ class DmarcMonitoringTest extends TestCase
         $this->client->addResponse($response);
 
         $monitorId = 'monitor-id-123';
-        $response = $this->dmarcMonitoring->getReportSources($monitorId);
+        $response = $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01', '2024-01-31');
 
         $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
 
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals("/v1/dmarc-monitoring/$monitorId/report-sources", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
+        self::assertEquals('2024-01-01', Arr::get($query, 'date_from'));
+        self::assertEquals('2024-01-31', Arr::get($query, 'date_to'));
+        self::assertNull(Arr::get($query, 'status'));
+    }
+
+    public function test_get_report_sources_with_status(): void
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $monitorId = 'monitor-id-123';
+        $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01', '2024-01-31', 'accepted');
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('accepted', Arr::get($query, 'status'));
     }
 
     public function test_get_report_sources_requires_monitor_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
 
-        $this->dmarcMonitoring->getReportSources('');
+        $this->dmarcMonitoring->getReportSources('', '2024-01-01', '2024-01-31');
+    }
+
+    public function test_get_report_sources_requires_date_from(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->dmarcMonitoring->getReportSources('monitor-id-123', '', '2024-01-31');
+    }
+
+    public function test_get_report_sources_requires_date_to(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->dmarcMonitoring->getReportSources('monitor-id-123', '2024-01-01', '');
+    }
+
+    public function test_get_report_sources_with_invalid_status(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->dmarcMonitoring->getReportSources('monitor-id-123', '2024-01-01', '2024-01-31', 'invalid_status');
     }
 
     // -------------------------------------------------------------------------

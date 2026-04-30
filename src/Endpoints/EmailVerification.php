@@ -42,14 +42,22 @@ class EmailVerification extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \JsonException
      */
-    public function find(string $emailVerificationId): array
-    {
+    public function find(
+        string $emailVerificationId,
+        ?bool $detailed = null,
+        ?int $page = null,
+        ?int $limit = null
+    ): array {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($emailVerificationId, 1, 'Email Verification id is required.')
         );
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$emailVerificationId")
+            $this->buildUri("$this->endpoint/$emailVerificationId", array_filter([
+                'detailed' => $detailed,
+                'page' => $page,
+                'limit' => $limit,
+            ], fn ($v) => $v !== null))
         );
     }
 
@@ -60,9 +68,11 @@ class EmailVerification extends AbstractEndpoint
      */
     public function create(EmailVerificationParams $params): array
     {
-        GeneralHelpers::assert(
-            fn () => Assertion::minLength($params->getName(), 1, 'Email Verification name is required.')
-        );
+        if (!$params->getListId()) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getName(), 1, 'Email Verification name is required.')
+            );
+        }
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
@@ -130,6 +140,39 @@ class EmailVerification extends AbstractEndpoint
         return $this->httpLayer->post(
             $this->buildUri("{$this->endpoint}/verify"),
             ['email' => $email]
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function verifyAsync(string $email): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($email, 1, 'Email address is required.')
+        );
+
+        return $this->httpLayer->post(
+            $this->buildUri("{$this->endpoint}/verify-async"),
+            ['email' => $email]
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function getVerifyAsyncResult(string $id): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($id, 1, 'Single email verification id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("{$this->endpoint}/verify-async/$id")
         );
     }
 }

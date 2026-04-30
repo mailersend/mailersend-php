@@ -17,6 +17,7 @@ MailerSend PHP SDK
         * [Send a scheduled message](#send-a-scheduled-message)
         * [Send email with precedence bulk header](#precedence-bulk-header)
         * [Send email with custom headers](#custom-headers)
+        * [Send an email with RCPT TO recipients](#send-an-email-with-rcpt-to)
     * [Bulk emails API](#bulk-email-api)
         * [Send bulk email](#send-bulk-email)
         * [Get bulk email status](#get-bulk-email-status)
@@ -73,6 +74,8 @@ MailerSend PHP SDK
     * [Templates API](#templates)
         * [Get a list of templates](#get-a-list-of-templates)
         * [Get a single template](#get-a-single-template)
+        * [Create a template](#create-a-template)
+        * [Update a template](#update-a-template)
         * [Delete a template](#delete-a-template)
     * [Email Verification API](#email-verification)
         * [Get all email verification lists](#get-all-email-verification-lists)
@@ -80,6 +83,9 @@ MailerSend PHP SDK
         * [Create an email verification list](#create-an-email–verification-list)
         * [Verify an email list](#verify-an-email-list)
         * [Get email verification list results](#get-email-verification-list-results)
+        * [Verify a single email](#verify-a-single-email)
+        * [Verify a single email asynchronously](#verify-a-single-email-async)
+        * [Get a single async email verification result](#get-async-verification-result)
     * [SMS API](#sms-api)
         * [Send an sms](#send-sms)
         * [Personalization](#sms-personalization)
@@ -115,6 +121,7 @@ MailerSend PHP SDK
         * [Add a Sender_Identity](#add-a-sender-identity-route)
         * [Update a Sender Identity](#update-a-sender-identity-route)
         * [Update a Sender Identity by email](#update-a-sender-identity-by-email-route)
+        * [Resend Sender Identity verification email](#resend-sender-identity-route)
         * [Delete a Sender Identity](#delete-a-sender-identity-route)
         * [Delete a Sender Identity by email](#delete-a-sender-identity-by-email-route)
     * [SMTP Users](#smtp-users-routing)
@@ -143,6 +150,12 @@ MailerSend PHP SDK
         * [Get report sources](#get-report-sources)
         * [Mark IP as favorite](#mark-ip-as-favorite)
         * [Remove IP from favorites](#remove-ip-from-favorites)
+    * [Blocklist Monitoring API](#blocklist-monitoring)
+        * [Get a list of blocklist monitors](#get-a-list-of-blocklist-monitors)
+        * [Get a single blocklist monitor](#get-a-blocklist-monitor)
+        * [Create a blocklist monitor](#create-a-blocklist-monitor)
+        * [Update a blocklist monitor](#update-a-blocklist-monitor)
+        * [Delete a blocklist monitor](#delete-a-blocklist-monitor)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
 * [Debugging validation errors](#debugging-validation-errors)
@@ -502,6 +515,34 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+<a name="send-an-email-with-rcpt-to"></a>
+### Send an email with RCPT TO recipients
+
+`rcptTo` is intended for SMTP source delivery and accepts a list of recipients.
+When `to` is empty and `rcptTo` is provided, the addresses are forwarded as BCC.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend();
+
+$rcptTo = [
+    new Recipient('rcpt@client.com'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content')
+    ->setRcptTo($rcptTo);
+
+$mailersend->email->send($emailParams);
+```
+
 <a name="bulk-email-api"></a>
 ## Bulk email API
 
@@ -752,7 +793,9 @@ $activityParams = (new ActivityParams())
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setEvent(['queued', 'sent']);
+                    ->setEvent(['queued', 'sent', 'survey_opened', 'survey_submitted', 'deferred'])
+                    ->setMessageId('message_id')
+                    ->setRecipientEmail('recipient@example.com');
 
 $mailersend->activity->getAll('domainId', $activityParams);
 ```
@@ -789,7 +832,8 @@ $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
                     ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
-                    ->setEvent(['queued', 'sent']);
+                    ->setEvent(['queued', 'sent'])
+                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
 
 $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 ```
@@ -806,7 +850,8 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag']);
+                    ->setTags(['tag'])
+                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
 
 $mailersend->analytics->opensByCountry($opensAnalyticsParams);
 ```
@@ -823,7 +868,8 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag']);
+                    ->setTags(['tag'])
+                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
 
 $mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
 ```
@@ -840,7 +886,8 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag']);
+                    ->setTags(['tag'])
+                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
 
 $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
@@ -934,7 +981,9 @@ $domainSettingsParam = (new DomainSettingsParams())
                             ->setTrackUnsubscribe(false)
                             ->setTrackContent(true)
                             ->setTrackUnsubscribeHtml('html')
+                            ->setTrackUnsubscribeHtmlEnabled(true)
                             ->setTrackUnsubscribePlain('plain')
+                            ->setTrackUnsubscribePlainEnabled(true)
                             ->setCustomTrackingEnabled(true)
                             ->setCustomTrackingSubdomain(false);
 
@@ -978,7 +1027,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->messages->get($limit = 100, $page = 3);
+$mailersend->messages->get($limit = 100, $page = 3, $domainId = 'domain_id');
 ```
 
 <a name="get-info-on-a-message"></a>
@@ -1401,6 +1450,9 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->webhooks->get('domain_id');
+
+// With limit
+$mailersend->webhooks->get('domain_id', $limit = 25);
 ```
 
 <a name="get-webhook"></a>
@@ -1434,6 +1486,12 @@ $mailersend->webhooks->create(
 $mailersend->webhooks->create(
     new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', false)
 );
+
+// Or with a specific webhook payload version (1 or 2)
+
+$mailersend->webhooks->create(
+    new WebhookParams('https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', true, 2)
+);
 ```
 
 <a name="update-webhook"></a>
@@ -1453,6 +1511,18 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 
 // Disable webhook
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false);
+
+// Update version, editable and domain_id
+$mailersend->webhooks->update(
+    'webhook_id',
+    'https://webhook_url',
+    'Webhook name',
+    WebhookParams::ALL_ACTIVITIES,
+    $enabled = true,
+    $version = 2,
+    $editable = true,
+    $domainId = 'domain_id'
+);
 ```
 
 <a name="delete-webhook"></a>
@@ -1504,6 +1574,46 @@ $mailersend = new MailerSend();
 $mailersend->template->find('template_id');
 ```
 
+<a name="create-a-template"></a>
+
+### Create a template
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TemplateParams;
+
+$mailersend = new MailerSend();
+
+$params = (new TemplateParams())
+    ->setName('My Template')
+    ->setHtml('<p>Hello {{name}}</p>')
+    ->setText('Hello {{name}}')
+    ->setDomainId('domain_id')
+    ->setCategories(['category1', 'category2'])
+    ->setTags(['tag1', 'tag2'])
+    ->setAutoGenerate(true);
+
+$mailersend->template->create($params);
+```
+
+<a name="update-a-template"></a>
+
+### Update a template
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\TemplateParams;
+
+$mailersend = new MailerSend();
+
+$params = (new TemplateParams())
+    ->setName('Updated Template Name')
+    ->setHtml('<p>Hello {{name}}</p>')
+    ->setText('Hello {{name}}');
+
+$mailersend->template->update('template_id', $params);
+```
+
 <a name="delete-a-template"></a>
 
 ### Delete a template
@@ -1542,6 +1652,14 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->emailVerification->find('email_verification_id');
+
+// With detailed flag and pagination
+$mailersend->emailVerification->find(
+    'email_verification_id',
+    $detailed = true,
+    $page = 1,
+    $limit = 10,
+);
 ```
 
 <a name="create-an-email–verification-list"></a>
@@ -1556,6 +1674,14 @@ $mailersend = new MailerSend();
 
 $emailVerificationParams = (new EmailVerificationParams('file.csv'))
     ->setEmailAddresses(['test@mail.com']);
+
+$mailersend->emailVerification->create($emailVerificationParams);
+
+// Optionally start verification immediately or attach to an existing list
+$emailVerificationParams = (new EmailVerificationParams('file.csv'))
+    ->setEmailAddresses(['test@mail.com'])
+    ->setListId('existing_list_id')
+    ->setVerify(true);
 
 $mailersend->emailVerification->create($emailVerificationParams);
 ```
@@ -1591,6 +1717,42 @@ $mailersend->emailVerification->getResults(
             EmailVerificationParams::CATCH_ALL,
         ],
     );
+```
+
+<a name="verify-a-single-email"></a>
+
+### Verify a single email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->emailVerification->verifyEmail('test@mail.com');
+```
+
+<a name="verify-a-single-email-async"></a>
+
+### Verify a single email asynchronously
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->emailVerification->verifyAsync('test@mail.com');
+```
+
+<a name="get-async-verification-result"></a>
+
+### Get a single async email verification result
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->emailVerification->getVerifyAsyncResult('single_email_verification_id');
 ```
 
 <a name="sms-api"></a>
@@ -1817,6 +1979,9 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $smsRecipients = $mailersend->smsWebhook->get('sms_number_id');
+
+// With limit
+$smsRecipients = $mailersend->smsWebhook->get('sms_number_id', $limit = 25);
 ```
 
 <a name="get-sms-webhook"></a>
@@ -1967,6 +2132,16 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->senderIdentity->getAll($domainId = 'domainId', $page = 1, $limit = 10);
+
+// With search and ordering
+$mailersend->senderIdentity->getAll(
+    $domainId = 'domainId',
+    $page = 1,
+    $limit = 10,
+    $query = 'email address',
+    $orderBy = 'created_at',
+    $order = 'desc',
+);
 ```
 
 <a name="get-a-single-sender-identity-route"></a>
@@ -2069,6 +2244,18 @@ $mailersend->senderIdentity->updateByEmail(
         ->setAddNote(true)
         ->setPersonalNote("Hi John, please use this token")
 );
+```
+
+<a name="resend-sender-identity-route"></a>
+
+### Resend Sender Identity verification email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->senderIdentity->resend('identityId');
 ```
 
 <a name="delete-a-sender-identity-route"></a>
@@ -2335,6 +2522,15 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getAll($page = 1, $limit = 25);
+
+// With search and ordering
+$mailersend->dmarcMonitoring->getAll(
+    $page = 1,
+    $limit = 25,
+    $query = 'example.com',
+    $sortBy = 'created_at',
+    $order = 'desc',
+);
 ```
 
 <a name="create-a-monitor"></a>
@@ -2390,6 +2586,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getAggregatedReports('monitor-id', $page = 1, $limit = 25);
+
+// With filters
+$mailersend->dmarcMonitoring->getAggregatedReports(
+    'monitor-id',
+    $page = 1,
+    $limit = 25,
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $search = 'example.com',
+    $category = 'dmarc',
+    $reportSource = 'google.com',
+);
 ```
 
 <a name="get-ip-specific-reports"></a>
@@ -2402,6 +2610,19 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->getIpReports('monitor-id', '1.2.3.4', $page = 1, $limit = 25);
+
+// With filters
+$mailersend->dmarcMonitoring->getIpReports(
+    'monitor-id',
+    '1.2.3.4',
+    $page = 1,
+    $limit = 25,
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $search = 'example.com',
+    $category = 'dmarc',
+    $reportSource = 'google.com',
+);
 ```
 
 <a name="get-report-sources"></a>
@@ -2413,7 +2634,15 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->dmarcMonitoring->getReportSources('monitor-id');
+$mailersend->dmarcMonitoring->getReportSources('monitor-id', '2024-01-01', '2024-01-31');
+
+// With optional status filter
+$mailersend->dmarcMonitoring->getReportSources(
+    'monitor-id',
+    $dateFrom = '2024-01-01',
+    $dateTo = '2024-01-31',
+    $status = 'accepted', // accepted, rejected, quarantined
+);
 ```
 
 <a name="mark-ip-as-favorite"></a>
@@ -2438,6 +2667,94 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->dmarcMonitoring->removeIpFromFavorites('monitor-id', '1.2.3.4');
+```
+
+<a name="blocklist-monitoring"></a>
+
+## Blocklist Monitoring
+
+<a name="get-a-list-of-blocklist-monitors"></a>
+
+### Get a list of blocklist monitors
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->blocklistMonitoring->getAll($page = 1, $limit = 25);
+
+// With search and ordering
+$mailersend->blocklistMonitoring->getAll(
+    $page = 1,
+    $limit = 25,
+    $query = 'example.com',
+    $sortBy = 'created_at',
+    $order = 'desc',
+);
+```
+
+<a name="get-a-blocklist-monitor"></a>
+
+### Get a single blocklist monitor
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->blocklistMonitoring->find('monitor-id');
+```
+
+<a name="create-a-blocklist-monitor"></a>
+
+### Create a blocklist monitor
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\BlocklistMonitoringParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->blocklistMonitoring->create(
+    (new BlocklistMonitoringParams('example.com'))
+        ->setName('My monitor')
+        ->setNotify(true)
+        ->setNotifyEmail('alerts@example.com')
+        ->setNotifyAddress('https://example.com/webhook')
+);
+```
+
+<a name="update-a-blocklist-monitor"></a>
+
+### Update a blocklist monitor
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\BlocklistMonitoringUpdateParams;
+
+$mailersend = new MailerSend();
+
+$mailersend->blocklistMonitoring->update(
+    'monitor-id',
+    (new BlocklistMonitoringUpdateParams())
+        ->setName('My monitor')
+        ->setNotify(true)
+        ->setNotifyEmail('alerts@example.com')
+        ->setNotifyAddress('https://example.com/webhook')
+);
+```
+
+<a name="delete-a-blocklist-monitor"></a>
+
+### Delete a blocklist monitor
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->blocklistMonitoring->delete('monitor-id');
 ```
 
 <a name="other-endpoints"></a>

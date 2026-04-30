@@ -8,6 +8,8 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
 {
     protected string $name;
     protected array $emailAddresses = [];
+    protected ?string $listId = null;
+    protected ?bool $verify = null;
 
     public const VALID = 'valid';
     public const CATCH_ALL = 'catch_all';
@@ -35,7 +37,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
         self::FAILED,
     ];
 
-    public function __construct(string $name)
+    public function __construct(string $name = '')
     {
         $this->name = $name;
     }
@@ -48,6 +50,30 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getListId(): ?string
+    {
+        return $this->listId;
+    }
+
+    public function setListId(?string $listId): self
+    {
+        $this->listId = $listId;
+
+        return $this;
+    }
+
+    public function getVerify(): ?bool
+    {
+        return $this->verify;
+    }
+
+    public function setVerify(?bool $verify): self
+    {
+        $this->verify = $verify;
 
         return $this;
     }
@@ -73,10 +99,15 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
 
     public function toArray(): array
     {
-        return [
-            'name' => $this->getName(),
-            'emails' => $this->emailAddresses,
-        ];
+        return array_filter(
+            [
+                'name' => $this->getName() !== '' ? $this->getName() : null,
+                'emails' => $this->emailAddresses,
+                'list_id' => $this->getListId(),
+                'verify' => $this->getVerify(),
+            ],
+            fn ($v) => $v !== null
+        );
     }
 
     #[\ReturnTypeWillChange]

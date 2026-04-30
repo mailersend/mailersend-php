@@ -41,13 +41,20 @@ class Webhook extends AbstractEndpoint
      * @param string $name
      * @param array $events
      * @param bool|null $enabled
+     * @param int|null $version
      * @return array
      * @throws ClientExceptionInterface
      * @throws JsonException
      * @throws MailerSendAssertException
      */
-    public function update(string $id, string $url, string $name, array $events, ?bool $enabled = null): array
-    {
+    public function update(
+        string $id,
+        string $url,
+        string $name,
+        array $events,
+        ?bool $enabled = null,
+        ?int $version = null
+    ): array {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.') &&
                 Assertion::url($url, 'Invalid URL.') &&
@@ -63,18 +70,20 @@ class Webhook extends AbstractEndpoint
                 'name' => $name,
                 'events' => $events,
                 'enabled' => $enabled,
-            ])
+                'version' => $version,
+            ], fn ($v) => $v !== null)
         );
     }
 
     /**
      * @param string $domainId
+     * @param int|null $limit
      * @return array
      * @throws JsonException
      * @throws MailerSendAssertException
      * @throws ClientExceptionInterface
      */
-    public function get(string $domainId): array
+    public function get(string $domainId, ?int $limit = null): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
@@ -83,7 +92,8 @@ class Webhook extends AbstractEndpoint
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint),
             array_filter([
-                'domain_id' => $domainId
+                'domain_id' => $domainId,
+                'limit' => $limit,
             ])
         );
     }

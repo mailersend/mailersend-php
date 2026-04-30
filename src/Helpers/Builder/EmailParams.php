@@ -27,6 +27,7 @@ class EmailParams
     protected array $headers = [];
     protected array $referencesHeader = [];
     protected ?string $listUnsubscribe = null;
+    protected array $rcptTo = [];
 
     public function getFrom(): ?string
     {
@@ -284,6 +285,17 @@ class EmailParams
     public function setListUnsubscribe(string $listUnsubscribe): EmailParams
     {
         $this->listUnsubscribe = $listUnsubscribe;
+        return $this;
+    }
+
+    public function getRcptTo(): array
+    {
+        return $this->rcptTo;
+    }
+
+    public function setRcptTo(array $rcptTo): EmailParams
+    {
+        $this->rcptTo = $rcptTo;
         return $this;
     }
 }
