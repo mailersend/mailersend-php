@@ -8,6 +8,7 @@ use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\OnHoldList;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -76,6 +77,45 @@ class OnHoldListTest extends TestCase
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
+    }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create(): void
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+
+        $this->client->addResponse($response);
+
+        $params = (new SuppressionParams())
+            ->setDomainId('domain_id')
+            ->setRecipients(['recipient']);
+
+        $response = $this->onHoldList->create($params);
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
+        self::assertSame(['recipient'], Arr::get($request_body, 'recipients'));
+    }
+
+    public function test_create_requires_recipients(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Recipients is required.');
+
+        $params = (new SuppressionParams())
+            ->setDomainId('domain_id');
+
+        $this->onHoldList->create($params);
     }
 
     /**
