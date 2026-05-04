@@ -424,7 +424,7 @@ $emailParams = (new EmailParams())
     ->setSubject('Subject')
     ->setHtml('This is the html version.')
     ->setText('This is the text version.')
-    ->setSendAt(1665626400);
+    ->setSendAt(1665626400) // Unix timestamp or ISO 8601 string, e.g. '2022-10-13T08:00:00+00:00'
     ->setPrecedenceBulkHeader(true);
 
 $mailersend->email->send($emailParams);
