@@ -14,6 +14,9 @@ MailerSend PHP SDK
         * [Send a template-based email](#template)
         * [Personalization](#personalization)
         * [Send an email with attachment](#attachments)
+        * [Send email with inline attachment](#send-email-with-inline-attachment)
+        * [Send email with references (threading)](#send-email-with-references-threading)
+        * [Send email with list-unsubscribe](#send-email-with-list-unsubscribe)
         * [Send a scheduled message](#send-a-scheduled-message)
         * [Send email with precedence bulk header](#precedence-bulk-header)
         * [Send an email with tracking](#send-an-email-with-tracking)
@@ -400,6 +403,92 @@ $emailParams = (new EmailParams())
     ->setHtml('This is the html version.')
     ->setText('This is the text version.')
     ->setAttachments($attachments);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="send-email-with-inline-attachment"></a>
+### Send email with inline attachment
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Attachment;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend();
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$attachments = [
+    new Attachment(file_get_contents('image.png'), 'image.png', 'inline', 'content-id-1')
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the html version with an inline image <img src="cid:content-id-1"/>.')
+    ->setText('This is the text version.')
+    ->setAttachments($attachments);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="send-email-with-references-threading"></a>
+### Send email with references (threading)
+
+> **Note:** The `references` field is available on paid plan accounts only.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend();
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Re: Subject')
+    ->setHtml('This is the HTML content.')
+    ->setText('This is the text content.')
+    ->setInReplyTo('<original-message-id@yourdomain.com>')
+    ->setReferences(['<original-message-id@yourdomain.com>', '<another-message-id@yourdomain.com>']);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="send-email-with-list-unsubscribe"></a>
+### Send email with list-unsubscribe
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend();
+
+$recipients = [
+    new Recipient('your@client.com', 'Your Client'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content.')
+    ->setText('This is the text content.')
+    ->setListUnsubscribe('https://www.yourdomain.com/unsubscribe');
 
 $mailersend->email->send($emailParams);
 ```
