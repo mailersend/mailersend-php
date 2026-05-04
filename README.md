@@ -1061,8 +1061,8 @@ $mailersend = new MailerSend();
 $mailersend->scheduleMessages->getAll(
     'domain_id',
     Constants::STATUS_SCHEDULED,
-    $limit = 100,
-    $page = 3
+    $page = 3,
+    $limit = 100
 )
 ```
 
