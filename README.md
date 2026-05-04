@@ -16,6 +16,7 @@ MailerSend PHP SDK
         * [Send an email with attachment](#attachments)
         * [Send a scheduled message](#send-a-scheduled-message)
         * [Send email with precedence bulk header](#precedence-bulk-header)
+        * [Send an email with tracking](#send-an-email-with-tracking)
         * [Send email with custom headers](#custom-headers)
         * [Send an email with RCPT TO recipients](#send-an-email-with-rcpt-to)
     * [Bulk emails API](#bulk-email-api)
@@ -327,7 +328,7 @@ $mailersend->email->send($emailParams);
 
 <a name="personalization"></a>
 
-### Advanced personalization
+### Personalization
 
 ```php
 use MailerSend\MailerSend;
@@ -456,6 +457,7 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+<a name="send-an-email-with-tracking"></a>
 ### Send an email with tracking
 
 ```php
@@ -817,7 +819,7 @@ $mailersend->activity->find('activity_id');
 
 ## Analytics
 
-<a name="activity-data-by-date"></a>
+<a name="get-activity-data-by-date"></a>
 
 ### Get activity data by date
 
@@ -1998,7 +2000,7 @@ $smsRecipients = $mailersend->smsWebhook->find('sms_webhook_id');
 
 <a name="create-sms-webhook"></a>
 
-### Create a single SMS webhook
+### Create an SMS webhook
 
 ```php
 use MailerSend\MailerSend;
@@ -2108,7 +2110,7 @@ $smsRecipients = $mailersend->smsInbound->update('sms_inbound_id', $smsInboundPa
 
 <a name="delete-sms-inbound"></a>
 
-### Delete an inbound route
+### Delete an SMS inbound route
 
 ```php
 use MailerSend\MailerSend;
