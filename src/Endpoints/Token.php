@@ -52,7 +52,6 @@ class Token extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.') &&
-                Assertion::minLength($tokenParams->getDomainId(), 1, 'Token domain id is required.') &&
                 Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );
 
@@ -70,23 +69,30 @@ class Token extends AbstractEndpoint
 
     /**
      * @param string $id
-     * @param string $status
+     * @param string|null $status
+     * @param string|null $name
      * @return array
      * @throws ClientExceptionInterface
      * @throws JsonException
      * @throws MailerSendAssertException
      */
-    public function update(string $id, string $status): array
+    public function update(string $id, ?string $status = null, ?string $name = null): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($id, 'Token id is required.') &&
-                Assertion::inArray($status, TokenParams::STATUS_ALL)
+            fn () => Assertion::notEmpty($id, 'Token id is required.')
         );
 
+        if ($status !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray($status, TokenParams::STATUS_ALL)
+            );
+        }
+
         return $this->httpLayer->put(
-            $this->buildUri($this->endpoint . '/' . $id . '/settings'),
+            $this->buildUri($this->endpoint . '/' . $id),
             array_filter(
                 [
+                    'name' => $name,
                     'status' => $status,
                 ],
             ),

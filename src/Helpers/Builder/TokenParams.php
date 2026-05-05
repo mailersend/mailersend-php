@@ -11,7 +11,7 @@ use MailerSend\Helpers\GeneralHelpers;
 class TokenParams implements Arrayable, JsonSerializable
 {
     private string $name;
-    private string $domainId;
+    private ?string $domainId;
     private array $scopes;
 
     public const EMAIL_FULL = 'email_full';
@@ -76,11 +76,11 @@ class TokenParams implements Arrayable, JsonSerializable
     /**
      * TokenParams constructor.
      * @param string $name
-     * @param string $domainId
+     * @param string|null $domainId
      * @param array $scopes
      * @throws MailerSendAssertException
      */
-    public function __construct(string $name, string $domainId, array $scopes)
+    public function __construct(string $name, ?string $domainId, array $scopes)
     {
         $this->setName($name)
             ->setDomainId($domainId)
@@ -107,18 +107,18 @@ class TokenParams implements Arrayable, JsonSerializable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDomainId(): string
+    public function getDomainId(): ?string
     {
         return $this->domainId;
     }
 
     /**
-     * @param string $domainId
+     * @param string|null $domainId
      * @return TokenParams
      */
-    public function setDomainId(string $domainId): TokenParams
+    public function setDomainId(?string $domainId): TokenParams
     {
         $this->domainId = $domainId;
 

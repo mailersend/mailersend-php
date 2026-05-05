@@ -35,13 +35,23 @@ class TokenTest extends TestCase
         );
     }
 
-    public function test_create_token_with_empty_domainId_throws_errors(): void
+    public function test_create_token_without_domain_id(): void
     {
-        $this->expectExceptionMessage('Token domain id is required.');
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
 
-        $this->token->create(
-            new TokenParams('token name', '', TokenParams::ALL_SCOPES)
+        $response = $this->token->create(
+            new TokenParams('token name', null, TokenParams::ALL_SCOPES)
         );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('POST', $request->getMethod());
+        self::assertEquals('/v1/token', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+        self::assertArrayNotHasKey('domain_id', $request_body);
     }
 
     public function test_create_token_with_empty_scopes_throws_errors(): void
@@ -128,7 +138,7 @@ class TokenTest extends TestCase
         $request_body = json_decode((string) $request->getBody(), true);
 
         self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/token/random_id/settings', $request->getUri()->getPath());
+        self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
         self::assertSame(TokenParams::STATUS_PAUSE, Arr::get($request_body, 'status'));
@@ -149,10 +159,33 @@ class TokenTest extends TestCase
         $request_body = json_decode((string) $request->getBody(), true);
 
         self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/token/random_id/settings', $request->getUri()->getPath());
+        self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
         self::assertSame(TokenParams::STATUS_UNPAUSE, Arr::get($request_body, 'status'));
+    }
+
+    public function test_update_token_name_and_status(): void
+    {
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getStatusCode')->willReturn(200);
+        $this->client->addResponse($response);
+
+        $response = $this->token->update(
+            'random_id',
+            TokenParams::STATUS_PAUSE,
+            'new_name'
+        );
+
+        $request = $this->client->getLastRequest();
+        $request_body = json_decode((string) $request->getBody(), true);
+
+        self::assertEquals('PUT', $request->getMethod());
+        self::assertEquals('/v1/token/random_id', $request->getUri()->getPath());
+        self::assertEquals(200, $response['status_code']);
+
+        self::assertSame(TokenParams::STATUS_PAUSE, Arr::get($request_body, 'status'));
+        self::assertSame('new_name', Arr::get($request_body, 'name'));
     }
 
     public function test_delete_token()
