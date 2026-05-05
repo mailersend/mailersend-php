@@ -9,7 +9,7 @@ class Constants
     public const MIN_LIMIT = 10;
     public const MAX_LIMIT = 100;
     public const POSSIBLE_EVENT_TYPES = ['queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints', 'opened_unique', 'clicked_unique', 'survey_opened', 'survey_submitted', 'deferred'];
-    public const POSSIBLE_SMS_STATUSES = ['queued', 'sent', 'delivered', 'failed'];
+    public const POSSIBLE_SMS_STATUSES = ['processed', 'queued', 'sent', 'delivered', 'failed'];
     public const POSSIBLE_SMS_RECIPIENT_STATUSES = ['active', 'opt_out'];
     public const POSSIBLE_GROUP_BY_OPTIONS = ['days', 'weeks', 'months', 'years'];
     public const GROUP_BY_DAYS = 'days';
@@ -54,6 +54,7 @@ class Constants
 
     // Forward Types
     public const TYPE_WEBHOOK = 'webhook';
+    public const TYPE_EMAIL = 'email';
 
     // Scheduled messages status
     public const STATUS_SCHEDULED = 'scheduled';

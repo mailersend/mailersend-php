@@ -69,7 +69,7 @@ class SmsWebhook extends AbstractEndpoint
      * @throws MailerSendAssertException
      * @throws ClientExceptionInterface
      */
-    public function get(string $smsNumberId, ?int $limit = null): array
+    public function get(string $smsNumberId, ?int $limit = null, ?int $page = null): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($smsNumberId, 1, 'SMS number id is required.')
@@ -80,6 +80,7 @@ class SmsWebhook extends AbstractEndpoint
             array_filter([
                 'sms_number_id' => $smsNumberId,
                 'limit' => $limit,
+                'page' => $page,
             ])
         );
     }

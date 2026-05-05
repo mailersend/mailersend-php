@@ -6,6 +6,7 @@ use Assert\Assertion;
 use MailerSend\Common\Constants;
 use MailerSend\Helpers\Builder\SmsInbound as SmsInboundBuilder;
 use MailerSend\Helpers\GeneralHelpers;
+use MailerSend\Exceptions\MailerSendAssertException;
 
 class SmsInbound extends AbstractEndpoint
 {
@@ -67,6 +68,16 @@ class SmsInbound extends AbstractEndpoint
                 Assertion::url($params->getForwardUrl(), 'Invalid URL.')
         );
 
+        if ($params->getFilter()) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray(
+                    $params->getFilter()->toArray()['comparer'],
+                    Constants::POSSIBLE_SMS_INBOUND_COMPARERS,
+                    'Invalid filter comparer.'
+                )
+            );
+        }
+
         return $this->httpLayer->post(
             $this->url($this->endpoint),
             array_filter($params->toArray(), function ($value) {
@@ -81,6 +92,16 @@ class SmsInbound extends AbstractEndpoint
      */
     public function update(string $smsInboundId, SmsInboundBuilder $params): array
     {
+        if ($params->getFilter()) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray(
+                    $params->getFilter()->toArray()['comparer'],
+                    Constants::POSSIBLE_SMS_INBOUND_COMPARERS,
+                    'Invalid filter comparer.'
+                )
+            );
+        }
+
         return $this->httpLayer->put(
             $this->url("$this->endpoint/$smsInboundId"),
             array_filter($params->toArray(), function ($value) {
