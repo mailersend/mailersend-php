@@ -61,6 +61,16 @@ class Template extends AbstractEndpoint
      */
     public function create(TemplateParams $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($params->getHtml(), 'HTML is required.')
+        );
+
+        if ($params->getName() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($params->getName(), 50, 'Name must be 50 characters or fewer.')
+            );
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray()
@@ -77,6 +87,12 @@ class Template extends AbstractEndpoint
         GeneralHelpers::assert(
             fn () => Assertion::minLength($templateId, 1, 'Template id is required.')
         );
+
+        if ($params->getName() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($params->getName(), 50, 'Name must be 50 characters or fewer.')
+            );
+        }
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$templateId"),
