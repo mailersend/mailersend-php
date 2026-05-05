@@ -21,6 +21,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
     public const ACTIVITY_DELIVERED = 'activity.delivered';
     public const ACTIVITY_SOFT_BOUNCED = 'activity.soft_bounced';
     public const ACTIVITY_HARD_BOUNCED = 'activity.hard_bounced';
+    public const ACTIVITY_DEFERRED = 'activity.deferred';
     public const ACTIVITY_OPENED = 'activity.opened';
     public const ACTIVITY_OPENED_UNIQUE = 'activity.opened_unique';
     public const ACTIVITY_CLICKED = 'activity.clicked';
@@ -41,7 +42,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
 
     public const ALL_ACTIVITIES = [
         self::ACTIVITY_SENT, self::ACTIVITY_DELIVERED,
-        self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED,
+        self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED, self::ACTIVITY_DEFERRED,
         self::ACTIVITY_OPENED, self::ACTIVITY_OPENED_UNIQUE,
         self::ACTIVITY_CLICKED, self::ACTIVITY_CLICKED_UNIQUE,
         self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT,
