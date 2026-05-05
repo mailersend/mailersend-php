@@ -54,6 +54,7 @@ class Suppression extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty($params->getRecipients(), 'Recipients is required.')
+            && Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
         );
 
         return $this->httpLayer->post(
