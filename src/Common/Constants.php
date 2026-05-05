@@ -33,13 +33,24 @@ class Constants
 
     // Comparison Operators
     public const COMPARER_EQUAL = 'equal';
-    public const COMPARER_NOT_EQUQL = 'not-equal';
+    public const COMPARER_NOT_EQUAL = 'not-equal';
     public const COMPARER_CONTAINS = 'contains';
     public const COMPARER_NOT_CONTAINS = 'not-contains';
     public const COMPARER_STARTS_WITH = 'starts-with';
     public const COMPARER_ENDS_WITH = 'ends-with';
     public const COMPARER_NOT_STARTS_WITH = 'not-starts-with';
     public const COMPARER_NOT_ENDS_WITH = 'not-ends-with';
+
+    public const POSSIBLE_SMS_INBOUND_COMPARERS = [
+        self::COMPARER_EQUAL,
+        self::COMPARER_NOT_EQUAL,
+        self::COMPARER_CONTAINS,
+        self::COMPARER_NOT_CONTAINS,
+        self::COMPARER_STARTS_WITH,
+        self::COMPARER_ENDS_WITH,
+        self::COMPARER_NOT_STARTS_WITH,
+        self::COMPARER_NOT_ENDS_WITH,
+    ];
 
     // Forward Types
     public const TYPE_WEBHOOK = 'webhook';
