@@ -884,9 +884,7 @@ $activityParams = (new ActivityParams())
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setEvent(['queued', 'sent', 'survey_opened', 'survey_submitted', 'deferred'])
-                    ->setMessageId('message_id')
-                    ->setRecipientEmail('recipient@example.com');
+                    ->setEvent(['queued', 'sent', 'survey_opened', 'survey_submitted', 'deferred']);
 
 $mailersend->activity->getAll('domainId', $activityParams);
 ```
@@ -923,8 +921,7 @@ $activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
                     ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
-                    ->setEvent(['queued', 'sent'])
-                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
+                    ->setEvent(['queued', 'sent']);
 
 $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 ```
@@ -941,8 +938,7 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag'])
-                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
+                    ->setTags(['tag']);
 
 $mailersend->analytics->opensByCountry($opensAnalyticsParams);
 ```
@@ -959,8 +955,7 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag'])
-                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
+                    ->setTags(['tag']);
 
 $mailersend->analytics->opensByUserAgentName($opensAnalyticsParams);
 ```
@@ -977,8 +972,7 @@ $mailersend = new MailerSend();
 
 $opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
                     ->setDomainId('domain_id')
-                    ->setTags(['tag'])
-                    ->setRecipientId(['recipient_id_1', 'recipient_id_2']);
+                    ->setTags(['tag']);
 
 $mailersend->analytics->opensByReadingEnvironment($opensAnalyticsParams);
 ```
