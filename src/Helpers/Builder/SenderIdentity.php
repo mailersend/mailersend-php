@@ -119,6 +119,19 @@ class SenderIdentity implements Arrayable, \JsonSerializable
         ];
     }
 
+    /**
+     * Returns only the fields accepted by the PUT (update) endpoint.
+     * The PUT endpoint does not accept domain_id, email, add_note, or personal_note.
+     */
+    public function toUpdateArray(): array
+    {
+        return [
+            'name' => $this->getName(),
+            'reply_to_email' => $this->getReplyToEmail(),
+            'reply_to_name' => $this->getReplyToName(),
+        ];
+    }
+
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {

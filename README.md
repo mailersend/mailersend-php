@@ -2281,7 +2281,7 @@ $mailersend = new MailerSend();
 $mailersend->senderIdentity->create(
     (new SenderIdentity('domainId', 'name', 'email'))
         ->setReplyToName("John Doe")
-        ->setReplyToEmail("john@test.com"))
+        ->setReplyToEmail("john@test.com")
         ->setAddNote(true)
         ->setPersonalNote("Hi John, please use this token")
 );
@@ -2303,9 +2303,7 @@ $mailersend->senderIdentity->update(
     'identityId',
     (new SenderIdentity('domainId', 'name', 'email'))
         ->setReplyToName("John Doe")
-        ->setReplyToEmail("john@test.com"))
-        ->setAddNote(true)
-        ->setPersonalNote("Hi John, please use this token")
+        ->setReplyToEmail("john@test.com")
 );
 ```
 
@@ -2325,9 +2323,7 @@ $mailersend->senderIdentity->updateByEmail(
     'identityId',
     (new SenderIdentity('domainId', 'name', 'email'))
         ->setReplyToName("John Doe")
-        ->setReplyToEmail("john@test.com"))
-        ->setAddNote(true)
-        ->setPersonalNote("Hi John, please use this token")
+        ->setReplyToEmail("john@test.com")
 );
 ```
 

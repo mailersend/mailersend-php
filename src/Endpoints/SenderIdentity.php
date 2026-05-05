@@ -99,7 +99,7 @@ class SenderIdentity extends AbstractEndpoint
     {
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$identityId"),
-            $params->toArray(),
+            $params->toUpdateArray(),
         );
     }
 
@@ -147,7 +147,7 @@ class SenderIdentity extends AbstractEndpoint
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/email/$email"),
-            $params->toArray(),
+            $params->toUpdateArray(),
         );
     }
 
