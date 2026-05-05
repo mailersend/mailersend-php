@@ -18,7 +18,8 @@ class EmailParams
     protected array $tags = [];
     protected array $attachments = [];
     protected array $personalization = [];
-    protected int|string|null $send_at = null;
+    /** @var int|string|null */
+    protected $send_at = null;
     protected ?bool $precedenceBulkHeader = null;
     protected ?string $inReplyToHeader = null;
     protected ?bool $trackClicks = null;
@@ -183,12 +184,16 @@ class EmailParams
         return $this;
     }
 
-    public function getSendAt(): int|string|null
+    /** @return int|string|null */
+    public function getSendAt()
     {
         return $this->send_at;
     }
 
-    public function setSendAt(int|string|null $send_at): self
+    /**
+     * @param int|string|null $send_at
+     */
+    public function setSendAt($send_at): self
     {
         $this->send_at = $send_at;
 
