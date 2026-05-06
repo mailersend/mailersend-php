@@ -844,10 +844,6 @@ class BulkEmailTest extends TestCase
         self::assertEquals('custom-value', $body[0]['headers'][0]['value']);
     }
 
-    // -------------------------------------------------------------------------
-    // references header — present
-    // -------------------------------------------------------------------------
-
     public function test_send_with_references_header(): void
     {
         $this->addSuccessResponse();
@@ -870,10 +866,6 @@ class BulkEmailTest extends TestCase
         self::assertEquals(['<ref1@mailersend.com>', '<ref2@mailersend.com>'], $body[0]['references']);
     }
 
-    // -------------------------------------------------------------------------
-    // list_unsubscribe — present
-    // -------------------------------------------------------------------------
-
     public function test_send_with_list_unsubscribe(): void
     {
         $this->addSuccessResponse();
@@ -895,10 +887,6 @@ class BulkEmailTest extends TestCase
         $body = $this->assertRequest('POST', '/v1/bulk-email');
         self::assertEquals('https://unsubscribe.example.com', $body[0]['list_unsubscribe']);
     }
-
-    // -------------------------------------------------------------------------
-    // rcptTo — present
-    // -------------------------------------------------------------------------
 
     public function test_send_with_rcpt_to(): void
     {
@@ -925,10 +913,6 @@ class BulkEmailTest extends TestCase
         self::assertEquals('rcpt@mailersend.com', $body[0]['rcptTo'][0]['email']);
     }
 
-    // -------------------------------------------------------------------------
-    // send_at — integer and ISO 8601 string
-    // -------------------------------------------------------------------------
-
     public function test_send_at_accepts_string_value(): void
     {
         $this->addSuccessResponse();
@@ -952,10 +936,6 @@ class BulkEmailTest extends TestCase
         $body = $this->assertRequest('POST', '/v1/bulk-email');
         self::assertEquals($sendAt, $body[0]['send_at']);
     }
-
-    // -------------------------------------------------------------------------
-    // precedence_bulk — false value serialized
-    // -------------------------------------------------------------------------
 
     public function test_send_includes_precedence_bulk_false(): void
     {
@@ -1007,19 +987,19 @@ class BulkEmailTest extends TestCase
     public static function absentOptionalFieldsProvider(): array
     {
         return [
-            'settings not set'        => ['settings'],
-            'headers not set'         => ['headers'],
-            'references not set'      => ['references'],
-            'list_unsubscribe not set'=> ['list_unsubscribe'],
-            'rcptTo not set'          => ['rcptTo'],
-            'send_at not set'         => ['send_at'],
-            'in_reply_to not set'     => ['in_reply_to'],
+            'settings not set' => ['settings'],
+            'headers not set' => ['headers'],
+            'references not set' => ['references'],
+            'list_unsubscribe not set' => ['list_unsubscribe'],
+            'rcptTo not set' => ['rcptTo'],
+            'send_at not set' => ['send_at'],
+            'in_reply_to not set' => ['in_reply_to'],
             'precedence_bulk not set' => ['precedence_bulk'],
-            'reply_to not set'        => ['reply_to'],
-            'cc not set'              => ['cc'],
-            'bcc not set'             => ['bcc'],
-            'tags not set'            => ['tags'],
-            'attachments not set'     => ['attachments'],
+            'reply_to not set' => ['reply_to'],
+            'cc not set' => ['cc'],
+            'bcc not set' => ['bcc'],
+            'tags not set' => ['tags'],
+            'attachments not set' => ['attachments'],
             'personalization not set' => ['personalization'],
         ];
     }

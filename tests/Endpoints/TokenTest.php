@@ -134,10 +134,6 @@ class TokenTest extends TestCase
         $this->token->find('');
     }
 
-    // -------------------------------------------------------------------------
-    // create
-    // -------------------------------------------------------------------------
-
     public function test_create_token(): void
     {
         $this->addSuccessResponse();
@@ -199,10 +195,6 @@ class TokenTest extends TestCase
 
         new TokenParams('token name', 'domainId', ['invalid_scope']);
     }
-
-    // -------------------------------------------------------------------------
-    // update
-    // -------------------------------------------------------------------------
 
     public function test_update_token_with_pause_status(): void
     {
@@ -272,10 +264,6 @@ class TokenTest extends TestCase
         $this->token->update('random_id', 'invalid_status');
     }
 
-    // -------------------------------------------------------------------------
-    // changeName
-    // -------------------------------------------------------------------------
-
     public function test_change_name(): void
     {
         $this->addSuccessResponse();
@@ -304,10 +292,6 @@ class TokenTest extends TestCase
         $this->token->changeName('random_id', '');
     }
 
-    // -------------------------------------------------------------------------
-    // delete
-    // -------------------------------------------------------------------------
-
     public function test_delete_token(): void
     {
         $this->addSuccessResponse();
@@ -325,10 +309,6 @@ class TokenTest extends TestCase
 
         $this->token->delete('');
     }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
 
     private function validTokenParams(): TokenParams
     {

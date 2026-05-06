@@ -26,10 +26,6 @@ class EmailTest extends TestCase
         $this->email = new Email(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
     }
 
-    // -------------------------------------------------------------------------
-    // Happy path — behavior
-    // -------------------------------------------------------------------------
-
     public function test_template_id_doesnt_require_subject_html_or_text(): void
     {
         $recipients = [
@@ -454,10 +450,6 @@ class EmailTest extends TestCase
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // Validation failures — boundaries
-    // -------------------------------------------------------------------------
-
     /**
      * @dataProvider invalidEmailParamsProvider
      * @param EmailParams $emailParams
@@ -717,10 +709,6 @@ class EmailTest extends TestCase
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // BCC name / format validation (dedicated provider)
-    // -------------------------------------------------------------------------
-
     /**
      * @dataProvider invalidBccParamsProvider
      * @param EmailParams $emailParams
@@ -753,10 +741,6 @@ class EmailTest extends TestCase
         ];
     }
 
-    // -------------------------------------------------------------------------
-    // rcptTo — present and absent
-    // -------------------------------------------------------------------------
-
     public function test_send_includes_rcpt_to_in_body(): void
     {
         $this->addSuccessResponse();
@@ -781,10 +765,6 @@ class EmailTest extends TestCase
         self::assertEquals('Rcpt To', $body['rcptTo'][0]['name']);
     }
 
-    // -------------------------------------------------------------------------
-    // references header — present
-    // -------------------------------------------------------------------------
-
     public function test_send_includes_references_in_body(): void
     {
         $this->addSuccessResponse();
@@ -808,10 +788,6 @@ class EmailTest extends TestCase
         self::assertEquals($references, $body['references']);
     }
 
-    // -------------------------------------------------------------------------
-    // list_unsubscribe — present
-    // -------------------------------------------------------------------------
-
     public function test_send_includes_list_unsubscribe_in_body(): void
     {
         $this->addSuccessResponse();
@@ -832,10 +808,6 @@ class EmailTest extends TestCase
         self::assertEquals('https://example.com/unsubscribe', $body['list_unsubscribe']);
     }
 
-    // -------------------------------------------------------------------------
-    // send_at — integer and ISO 8601 string
-    // -------------------------------------------------------------------------
-
     public function test_send_at_accepts_string_value(): void
     {
         $this->addSuccessResponse();
@@ -855,10 +827,6 @@ class EmailTest extends TestCase
         $body = $this->assertRequest('POST', '/v1/email');
         self::assertEquals($sendAt, $body['send_at']);
     }
-
-    // -------------------------------------------------------------------------
-    // precedence_bulk — false value serialized
-    // -------------------------------------------------------------------------
 
     public function test_send_includes_precedence_bulk_false(): void
     {
@@ -904,20 +872,20 @@ class EmailTest extends TestCase
     public static function absentOptionalFieldsProvider(): array
     {
         return [
-            'rcptTo not set'          => ['rcptTo'],
-            'references not set'      => ['references'],
-            'list_unsubscribe not set'=> ['list_unsubscribe'],
-            'settings not set'        => ['settings'],
-            'reply_to not set'        => ['reply_to'],
-            'send_at not set'         => ['send_at'],
-            'in_reply_to not set'     => ['in_reply_to'],
+            'rcptTo not set' => ['rcptTo'],
+            'references not set' => ['references'],
+            'list_unsubscribe not set' => ['list_unsubscribe'],
+            'settings not set' => ['settings'],
+            'reply_to not set' => ['reply_to'],
+            'send_at not set' => ['send_at'],
+            'in_reply_to not set' => ['in_reply_to'],
             'precedence_bulk not set' => ['precedence_bulk'],
-            'cc not set'              => ['cc'],
-            'bcc not set'             => ['bcc'],
-            'tags not set'            => ['tags'],
-            'attachments not set'     => ['attachments'],
+            'cc not set' => ['cc'],
+            'bcc not set' => ['bcc'],
+            'tags not set' => ['tags'],
+            'attachments not set' => ['attachments'],
             'personalization not set' => ['personalization'],
-            'headers not set'         => ['headers'],
+            'headers not set' => ['headers'],
         ];
     }
 }
