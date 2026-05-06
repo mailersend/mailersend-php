@@ -17,7 +17,6 @@ use Psr\Http\Message\ResponseInterface;
 class BlocklistMonitoringTest extends TestCase
 {
     protected BlocklistMonitoring $blocklistMonitoring;
-    protected ResponseInterface $defaultResponse;
 
     public function setUp(): void
     {
@@ -25,9 +24,6 @@ class BlocklistMonitoringTest extends TestCase
 
         $this->client = new Client();
         $this->blocklistMonitoring = new BlocklistMonitoring(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-
-        $this->defaultResponse = $this->createStub(ResponseInterface::class);
-        $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
     /**
@@ -65,9 +61,10 @@ class BlocklistMonitoringTest extends TestCase
      * @dataProvider invalidGetAllDataProvider
      */
     #[DataProvider('invalidGetAllDataProvider')]
-    public function test_get_all_with_errors(array $params): void
+    public function test_get_all_with_errors(array $params, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($errorMessage);
 
         $this->blocklistMonitoring->getAll(
             $params['page'] ?? null,
@@ -78,29 +75,69 @@ class BlocklistMonitoringTest extends TestCase
         );
     }
 
-    public function test_find(): void
+    public function test_get_all_with_no_params_excludes_optional_query_params(): void
     {
-        $this->client->addResponse($this->defaultResponse);
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->getAll();
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams([], $query);
+        self::assertArrayNotHasKey('page', $query);
+        self::assertArrayNotHasKey('query', $query);
+        self::assertArrayNotHasKey('sort_by', $query);
+        self::assertArrayNotHasKey('order', $query);
+    }
+
+    public function test_find_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->find('monitor-id');
+
+        $this->assertRequest('GET', '/v1/blocklist-monitoring/monitor-id');
+    }
+
+    public function test_find_forwards_status_code(): void
+    {
+        $this->addSuccessResponse();
 
         $response = $this->blocklistMonitoring->find('monitor-id');
 
-        $request = $this->client->getLastRequest();
-
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/blocklist-monitoring/monitor-id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
     public function test_find_requires_monitor_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Monitor id is required.');
 
         $this->blocklistMonitoring->find('');
     }
 
-    public function test_create(): void
+    public function test_create_uses_correct_method_and_path(): void
     {
-        $this->client->addResponse($this->defaultResponse);
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->create(new BlocklistMonitoringParams('example.com'));
+
+        $this->assertRequest('POST', '/v1/blocklist-monitoring');
+    }
+
+    public function test_create_forwards_status_code(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->blocklistMonitoring->create(new BlocklistMonitoringParams('example.com'));
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_create_sends_all_params(): void
+    {
+        $this->addSuccessResponse();
 
         $params = (new BlocklistMonitoringParams('example.com'))
             ->setName('My Monitor')
@@ -108,74 +145,121 @@ class BlocklistMonitoringTest extends TestCase
             ->setNotifyEmail('notify@example.com')
             ->setNotifyAddress('127.0.0.1');
 
-        $response = $this->blocklistMonitoring->create($params);
+        $this->blocklistMonitoring->create($params);
 
-        $request = $this->client->getLastRequest();
-        $body = json_decode((string) $request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $body = $this->assertRequest('POST', '/v1/blocklist-monitoring');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/blocklist-monitoring', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertSame('example.com', Arr::get($body, 'address'));
-        self::assertSame('My Monitor', Arr::get($body, 'name'));
-        self::assertTrue(Arr::get($body, 'notify'));
-        self::assertSame('notify@example.com', Arr::get($body, 'notify_email'));
-        self::assertSame('127.0.0.1', Arr::get($body, 'notify_address'));
+        $this->assertBodyContains([
+            'address' => 'example.com',
+            'name' => 'My Monitor',
+            'notify' => true,
+            'notify_email' => 'notify@example.com',
+            'notify_address' => '127.0.0.1',
+        ], $body);
+    }
+
+    public function test_create_with_only_address_excludes_optional_fields(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->create(new BlocklistMonitoringParams('example.com'));
+
+        $body = $this->assertRequest('POST', '/v1/blocklist-monitoring');
+
+        self::assertSame('example.com', $body['address']);
+        $this->assertBodyExcludes(['name', 'notify', 'notify_email', 'notify_address'], $body);
     }
 
     public function test_create_requires_address(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Address is required.');
 
-        $params = (new BlocklistMonitoringParams('')); // empty address triggers validation in create()
+        $params = (new BlocklistMonitoringParams(''));
         $this->blocklistMonitoring->create($params);
     }
 
-    public function test_update(): void
+    public function test_update_uses_correct_method_and_path(): void
     {
-        $this->client->addResponse($this->defaultResponse);
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->update('monitor-id', new BlocklistMonitoringUpdateParams());
+
+        $this->assertRequest('PUT', '/v1/blocklist-monitoring/monitor-id');
+    }
+
+    public function test_update_forwards_status_code(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->blocklistMonitoring->update('monitor-id', new BlocklistMonitoringUpdateParams());
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_update_sends_all_params(): void
+    {
+        $this->addSuccessResponse();
 
         $params = (new BlocklistMonitoringUpdateParams())
             ->setName('Updated Monitor')
             ->setNotify(false)
-            ->setNotifyEmail('new@example.com');
+            ->setNotifyEmail('new@example.com')
+            ->setNotifyAddress('10.0.0.1');
 
-        $response = $this->blocklistMonitoring->update('monitor-id', $params);
+        $this->blocklistMonitoring->update('monitor-id', $params);
 
-        $request = $this->client->getLastRequest();
-        $body = json_decode((string) $request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $body = $this->assertRequest('PUT', '/v1/blocklist-monitoring/monitor-id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/blocklist-monitoring/monitor-id', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertSame('Updated Monitor', Arr::get($body, 'name'));
-        self::assertFalse(Arr::get($body, 'notify'));
-        self::assertSame('new@example.com', Arr::get($body, 'notify_email'));
+        $this->assertBodyContains([
+            'name' => 'Updated Monitor',
+            'notify' => false,
+            'notify_email' => 'new@example.com',
+            'notify_address' => '10.0.0.1',
+        ], $body);
+    }
+
+    public function test_update_with_no_params_sends_empty_body(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->update('monitor-id', new BlocklistMonitoringUpdateParams());
+
+        $body = $this->assertRequest('PUT', '/v1/blocklist-monitoring/monitor-id');
+
+        $this->assertBodyExcludes(['name', 'notify', 'notify_email', 'notify_address'], $body);
     }
 
     public function test_update_requires_monitor_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Monitor id is required.');
 
         $this->blocklistMonitoring->update('', new BlocklistMonitoringUpdateParams());
     }
 
-    public function test_delete(): void
+    public function test_delete_uses_correct_method_and_path(): void
     {
-        $this->client->addResponse($this->defaultResponse);
+        $this->addSuccessResponse();
+
+        $this->blocklistMonitoring->delete('monitor-id');
+
+        $this->assertRequest('DELETE', '/v1/blocklist-monitoring/monitor-id');
+    }
+
+    public function test_delete_forwards_status_code(): void
+    {
+        $this->addSuccessResponse();
 
         $response = $this->blocklistMonitoring->delete('monitor-id');
 
-        $request = $this->client->getLastRequest();
-
-        self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/blocklist-monitoring/monitor-id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
     public function test_delete_requires_monitor_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Monitor id is required.');
 
         $this->blocklistMonitoring->delete('');
     }
@@ -231,15 +315,19 @@ class BlocklistMonitoringTest extends TestCase
         return [
             'limit below minimum' => [
                 'params' => ['limit' => Constants::MIN_LIMIT - 1],
+                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
             ],
             'limit above maximum' => [
                 'params' => ['limit' => Constants::MAX_LIMIT + 1],
+                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
             ],
             'invalid sort_by value' => [
                 'params' => ['sort_by' => 'invalid_field'],
+                'errorMessage' => 'sort_by must be one of: ' . implode(', ', BlocklistMonitoring::POSSIBLE_SORT_BY) . '.',
             ],
             'invalid order value' => [
                 'params' => ['order' => 'random'],
+                'errorMessage' => 'order must be asc or desc.',
             ],
         ];
     }

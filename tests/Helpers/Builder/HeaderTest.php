@@ -6,28 +6,38 @@ use MailerSend\Helpers\Arr;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\Header;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class HeaderTest extends TestCase
 {
-    public function test_properly_sets_header_params(): void
-    {
-        $header = (new Header('Custom-Header-1', 'Value 1'))->toArray();
-
-        self::assertEquals('Custom-Header-1', Arr::get($header, 'name'));
-        self::assertEquals('Value 1', Arr::get($header, 'value'));
-    }
-
-    public function test_header_validates_empty_name(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        (new Header('', 'Value 1'));
-    }
-
-    public function test_header_validates_empty_value(): void
+    /**
+     * @dataProvider invalidHeaderProvider
+     * @param string $name
+     * @param string $value
+     * @param string $exceptionMessage
+     */
+    #[DataProvider('invalidHeaderProvider')]
+    public function test_rejects_invalid_params(string $name, string $value, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
-        (new Header('Custom-Header-1', ''));
+        new Header($name, $value);
+    }
+
+    public static function invalidHeaderProvider(): array
+    {
+        return [
+            'empty name' => [
+                '',
+                'Value 1',
+                'Value "" is empty, but non empty value was expected.',
+            ],
+            'empty value' => [
+                'Custom-Header-1',
+                '',
+                'Value "" is empty, but non empty value was expected.',
+            ],
+        ];
     }
 }

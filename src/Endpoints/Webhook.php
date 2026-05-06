@@ -31,7 +31,7 @@ class Webhook extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter($webhookParams->toArray())
+            array_filter($webhookParams->toArray(), fn ($v) => $v !== null)
         );
     }
 
@@ -90,8 +90,7 @@ class Webhook extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint),
-            array_filter([
+            $this->buildUri($this->endpoint, [
                 'domain_id' => $domainId,
                 'limit' => $limit,
                 'page' => $page,

@@ -3,10 +3,11 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Recipient;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class RecipientTest extends TestCase
@@ -25,72 +26,122 @@ class RecipientTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    public function test_get_recipients_min_limit_is_validated()
+    public function test_get_sends_correct_method_and_path(): void
     {
-        $this->expectExceptionMessage('Minimum limit is ' . Recipient::MIN_LIMIT . '.');
+        $this->addSuccessResponse();
 
-        $this->recipients->get('domain_id', 9);
-    }
+        $response = $this->recipients->get(null);
 
-    public function test_get_recipients_max_limit_is_validated()
-    {
-        $this->expectExceptionMessage('Maximum limit is ' . Recipient::MAX_LIMIT . '.');
-
-        $this->recipients->get('domain_id', 101);
-    }
-
-    public function test_get_recipients()
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
-
-        $response = $this->recipients->get(null, 30, 2);
-
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
-
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/recipients', $request->getUri()->getPath());
+        $this->assertRequest('GET', '/v1/recipients');
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame(30, Arr::get($request_body, 'limit'));
-        self::assertSame(2, Arr::get($request_body, 'page'));
-        self::assertNull(Arr::get($request_body, 'domain_id'));
     }
 
-    public function test_get_recipients_with_domain_filter()
+    public function test_get_with_limit(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
-        $response = $this->recipients->get('domain_id', 30, 2);
+        $this->recipients->get(null, 30);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyContains(['limit' => 30], $body);
+    }
 
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/recipients', $request->getUri()->getPath());
+    public function test_get_with_page(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get(null, 25, 2);
+
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyContains(['page' => 2], $body);
+    }
+
+    public function test_get_sends_default_limit(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get(null);
+
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyContains(['limit' => Recipient::DEFAULT_LIMIT], $body);
+    }
+
+    public function test_get_with_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get('domain_id');
+
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyContains(['domain_id' => 'domain_id'], $body);
+    }
+
+    public function test_get_excludes_domain_id_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get(null, 25);
+
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyExcludes(['domain_id'], $body);
+    }
+
+    public function test_get_excludes_page_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get(null, 25, null);
+
+        $body = $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyExcludes(['page'], $body);
+    }
+
+    /**
+     * @dataProvider invalidGetLimitProvider
+     * @param int $limit
+     * @param string $exceptionMessage
+     */
+    #[DataProvider('invalidGetLimitProvider')]
+    public function test_get_rejects_invalid_limit(int $limit, string $exceptionMessage): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $this->recipients->get('domain_id', $limit);
+    }
+
+    public static function invalidGetLimitProvider(): array
+    {
+        return [
+            'limit below minimum' => [9, 'Minimum limit is ' . Recipient::MIN_LIMIT . '.'],
+            'limit above maximum' => [101, 'Maximum limit is ' . Recipient::MAX_LIMIT . '.'],
+        ];
+    }
+
+    public function test_get_rejects_empty_domain_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id cannot be empty.');
+        $this->recipients->get('');
+    }
+
+    public function test_find_sends_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->recipients->find('random_id');
+
+        $this->assertRequest('GET', '/v1/recipients/random_id');
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame(30, Arr::get($request_body, 'limit'));
-        self::assertSame(2, Arr::get($request_body, 'page'));
-        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
     }
 
-    public function test_delete_recipient()
+    public function test_delete_sends_correct_method_and_path(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->recipients->delete('random_id');
 
-        $request = $this->client->getLastRequest();
-
-        self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/recipients/random_id', $request->getUri()->getPath());
+        $this->assertRequest('DELETE', '/v1/recipients/random_id');
         self::assertEquals(200, $response['status_code']);
     }
 }

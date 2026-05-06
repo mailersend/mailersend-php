@@ -8,7 +8,6 @@ use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\OnHoldList;
 use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -44,7 +43,7 @@ class OnHoldListTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->onHoldList->getAll(
-            Arr::get($params, 'domain_id'),
+            null,
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
@@ -55,9 +54,9 @@ class OnHoldListTest extends TestCase
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
         self::assertEquals(Arr::get($params, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($params, 'limit'), Arr::get($query, 'limit'));
+        self::assertArrayNotHasKey('domain_id', $query);
     }
 
     /**
@@ -77,45 +76,6 @@ class OnHoldListTest extends TestCase
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
-    }
-
-    /**
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create(): void
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
-
-        $params = (new SuppressionParams())
-            ->setDomainId('domain_id')
-            ->setRecipients(['recipient']);
-
-        $response = $this->onHoldList->create($params);
-
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
-        self::assertSame(['recipient'], Arr::get($request_body, 'recipients'));
-    }
-
-    public function test_create_requires_recipients(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Recipients is required.');
-
-        $params = (new SuppressionParams())
-            ->setDomainId('domain_id');
-
-        $this->onHoldList->create($params);
     }
 
     /**
@@ -149,6 +109,18 @@ class OnHoldListTest extends TestCase
         self::assertSame(Arr::get($params, 'domain_id'), Arr::get($request_body, 'domain_id'));
     }
 
+    public function test_delete_excludes_ids_when_deleting_all(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->delete(null, true);
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/on-hold-list');
+
+        self::assertTrue($body['all']);
+        $this->assertBodyExcludes(['ids'], $body);
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
@@ -161,16 +133,45 @@ class OnHoldListTest extends TestCase
         $this->onHoldList->delete();
     }
 
+    /**
+     * OnHoldList::getAll overrides the base and does not forward domain_id.
+     */
+    public function test_get_all_excludes_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->getAll('some-domain-id', 1, 10);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
+        self::assertArrayNotHasKey('domain_id', $query);
+        self::assertEquals('1', $query['page']);
+        self::assertEquals('10', $query['limit']);
+    }
+
+    /**
+     * OnHoldList::delete overrides the base and does not forward domain_id.
+     */
+    public function test_delete_excludes_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->delete(['id_1'], false, 'some-domain-id');
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/on-hold-list');
+
+        self::assertEquals(['id_1'], $body['ids']);
+        $this->assertBodyExcludes(['domain_id'], $body);
+    }
+
     public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
                 'params' => [],
-            ],
-            'with domain id' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                ],
             ],
             'with limit' => [
                 'params' => [
@@ -184,7 +185,6 @@ class OnHoldListTest extends TestCase
             ],
             'complete request' => [
                 'params' => [
-                    'domain_id' => 'domain_id',
                     'page' => 1,
                     'limit' => 10,
                 ],

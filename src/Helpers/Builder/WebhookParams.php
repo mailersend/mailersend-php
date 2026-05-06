@@ -136,9 +136,9 @@ class WebhookParams implements Arrayable, \JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return bool|null
      */
-    public function getEnabled(): ?string
+    public function getEnabled(): ?bool
     {
         return $this->enabled;
     }
