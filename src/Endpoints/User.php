@@ -69,9 +69,14 @@ class User extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function update(string $userId, UserParams $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($userId, 1, 'User id is required.')
+        );
+
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$userId"),
             $params->toArray(),

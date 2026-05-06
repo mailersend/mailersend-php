@@ -92,6 +92,10 @@ class SmsInbound extends AbstractEndpoint
      */
     public function update(string $smsInboundId, SmsInboundBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($smsInboundId, 1, 'SMS inbound id is required.')
+        );
+
         if ($params->getFilter()) {
             GeneralHelpers::assert(
                 fn () => Assertion::inArray(
