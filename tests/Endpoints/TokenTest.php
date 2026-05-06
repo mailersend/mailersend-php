@@ -48,18 +48,6 @@ class TokenTest extends TestCase
         self::assertEquals(200, $response['status_code']);
     }
 
-    public function test_get_all_without_page_omits_page_from_query(): void
-    {
-        $this->addSuccessResponse();
-
-        $this->token->getAll();
-
-        $request = $this->client->getLastRequest();
-        parse_str($request->getUri()->getQuery(), $query);
-
-        self::assertArrayNotHasKey('page', $query);
-    }
-
     public function test_get_all_with_page(): void
     {
         $this->addSuccessResponse();

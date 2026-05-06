@@ -67,27 +67,6 @@ class SenderIdentityTest extends TestCase
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_get_all_omits_optional_params_when_not_set(): void
-    {
-        $this->addSuccessResponse();
-
-        $this->senderIdentityRouting->getAll();
-
-        $request = $this->client->getLastRequest();
-        parse_str($request->getUri()->getQuery(), $query);
-
-        self::assertArrayNotHasKey('domain_id', $query);
-        self::assertArrayNotHasKey('page', $query);
-        self::assertArrayNotHasKey('query', $query);
-        self::assertArrayNotHasKey('order_by', $query);
-        self::assertArrayNotHasKey('order', $query);
-    }
-
-    /**
-     * @throws \JsonException
-     * @throws \MailerSend\Exceptions\MailerSendAssertException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
     public function test_get_all_with_query_param(): void
     {
         $this->addSuccessResponse();

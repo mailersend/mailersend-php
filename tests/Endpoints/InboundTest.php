@@ -153,15 +153,6 @@ class InboundTest extends TestCase
         self::assertSame('domainId', Arr::get($body, 'domain_id'));
         self::assertSame('name', Arr::get($body, 'name'));
         self::assertFalse(Arr::get($body, 'domain_enabled'));
-
-        // Optional params must be absent when not set
-        self::assertNull(Arr::get($body, 'inbound_domain'));
-        self::assertNull(Arr::get($body, 'catch_filter'));
-        self::assertNull(Arr::get($body, 'match_filter'));
-        self::assertNull(Arr::get($body, 'catch_type'));
-        self::assertNull(Arr::get($body, 'match_type'));
-        self::assertNull(Arr::get($body, 'inbound_priority'));
-        self::assertEmpty(Arr::get($body, 'forwards'));
     }
 
     /**

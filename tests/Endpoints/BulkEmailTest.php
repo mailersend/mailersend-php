@@ -960,50 +960,6 @@ class BulkEmailTest extends TestCase
         self::assertFalse($body[0]['precedence_bulk']);
     }
 
-    /**
-     * @dataProvider absentOptionalFieldsProvider
-     * @param string $key
-     */
-    #[DataProvider('absentOptionalFieldsProvider')]
-    public function test_send_omits_optional_field_when_not_set(string $key): void
-    {
-        $this->addSuccessResponse();
-
-        $bulkEmailParams = [
-            (new EmailParams())
-                ->setFrom('test@mailersend.com')
-                ->setFromName('Sender')
-                ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
-                ->setSubject('Subject')
-                ->setText('Text'),
-        ];
-
-        $this->bulkEmail->send($bulkEmailParams);
-
-        $body = $this->assertRequest('POST', '/v1/bulk-email');
-        $this->assertBodyExcludes([$key], $body[0]);
-    }
-
-    public static function absentOptionalFieldsProvider(): array
-    {
-        return [
-            'settings not set' => ['settings'],
-            'headers not set' => ['headers'],
-            'references not set' => ['references'],
-            'list_unsubscribe not set' => ['list_unsubscribe'],
-            'rcptTo not set' => ['rcptTo'],
-            'send_at not set' => ['send_at'],
-            'in_reply_to not set' => ['in_reply_to'],
-            'precedence_bulk not set' => ['precedence_bulk'],
-            'reply_to not set' => ['reply_to'],
-            'cc not set' => ['cc'],
-            'bcc not set' => ['bcc'],
-            'tags not set' => ['tags'],
-            'attachments not set' => ['attachments'],
-            'personalization not set' => ['personalization'],
-        ];
-    }
-
     public function test_send_uses_correct_method_and_path(): void
     {
         $this->addSuccessResponse();

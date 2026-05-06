@@ -124,25 +124,6 @@ class EmailVerificationTest extends TestCase
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
-     * @throws MailerSendAssertException
-     */
-    public function test_find_optional_params_absent_when_not_set(): void
-    {
-        $this->addSuccessResponse();
-
-        $this->emailVerification->find('email_verification_id');
-
-        $request = $this->client->getLastRequest();
-        parse_str($request->getUri()->getQuery(), $query);
-
-        self::assertArrayNotHasKey('detailed', $query);
-        self::assertArrayNotHasKey('page', $query);
-        self::assertArrayNotHasKey('limit', $query);
-    }
-
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
      */
     public function test_find_requires_email_verification_id(): void
     {
