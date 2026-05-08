@@ -2,10 +2,6 @@
 
 namespace MailerSend\Helpers\Builder;
 
-use Assert\Assertion;
-use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\GeneralHelpers;
-
 class OpensAnalyticsParams
 {
     protected ?string $domain_id = null;

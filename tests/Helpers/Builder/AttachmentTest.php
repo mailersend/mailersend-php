@@ -2,6 +2,7 @@
 
 namespace MailerSend\Tests\Helpers\Builder;
 
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Tests\TestCase;
@@ -37,6 +38,46 @@ class AttachmentTest extends TestCase
         $attachment = (new Attachment('content', 'filename.test'))->toArray();
 
         self::assertNull(Arr::get($attachment, 'id'));
+    }
+
+    public function test_disposition_rejects_invalid_value(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Disposition must be either "inline" or "attachment".');
+
+        $attachment = new Attachment('content', 'filename.test');
+        $attachment->setDisposition('foobar');
+    }
+
+    public function test_disposition_accepts_inline(): void
+    {
+        $attachment = new Attachment('content', 'filename.test', 'inline');
+
+        self::assertEquals('inline', Arr::get($attachment->toArray(), 'disposition'));
+    }
+
+    public function test_disposition_accepts_attachment(): void
+    {
+        $attachment = new Attachment('content', 'filename.test', 'attachment');
+
+        self::assertEquals('attachment', Arr::get($attachment->toArray(), 'disposition'));
+    }
+
+    public function test_id_rejects_value_exceeding_256_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Attachment id may not be greater than 256 characters.');
+
+        $attachment = new Attachment('content', 'filename.test');
+        $attachment->setId(str_repeat('a', 257));
+    }
+
+    public function test_id_accepts_value_of_exactly_256_chars(): void
+    {
+        $id = str_repeat('a', 256);
+        $attachment = new Attachment('content', 'filename.test', null, $id);
+
+        self::assertEquals($id, Arr::get($attachment->toArray(), 'id'));
     }
 
 }

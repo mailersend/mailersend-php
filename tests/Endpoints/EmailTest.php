@@ -311,7 +311,7 @@ class EmailTest extends TestCase
                     ->setTags([
                         'tag'
                     ])
-                    ->setSendAt(1665626400),
+                    ->setSendAt(time() + 3600),
             ],
             'with precedence header' => [
                 (new EmailParams())
@@ -705,6 +705,87 @@ class EmailTest extends TestCase
                     ])
                     ->setSubject('Subject'),
                 'One of template_id, html or text must be supplied',
+            ],
+            'too many recipients' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients(array_map(
+                        fn ($i) => new Recipient("recipient{$i}@mailersend.com", "Recipient {$i}"),
+                        range(1, 51)
+                    ))
+                    ->setSubject('Subject')
+                    ->setHtml('HTML'),
+                'Recipients list should not contain more than 50 items.',
+            ],
+            'subject too long' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject(str_repeat('a', 999))
+                    ->setHtml('HTML'),
+                'Subject may not be greater than 998 characters.',
+            ],
+            'too many tags' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setTags(['tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6']),
+                'Tags list should not contain more than 5 items.',
+            ],
+            'tag too long' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setTags([str_repeat('a', 192)]),
+                'Each tag may not be greater than 191 characters.',
+            ],
+            'send_at in the past' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setSendAt(time() - 3600),
+                'Send at must not be in the past.',
+            ],
+            'send_at more than 72 hours in the future' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setSendAt(time() + 259201),
+                'Send at may not be more than 72 hours in the future.',
+            ],
+            'in_reply_to too long' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setInReplyToHeader(str_repeat('a', 999)),
+                'In reply to may not be greater than 998 characters.',
+            ],
+            'list_unsubscribe too long' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setListUnsubscribe(str_repeat('a', 991)),
+                'List unsubscribe may not be greater than 990 characters.',
             ],
         ];
     }
