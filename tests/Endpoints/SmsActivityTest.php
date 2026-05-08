@@ -252,6 +252,32 @@ class SmsActivityTest extends TestCase
         self::assertEquals(['queued', 'sent'], $query['status'] ?? null);
     }
 
+    public function test_find_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->find('sms-message-id');
+
+        $this->assertRequest('GET', '/v1/sms-messages/sms-message-id');
+    }
+
+    public function test_find_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->smsActivity->find('sms-message-id');
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_find_requires_sms_message_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS message id is required.');
+
+        $this->smsActivity->find('');
+    }
+
     /**
      * @dataProvider invalidSmsActivityParamsProvider
      * @param SmsActivityParams $smsActivityParams

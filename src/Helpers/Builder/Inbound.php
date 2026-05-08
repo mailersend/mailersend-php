@@ -2,7 +2,10 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
+use Assert\AssertionFailedException;
 use MailerSend\Contracts\Arrayable;
+use MailerSend\Exceptions\MailerSendAssertException;
 
 class Inbound implements Arrayable, \JsonSerializable
 {
@@ -109,15 +112,34 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this->forwards;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setForwards(array $forwards): self
     {
+        try {
+            Assertion::minCount($forwards, 1, 'Forwards must contain at least 1 item.');
+            Assertion::maxCount($forwards, 5, 'Forwards cannot contain more than 5 items.');
+        } catch (AssertionFailedException $e) {
+            throw new MailerSendAssertException($e->getMessage());
+        }
+
         $this->forwards = $forwards;
 
         return $this;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function addForward(Forward $forward): self
     {
+        try {
+            Assertion::maxCount($this->forwards, 4, 'Forwards cannot contain more than 5 items.');
+        } catch (AssertionFailedException $e) {
+            throw new MailerSendAssertException($e->getMessage());
+        }
+
         $this->forwards[] = $forward;
 
         return $this;

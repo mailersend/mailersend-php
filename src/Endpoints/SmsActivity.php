@@ -51,4 +51,20 @@ class SmsActivity extends AbstractEndpoint
 
         return $this->httpLayer->get($this->url("$this->endpoint", $smsActivityParams->toArray()));
     }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function find(string $smsMessageId): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($smsMessageId, 1, 'SMS message id is required.')
+        );
+
+        return $this->httpLayer->get(
+            $this->buildUri("sms-messages/$smsMessageId")
+        );
+    }
 }
