@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Common\Roles;
 use MailerSend\Helpers\GeneralHelpers;
 use MailerSend\Helpers\Builder\UserParams;
 
@@ -57,9 +58,16 @@ class User extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function create(UserParams $params): array
     {
+        if ($params->getRole() === Roles::CUSTOM_USER) {
+            GeneralHelpers::assert(
+                fn () => Assertion::notEmpty($params->getPermissions(), 'Permissions are required for Custom User role.')
+            );
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray(),
@@ -76,6 +84,12 @@ class User extends AbstractEndpoint
         GeneralHelpers::assert(
             fn () => Assertion::minLength($userId, 1, 'User id is required.')
         );
+
+        if ($params->getRole() === Roles::CUSTOM_USER) {
+            GeneralHelpers::assert(
+                fn () => Assertion::notEmpty($params->getPermissions(), 'Permissions are required for Custom User role.')
+            );
+        }
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$userId"),

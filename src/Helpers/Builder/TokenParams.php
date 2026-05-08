@@ -38,7 +38,6 @@ class TokenParams implements Arrayable, JsonSerializable
     public const SENDER_IDENTITY_FULL = 'sender_identity_full';
     public const USERS_READ = 'users_read';
     public const USERS_FULL = 'users_full';
-    public const IFTTT = 'ifttt';
     public const SMTP_USERS_READ = 'smtp_users_read';
     public const SMTP_USERS_FULL = 'smtp_users_full';
     public const DMARC_MONITORING_READ = 'dmarc_monitoring_read';
@@ -62,7 +61,6 @@ class TokenParams implements Arrayable, JsonSerializable
         self::RECIPIENTS_READ, self::RECIPIENTS_FULL,
         self::SENDER_IDENTITY_READ, self::SENDER_IDENTITY_FULL,
         self::USERS_READ, self::USERS_FULL,
-        self::IFTTT,
         self::SMTP_USERS_READ, self::SMTP_USERS_FULL,
         self::DMARC_MONITORING_READ, self::DMARC_MONITORING_FULL,
         self::BLOCKLIST_MONITORING_READ, self::BLOCKLIST_MONITORING_FULL,

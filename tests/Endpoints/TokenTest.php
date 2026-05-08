@@ -169,6 +169,10 @@ class TokenTest extends TestCase
                 new TokenParams('', 'token_domain', TokenParams::ALL_SCOPES),
                 'Token name is required.',
             ],
+            'name exceeds 50 chars' => [
+                new TokenParams(str_repeat('a', 51), 'domainId', TokenParams::ALL_SCOPES),
+                'Token name must not exceed 50 characters.',
+            ],
             'empty scopes' => [
                 new TokenParams('token name', 'domainId', []),
                 'Token scopes are required.',
@@ -252,6 +256,14 @@ class TokenTest extends TestCase
         $this->token->update('random_id', 'invalid_status');
     }
 
+    public function test_update_token_rejects_name_exceeding_50_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Token name must not exceed 50 characters.');
+
+        $this->token->update('random_id', null, str_repeat('a', 51));
+    }
+
     public function test_change_name(): void
     {
         $this->addSuccessResponse();
@@ -278,6 +290,14 @@ class TokenTest extends TestCase
         $this->expectExceptionMessage('Token name is required.');
 
         $this->token->changeName('random_id', '');
+    }
+
+    public function test_change_name_rejects_name_exceeding_50_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Token name must not exceed 50 characters.');
+
+        $this->token->changeName('random_id', str_repeat('a', 51));
     }
 
     public function test_delete_token(): void

@@ -574,4 +574,167 @@ class SenderIdentityTest extends TestCase
 
         $this->senderIdentityRouting->resend('');
     }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_name_over_191_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Name may not be greater than 191 characters.');
+
+        $this->senderIdentityRouting->create(
+            new SenderIdentityBuilder('domainId', str_repeat('a', 192), 'test@test.com')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_email_over_320_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email may not be greater than 320 characters.');
+
+        $this->senderIdentityRouting->create(
+            new SenderIdentityBuilder('domainId', 'Test', str_repeat('a', 312) . '@test.com')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_reply_to_email_over_320_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Reply to email may not be greater than 320 characters.');
+
+        $this->senderIdentityRouting->create(
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setReplyToEmail(str_repeat('a', 312) . '@test.com')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_reply_to_name_over_191_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Reply to name may not be greater than 191 characters.');
+
+        $this->senderIdentityRouting->create(
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setReplyToName(str_repeat('a', 192))
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_personal_note_over_250_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Personal note may not be greater than 250 characters.');
+
+        $this->senderIdentityRouting->create(
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setPersonalNote(str_repeat('a', 251))
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_reply_to_name_without_reply_to_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Reply to email is required when reply to name is set.');
+
+        $this->senderIdentityRouting->create(
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setReplyToName('John Doe')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_rejects_reply_to_name_without_reply_to_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Reply to email is required when reply to name is set.');
+
+        $this->senderIdentityRouting->update(
+            'identityId',
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setReplyToName('John Doe')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_by_email_rejects_reply_to_name_without_reply_to_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Reply to email is required when reply to name is set.');
+
+        $this->senderIdentityRouting->updateByEmail(
+            'test@identity.com',
+            (new SenderIdentityBuilder('domainId', 'Test', 'test@test.com'))
+                ->setReplyToName('John Doe')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_requires_identity_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Sender identity id is required.');
+
+        $this->senderIdentityRouting->update(
+            '',
+            new SenderIdentityBuilder('domainId', 'Test', 'test@test.com')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_requires_domain_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id is required.');
+
+        $this->senderIdentityRouting->create(
+            new SenderIdentityBuilder('', 'Test', 'test@test.com')
+        );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_requires_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email is required.');
+
+        $this->senderIdentityRouting->create(
+            new SenderIdentityBuilder('domainId', 'Test', '')
+        );
+    }
 }

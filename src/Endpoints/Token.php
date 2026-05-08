@@ -52,6 +52,7 @@ class Token extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.') &&
+                Assertion::maxLength($tokenParams->getName(), 50, 'Token name must not exceed 50 characters.') &&
                 Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );
 
@@ -88,6 +89,12 @@ class Token extends AbstractEndpoint
             );
         }
 
+        if ($name !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($name, 50, 'Token name must not exceed 50 characters.')
+            );
+        }
+
         return $this->httpLayer->put(
             $this->buildUri($this->endpoint . '/' . $id),
             array_filter(
@@ -111,7 +118,8 @@ class Token extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty($id, 'Token id is required.') &&
-                Assertion::notEmpty($name, 'Token name is required.')
+                Assertion::notEmpty($name, 'Token name is required.') &&
+                Assertion::maxLength($name, 50, 'Token name must not exceed 50 characters.')
         );
 
         return $this->httpLayer->put(

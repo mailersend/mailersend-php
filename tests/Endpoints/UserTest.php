@@ -273,6 +273,99 @@ class UserTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
+    public function test_create_rejects_invalid_email_format(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+
+        $this->user->create(new UserParams('not-an-email', Roles::ADMIN));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_rejects_email_exceeding_320_chars(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email may not be greater than 320 characters.');
+
+        // 315 'a's + '@' + 'b.com' = 321 chars, exceeds 320-char limit
+        $longEmail = str_repeat('a', 315) . '@b.com';
+        $this->user->create(new UserParams($longEmail, Roles::ADMIN));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_rejects_invalid_role(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid role.');
+
+        $this->user->create(new UserParams('test@user.com', 'InvalidRole'));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_update_rejects_invalid_role(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid role.');
+
+        $this->user->update('userId', new UserParams('test@user.com', 'InvalidRole'));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_rejects_custom_user_role_without_permissions(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Permissions are required for Custom User role.');
+
+        $this->user->create(new UserParams('test@user.com', Roles::CUSTOM_USER));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_update_rejects_custom_user_role_without_permissions(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Permissions are required for Custom User role.');
+
+        $this->user->update('userId', new UserParams('test@user.com', Roles::CUSTOM_USER));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_accepts_custom_user_role_with_permissions(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new UserParams('test@user.com', Roles::CUSTOM_USER))
+            ->setPermissions(['read-activity']);
+
+        $response = $this->user->create($params);
+
+        $body = $this->assertRequest('POST', '/v1/users');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame(Roles::CUSTOM_USER, $body['role']);
+        self::assertSame(['read-activity'], $body['permissions']);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
     public function test_delete(): void
     {
         $this->addSuccessResponse();

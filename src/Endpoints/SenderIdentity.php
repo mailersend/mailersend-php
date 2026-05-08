@@ -82,9 +82,24 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function create(SenderIdentityBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
+        );
+
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getEmail(), 1, 'Email is required.')
+        );
+
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray(),
@@ -94,9 +109,20 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function update(string $identityId, SenderIdentityBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($identityId, 1, 'Sender identity id is required.')
+        );
+
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
+
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$identityId"),
             $params->toUpdateArray(),
@@ -138,12 +164,19 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function updateByEmail(string $email, SenderIdentityBuilder $params): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::email($email, 'Valid email is required.')
         );
+
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/email/$email"),
