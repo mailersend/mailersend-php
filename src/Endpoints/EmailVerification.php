@@ -70,7 +70,25 @@ class EmailVerification extends AbstractEndpoint
     {
         if (!$params->getListId()) {
             GeneralHelpers::assert(
-                fn () => Assertion::minLength($params->getName(), 1, 'Email Verification name is required.')
+                fn () => Assertion::minLength($params->getName(), 1, 'Email Verification name is required.') &&
+                    Assertion::maxLength($params->getName(), 191, 'Email Verification name may not exceed 191 characters.')
+            );
+        }
+
+        if (!$params->getListId()) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minCount($params->getEmailAddresses(), 1, 'Emails list must contain at least 1 item.') &&
+                    Assertion::maxCount($params->getEmailAddresses(), 10000, 'Emails list may not contain more than 10000 items.')
+            );
+        } elseif (!empty($params->getEmailAddresses())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxCount($params->getEmailAddresses(), 10000, 'Emails list may not contain more than 10000 items.')
+            );
+        }
+
+        foreach ($params->getEmailAddresses() as $emailAddress) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($emailAddress, 320, 'Email address may not exceed 320 characters.')
             );
         }
 
@@ -111,6 +129,17 @@ class EmailVerification extends AbstractEndpoint
             fn () => Assertion::minLength($emailVerificationId, 1, 'Email Verification id is required.')
         );
 
+        if ($limit) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $limit,
+                    Constants::MIN_LIMIT,
+                    500,
+                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and 500.'
+                )
+            );
+        }
+
         if (!empty($results)) {
             GeneralHelpers::assert(
                 fn () => Assertion::allInArray($results, EmailVerificationParams::POSSIBLE_RESULTS)
@@ -134,7 +163,8 @@ class EmailVerification extends AbstractEndpoint
     public function verifyEmail(string $email): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($email, 1, 'Email address is required.')
+            fn () => Assertion::minLength($email, 1, 'Email address is required.') &&
+                Assertion::maxLength($email, 320, 'Email address may not exceed 320 characters.')
         );
 
         return $this->httpLayer->post(
@@ -151,7 +181,8 @@ class EmailVerification extends AbstractEndpoint
     public function verifyAsync(string $email): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($email, 1, 'Email address is required.')
+            fn () => Assertion::minLength($email, 1, 'Email address is required.') &&
+                Assertion::maxLength($email, 320, 'Email address may not exceed 320 characters.')
         );
 
         return $this->httpLayer->post(

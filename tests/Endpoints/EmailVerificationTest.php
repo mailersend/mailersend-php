@@ -386,6 +386,96 @@ class EmailVerificationTest extends TestCase
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     */
+    public function test_verify_email_rejects_email_exceeding_max_length(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email address may not exceed 320 characters.');
+
+        $this->emailVerification->verifyEmail(str_repeat('a', 312) . '@mail.com');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_verify_async_rejects_email_exceeding_max_length(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email address may not exceed 320 characters.');
+
+        $this->emailVerification->verifyAsync(str_repeat('a', 312) . '@mail.com');
+    }
+
+    public function test_create_rejects_empty_emails_array(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Emails list must contain at least 1 item.');
+
+        $this->emailVerification->create(new EmailVerificationParams('file.csv'));
+    }
+
+    public function test_create_rejects_emails_array_exceeding_max_count(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Emails list may not contain more than 10000 items.');
+
+        $emails = array_fill(0, 10001, 'test@mail.com');
+
+        $this->emailVerification->create(
+            (new EmailVerificationParams('file.csv'))->setEmailAddresses($emails)
+        );
+    }
+
+    public function test_create_rejects_individual_email_exceeding_max_length(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email address may not exceed 320 characters.');
+
+        $longEmail = str_repeat('a', 312) . '@mail.com';
+
+        $this->emailVerification->create(
+            (new EmailVerificationParams('file.csv'))->setEmailAddresses([$longEmail])
+        );
+    }
+
+    public function test_create_rejects_name_exceeding_max_length(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Email Verification name may not exceed 191 characters.');
+
+        $this->emailVerification->create(
+            (new EmailVerificationParams(str_repeat('a', 192)))->setEmailAddresses(['test@mail.com'])
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_get_results_rejects_limit_above_maximum(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and 500.');
+
+        $this->emailVerification->getResults('email_verification_id', null, 501);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_get_results_rejects_limit_below_minimum(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and 500.');
+
+        $this->emailVerification->getResults('email_verification_id', null, 9);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
      * @throws MailerSendAssertException
      */
     public function test_get_verify_async_result(): void
