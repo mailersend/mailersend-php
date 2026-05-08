@@ -3,6 +3,7 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
+use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Webhook;
 use MailerSend\Helpers\Builder\WebhookParams;
@@ -110,8 +111,12 @@ class WebhookTest extends TestCase
                 'Webhook name is required.',
             ],
             'name too long' => [
-                new WebhookParams('https://link.com/webhook', str_repeat('a', 192), WebhookParams::ALL_ACTIVITIES, 'domain_id'),
-                'Webhook name cannot be longer than 191 character.',
+                new WebhookParams('https://link.com/webhook', str_repeat('a', 51), WebhookParams::ALL_ACTIVITIES, 'domain_id'),
+                'Webhook name cannot be longer than 50 characters.',
+            ],
+            'url too long' => [
+                new WebhookParams('https://link.com/' . str_repeat('a', 175), 'Webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id'),
+                'Webhook url cannot be longer than 191 characters.',
             ],
             'missing domain id' => [
                 new WebhookParams('https://link.com/webhook', 'webhook name', WebhookParams::ALL_ACTIVITIES, ''),
@@ -389,5 +394,47 @@ class WebhookTest extends TestCase
 
         self::assertEquals(200, $response['status_code']);
         $this->assertBodyExcludes(['url', 'name', 'events', 'enabled', 'version'], $body);
+    }
+
+    public function test_update_rejects_url_too_long(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Webhook url cannot be longer than 191 characters.');
+
+        $this->webhooks->update('random_id', 'https://link.com/' . str_repeat('a', 175));
+    }
+
+    public function test_create_rejects_invalid_version(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Webhook version must be 1 or 2.');
+
+        $this->webhooks->create(
+            new WebhookParams('https://link.com/webhook', 'webhook name', WebhookParams::ALL_ACTIVITIES, 'domain_id', null, 3)
+        );
+    }
+
+    public function test_update_rejects_invalid_version(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Webhook version must be 1 or 2.');
+
+        $this->webhooks->update('random_id', null, null, null, null, 3);
+    }
+
+    public function test_get_webhooks_rejects_limit_below_minimum(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.');
+
+        $this->webhooks->get('domain_id', 9);
+    }
+
+    public function test_get_webhooks_rejects_limit_above_maximum(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.');
+
+        $this->webhooks->get('domain_id', 101);
     }
 }

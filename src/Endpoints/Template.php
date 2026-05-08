@@ -71,6 +71,23 @@ class Template extends AbstractEndpoint
             );
         }
 
+        if ($params->getAutoGenerate() !== true) {
+            GeneralHelpers::assert(
+                fn () => Assertion::notEmpty($params->getText(), 'Text is required when auto_generate is not true.')
+            );
+        }
+
+        if ($params->getTags() !== null && count($params->getTags()) > 0) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxCount($params->getTags(), 5, 'Tags list should not contain more than 5 items.')
+            );
+            foreach ($params->getTags() as $tag) {
+                GeneralHelpers::assert(
+                    fn () => Assertion::maxLength($tag, 191, 'Each tag may not be greater than 191 characters.')
+                );
+            }
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray()
@@ -92,6 +109,17 @@ class Template extends AbstractEndpoint
             GeneralHelpers::assert(
                 fn () => Assertion::maxLength($params->getName(), 50, 'Name must be 50 characters or fewer.')
             );
+        }
+
+        if ($params->getTags() !== null && count($params->getTags()) > 0) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxCount($params->getTags(), 5, 'Tags list should not contain more than 5 items.')
+            );
+            foreach ($params->getTags() as $tag) {
+                GeneralHelpers::assert(
+                    fn () => Assertion::maxLength($tag, 191, 'Each tag may not be greater than 191 characters.')
+                );
+            }
         }
 
         return $this->httpLayer->put(

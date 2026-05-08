@@ -169,6 +169,141 @@ class TemplateTest extends TestCase
     }
 
     /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_requires_text_when_auto_generate_is_not_true(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Text is required when auto_generate is not true.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>');
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_does_not_require_text_when_auto_generate_is_true(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setAutoGenerate(true);
+
+        $response = $this->template->create($params);
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_more_than_5_tags(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Tags list should not contain more than 5 items.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setAutoGenerate(true)
+            ->setTags(['a', 'b', 'c', 'd', 'e', 'f']);
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_tag_exceeding_191_characters(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Each tag may not be greater than 191 characters.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setAutoGenerate(true)
+            ->setTags([str_repeat('a', 192)]);
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_rejects_more_than_5_tags(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Tags list should not contain more than 5 items.');
+
+        $params = (new TemplateParams())
+            ->setTags(['a', 'b', 'c', 'd', 'e', 'f']);
+
+        $this->template->update('template-id', $params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_rejects_tag_exceeding_191_characters(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Each tag may not be greater than 191 characters.');
+
+        $params = (new TemplateParams())
+            ->setTags([str_repeat('a', 192)]);
+
+        $this->template->update('template-id', $params);
+    }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_excludes_null_fields_from_request_body(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setAutoGenerate(true);
+
+        $this->template->create($params);
+
+        $body = $this->assertRequest('POST', '/v1/templates');
+
+        $this->assertBodyExcludes(['name', 'text', 'domain_id', 'categories', 'tags'], $body);
+    }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_update_excludes_null_fields_from_request_body(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new TemplateParams())
+            ->setHtml('<p>Updated</p>');
+
+        $this->template->update('template-id', $params);
+
+        $body = $this->assertRequest('PUT', '/v1/templates/template-id');
+
+        $this->assertBodyExcludes(['name', 'text', 'domain_id', 'categories', 'tags', 'auto_generate'], $body);
+    }
+
+    /**
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface

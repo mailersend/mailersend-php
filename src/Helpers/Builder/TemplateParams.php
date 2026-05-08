@@ -96,7 +96,7 @@ class TemplateParams implements Arrayable, \JsonSerializable
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'name' => $this->getName(),
             'html' => $this->getHtml(),
             'text' => $this->getText(),
@@ -104,7 +104,7 @@ class TemplateParams implements Arrayable, \JsonSerializable
             'categories' => $this->getCategories(),
             'tags' => $this->getTags(),
             'auto_generate' => $this->getAutoGenerate(),
-        ];
+        ], fn ($value) => $value !== null);
     }
 
     #[\ReturnTypeWillChange]
