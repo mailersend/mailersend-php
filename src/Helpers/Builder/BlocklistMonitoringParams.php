@@ -2,7 +2,9 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
 use MailerSend\Contracts\Arrayable;
+use MailerSend\Helpers\GeneralHelpers;
 
 class BlocklistMonitoringParams implements Arrayable, \JsonSerializable
 {
@@ -36,6 +38,12 @@ class BlocklistMonitoringParams implements Arrayable, \JsonSerializable
 
     public function setName(?string $name): self
     {
+        if ($name !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($name, 255, 'Name may not be greater than 255 characters.')
+            );
+        }
+
         $this->name = $name;
 
         return $this;
@@ -60,6 +68,15 @@ class BlocklistMonitoringParams implements Arrayable, \JsonSerializable
 
     public function setNotifyEmail(?string $notifyEmail): self
     {
+        if ($notifyEmail !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($notifyEmail, 255, 'Notify email may not be greater than 255 characters.')
+            );
+            GeneralHelpers::assert(
+                fn () => Assertion::email($notifyEmail, 'Notify email is invalid.')
+            );
+        }
+
         $this->notifyEmail = $notifyEmail;
 
         return $this;
@@ -72,6 +89,15 @@ class BlocklistMonitoringParams implements Arrayable, \JsonSerializable
 
     public function setNotifyAddress(?string $notifyAddress): self
     {
+        if ($notifyAddress !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($notifyAddress, 500, 'Notify address may not be greater than 500 characters.')
+            );
+            GeneralHelpers::assert(
+                fn () => Assertion::url($notifyAddress, 'Notify address must be a valid URL.')
+            );
+        }
+
         $this->notifyAddress = $notifyAddress;
 
         return $this;

@@ -55,6 +55,18 @@ class DmarcMonitoring extends AbstractEndpoint
             );
         }
 
+        if ($query !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($query, 255, 'Query may not be greater than 255 characters.')
+            );
+        }
+
+        if ($page !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range($page, 1, PHP_INT_MAX, 'Page must be at least 1.')
+            );
+        }
+
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint, array_filter([
                 'page' => $page,
@@ -96,6 +108,10 @@ class DmarcMonitoring extends AbstractEndpoint
 
         GeneralHelpers::assert(
             fn () => Assertion::minLength($params->getWantedDmarcRecord(), 1, 'Wanted DMARC record is required.')
+        );
+
+        GeneralHelpers::assert(
+            fn () => Assertion::maxLength($params->getWantedDmarcRecord(), 1000, 'Wanted DMARC record may not be greater than 1000 characters.')
         );
 
         return $this->httpLayer->put(
@@ -150,6 +166,24 @@ class DmarcMonitoring extends AbstractEndpoint
             );
         }
 
+        if ($search !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($search, 255, 'Search may not be greater than 255 characters.')
+            );
+        }
+
+        if ($reportSource !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($reportSource, 255, 'Report source may not be greater than 255 characters.')
+            );
+        }
+
+        if ($page !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range($page, 1, PHP_INT_MAX, 'Page must be at least 1.')
+            );
+        }
+
         return $this->httpLayer->get(
             $this->buildUri("$this->endpoint/$monitorId/report", array_filter([
                 'page' => $page,
@@ -195,6 +229,24 @@ class DmarcMonitoring extends AbstractEndpoint
                     Constants::MAX_LIMIT,
                     'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
+            );
+        }
+
+        if ($search !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($search, 255, 'Search may not be greater than 255 characters.')
+            );
+        }
+
+        if ($reportSource !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($reportSource, 255, 'Report source may not be greater than 255 characters.')
+            );
+        }
+
+        if ($page !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range($page, 1, PHP_INT_MAX, 'Page must be at least 1.')
             );
         }
 

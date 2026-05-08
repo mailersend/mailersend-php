@@ -148,10 +148,12 @@ class DmarcMonitoringTest extends TestCase
     public static function invalidGetAllDataProvider(): array
     {
         return [
-            'limit too low'    => [null, 9,   null, null,      null,  'Limit is supposed to be between 10 and 100.'],
-            'limit too high'   => [null, 101, null, null,      null,  'Limit is supposed to be between 10 and 100.'],
-            'invalid sort_by'  => [null, null, null, 'invalid_field', null, 'sort_by must be one of: created_at, updated_at, dmarc_valid, spf_status.'],
-            'invalid order'    => [null, null, null, null,      'random', 'order must be asc or desc.'],
+            'limit too low'              => [null, 9,   null, null,      null,  'Limit is supposed to be between 10 and 100.'],
+            'limit too high'             => [null, 101, null, null,      null,  'Limit is supposed to be between 10 and 100.'],
+            'invalid sort_by'            => [null, null, null, 'invalid_field', null, 'sort_by must be one of: created_at, updated_at, dmarc_valid, spf_status.'],
+            'invalid order'              => [null, null, null, null,      'random', 'order must be asc or desc.'],
+            'query exceeds 255 chars'    => [null, null, str_repeat('a', 256), null, null, 'Query may not be greater than 255 characters.'],
+            'page below minimum'         => [0,    null, null, null,      null,  'Page must be at least 1.'],
         ];
     }
 
@@ -202,6 +204,25 @@ class DmarcMonitoringTest extends TestCase
         $this->expectExceptionMessage('Wanted DMARC record is required.');
 
         $this->dmarcMonitoring->update('monitor-id-123', new DmarcMonitoringUpdateParams(''));
+    }
+
+    /**
+     * @dataProvider invalidUpdateDataProvider
+     */
+    #[DataProvider('invalidUpdateDataProvider')]
+    public function test_update_rejects_invalid_params(string $wantedDmarcRecord, string $message): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->dmarcMonitoring->update('monitor-id-123', new DmarcMonitoringUpdateParams($wantedDmarcRecord));
+    }
+
+    public static function invalidUpdateDataProvider(): array
+    {
+        return [
+            'wanted_dmarc_record exceeds 1000 chars' => [str_repeat('a', 1001), 'Wanted DMARC record may not be greater than 1000 characters.'],
+        ];
     }
 
     public function test_delete(): void
@@ -296,6 +317,31 @@ class DmarcMonitoringTest extends TestCase
         $this->expectExceptionMessage($message);
 
         $this->dmarcMonitoring->getAggregatedReports('monitor-id-123', null, $limit);
+    }
+
+    /**
+     * @dataProvider invalidGetAggregatedReportsDataProvider
+     */
+    #[DataProvider('invalidGetAggregatedReportsDataProvider')]
+    public function test_get_aggregated_reports_rejects_invalid_params(
+        ?int $page,
+        ?string $search,
+        ?string $reportSource,
+        string $message
+    ): void {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->dmarcMonitoring->getAggregatedReports('monitor-id-123', $page, null, null, null, $search, null, $reportSource);
+    }
+
+    public static function invalidGetAggregatedReportsDataProvider(): array
+    {
+        return [
+            'search exceeds 255 chars'         => [null, str_repeat('a', 256), null,                   'Search may not be greater than 255 characters.'],
+            'report_source exceeds 255 chars'  => [null, null,                 str_repeat('a', 256),   'Report source may not be greater than 255 characters.'],
+            'page below minimum'               => [0,   null,                  null,                   'Page must be at least 1.'],
+        ];
     }
 
     public static function validAggregatedReportsDataProvider(): array
@@ -433,6 +479,31 @@ class DmarcMonitoringTest extends TestCase
         $this->expectExceptionMessage($message);
 
         $this->dmarcMonitoring->getIpReports('monitor-id-123', '1.2.3.4', null, $limit);
+    }
+
+    /**
+     * @dataProvider invalidGetIpReportsDataProvider
+     */
+    #[DataProvider('invalidGetIpReportsDataProvider')]
+    public function test_get_ip_reports_rejects_invalid_params(
+        ?int $page,
+        ?string $search,
+        ?string $reportSource,
+        string $message
+    ): void {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->dmarcMonitoring->getIpReports('monitor-id-123', '1.2.3.4', $page, null, null, null, $search, null, $reportSource);
+    }
+
+    public static function invalidGetIpReportsDataProvider(): array
+    {
+        return [
+            'search exceeds 255 chars'         => [null, str_repeat('a', 256), null,                   'Search may not be greater than 255 characters.'],
+            'report_source exceeds 255 chars'  => [null, null,                 str_repeat('a', 256),   'Report source may not be greater than 255 characters.'],
+            'page below minimum'               => [0,   null,                  null,                   'Page must be at least 1.'],
+        ];
     }
 
     public static function validIpReportsDataProvider(): array

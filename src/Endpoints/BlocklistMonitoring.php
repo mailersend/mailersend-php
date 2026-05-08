@@ -38,6 +38,18 @@ class BlocklistMonitoring extends AbstractEndpoint
             );
         }
 
+        if ($query) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($query, 255, 'Query may not be greater than 255 characters.')
+            );
+        }
+
+        if ($page !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range($page, 1, PHP_INT_MAX, 'Page must be at least 1.')
+            );
+        }
+
         if ($sortBy) {
             GeneralHelpers::assert(
                 fn () => Assertion::inArray(
@@ -92,6 +104,18 @@ class BlocklistMonitoring extends AbstractEndpoint
             fn () => Assertion::minLength($params->getAddress(), 1, 'Address is required.')
         );
 
+        GeneralHelpers::assert(
+            fn () => Assertion::maxLength($params->getAddress(), 255, 'Address may not be greater than 255 characters.')
+        );
+
+        if ($params->getNotify() === true) {
+            if (empty($params->getNotifyEmail()) && empty($params->getNotifyAddress())) {
+                GeneralHelpers::assert(
+                    fn () => Assertion::notEmpty(null, 'Notify email or notify address is required when notify is enabled.')
+                );
+            }
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray()
@@ -108,6 +132,14 @@ class BlocklistMonitoring extends AbstractEndpoint
         GeneralHelpers::assert(
             fn () => Assertion::minLength($monitorId, 1, 'Monitor id is required.')
         );
+
+        if ($params->getNotify() === true) {
+            if (empty($params->getNotifyEmail()) && empty($params->getNotifyAddress())) {
+                GeneralHelpers::assert(
+                    fn () => Assertion::notEmpty(null, 'Notify email or notify address is required when notify is enabled.')
+                );
+            }
+        }
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$monitorId"),
