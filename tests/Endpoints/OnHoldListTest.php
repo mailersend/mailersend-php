@@ -43,7 +43,7 @@ class OnHoldListTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->onHoldList->getAll(
-            null,
+            Arr::get($params, 'domain_id'),
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
@@ -56,7 +56,7 @@ class OnHoldListTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertEquals(Arr::get($params, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($params, 'limit'), Arr::get($query, 'limit'));
-        self::assertArrayNotHasKey('domain_id', $query);
+        self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
     }
 
     /**
@@ -133,10 +133,7 @@ class OnHoldListTest extends TestCase
         $this->onHoldList->delete();
     }
 
-    /**
-     * OnHoldList::getAll overrides the base and does not forward domain_id.
-     */
-    public function test_get_all_excludes_domain_id(): void
+    public function test_get_all_forwards_domain_id(): void
     {
         $this->addSuccessResponse();
 
@@ -147,15 +144,12 @@ class OnHoldListTest extends TestCase
 
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
-        self::assertArrayNotHasKey('domain_id', $query);
+        self::assertEquals('some-domain-id', $query['domain_id']);
         self::assertEquals('1', $query['page']);
         self::assertEquals('10', $query['limit']);
     }
 
-    /**
-     * OnHoldList::delete overrides the base and does not forward domain_id.
-     */
-    public function test_delete_excludes_domain_id(): void
+    public function test_delete_forwards_domain_id(): void
     {
         $this->addSuccessResponse();
 
@@ -164,7 +158,7 @@ class OnHoldListTest extends TestCase
         $body = $this->assertRequest('DELETE', '/v1/suppressions/on-hold-list');
 
         self::assertEquals(['id_1'], $body['ids']);
-        $this->assertBodyExcludes(['domain_id'], $body);
+        self::assertEquals('some-domain-id', $body['domain_id']);
     }
 
     public static function validGetAllDataProvider(): array
@@ -183,8 +177,14 @@ class OnHoldListTest extends TestCase
                     'page' => 1,
                 ],
             ],
+            'with domain_id' => [
+                'params' => [
+                    'domain_id' => 'domain_id',
+                ],
+            ],
             'complete request' => [
                 'params' => [
+                    'domain_id' => 'domain_id',
                     'page' => 1,
                     'limit' => 10,
                 ],
@@ -218,6 +218,12 @@ class OnHoldListTest extends TestCase
             'with ids' => [
                 'params' => [
                     'ids' => ['id'],
+                ],
+            ],
+            'with ids and domain_id' => [
+                'params' => [
+                    'ids' => ['id'],
+                    'domain_id' => 'domain_id',
                 ],
             ],
             'all' => [
