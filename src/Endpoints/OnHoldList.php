@@ -35,6 +35,7 @@ class OnHoldList extends Suppression
 
         return $this->httpLayer->get(
             $this->buildUri($this->endpoint, [
+                'domain_id' => $domainId,
                 'page' => $page,
                 'limit' => $limit,
             ])
@@ -58,6 +59,7 @@ class OnHoldList extends Suppression
         return $this->httpLayer->delete(
             $this->buildUri($this->endpoint),
             array_filter([
+                'domain_id' => $domainId,
                 'ids' => $ids,
                 'all' => $all,
             ], fn ($e) => !is_null($e))
