@@ -152,6 +152,32 @@ class EmailTest extends TestCase
         $this->assertRequest('POST', '/v1/email');
     }
 
+    public function test_send_accepts_valid_send_at(): void
+    {
+        $this->addSuccessResponse();
+
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setReplyTo('reply-to@mailersend.com')
+            ->setReplyToName('Reply To')
+            ->setRecipients([
+                [
+                    'name' => 'Recipient',
+                    'email' => 'recipient@mailersend.com',
+                ]
+            ])
+            ->setSubject('Subject')
+            ->setHtml('HTML')
+            ->setText('Text')
+            ->setTags(['tag'])
+            ->setSendAt(time() + 3600);
+
+        $response = $this->email->send($emailParams);
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
     public function test_send_forwards_status_code(): void
     {
         $this->addSuccessResponse(200);
@@ -292,26 +318,6 @@ class EmailTest extends TestCase
                     ])
                     ->setSubject('Subject')
                     ->setText('Text'),
-            ],
-            'with send at' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setReplyTo('reply-to@mailersend.com')
-                    ->setReplyToName('Reply To')
-                    ->setRecipients([
-                        [
-                            'name' => 'Recipient',
-                            'email' => 'recipient@mailersend.com',
-                        ]
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML')
-                    ->setText('Text')
-                    ->setTags([
-                        'tag'
-                    ])
-                    ->setSendAt(time() + 3600),
             ],
             'with precedence header' => [
                 (new EmailParams())
@@ -747,26 +753,6 @@ class EmailTest extends TestCase
                     ->setTags([str_repeat('a', 192)]),
                 'Each tag may not be greater than 191 characters.',
             ],
-            'send_at in the past' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML')
-                    ->setSendAt(time() - 3600),
-                'Send at must not be in the past.',
-            ],
-            'send_at more than 72 hours in the future' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML')
-                    ->setSendAt(time() + 259201),
-                'Send at may not be more than 72 hours in the future.',
-            ],
             'in_reply_to too long' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
@@ -776,6 +762,26 @@ class EmailTest extends TestCase
                     ->setHtml('HTML')
                     ->setInReplyToHeader(str_repeat('a', 999)),
                 'In reply to may not be greater than 998 characters.',
+            ],
+            'send_at in the past' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setSendAt(1000000000), // 2001-09-09, always in the past
+                'Send at must not be in the past.',
+            ],
+            'send_at more than 72 hours in the future' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setSendAt(9999999999), // 2286-11-20, always > 72h in the future
+                'Send at may not be more than 72 hours in the future.',
             ],
             'list_unsubscribe too long' => [
                 (new EmailParams())

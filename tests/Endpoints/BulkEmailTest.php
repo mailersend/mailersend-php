@@ -99,6 +99,34 @@ class BulkEmailTest extends TestCase
         }
     }
 
+    public function test_send_accepts_valid_send_at(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setReplyTo('reply-to@mailersend.com')
+                ->setReplyToName('Reply To')
+                ->setRecipients([
+                    [
+                        'name' => 'Recipient',
+                        'email' => 'recipient@mailersend.com',
+                    ]
+                ])
+                ->setSubject('Subject')
+                ->setHtml('HTML')
+                ->setText('Text')
+                ->setTags(['tag'])
+                ->setSendAt(time() + 3600),
+        ];
+
+        $response = $this->bulkEmail->send($bulkEmailParams);
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
     public static function validEmailParamsProvider(): array
     {
         return [
@@ -345,28 +373,6 @@ class BulkEmailTest extends TestCase
                         ->setSubject('Subject')
                         ->setText('Text')
                 ]
-            ],
-            'with send at' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('test@mailersend.com')
-                        ->setFromName('Sender')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
-                        ->setRecipients([
-                            [
-                                'name' => 'Recipient',
-                                'email' => 'recipient@mailersend.com',
-                            ]
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML')
-                        ->setText('Text')
-                        ->setTags([
-                            'tag'
-                        ])
-                        ->setSendAt(time() + 3600),
-                ],
             ],
             'with precedence header' => [
                 [
@@ -811,7 +817,7 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
                         ->setSubject('Subject')
                         ->setHtml('HTML')
-                        ->setSendAt(time() - 3600),
+                        ->setSendAt(1000000000), // 2001-09-09, always in the past
                 ],
                 'Send at must not be in the past.',
             ],
@@ -823,7 +829,7 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
                         ->setSubject('Subject')
                         ->setHtml('HTML')
-                        ->setSendAt(time() + 259201),
+                        ->setSendAt(9999999999), // 2286-11-20, always > 72h in the future
                 ],
                 'Send at may not be more than 72 hours in the future.',
             ],
