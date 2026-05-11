@@ -2,7 +2,10 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
+use Assert\AssertionFailedException;
 use MailerSend\Contracts\Arrayable;
+use MailerSend\Exceptions\MailerSendAssertException;
 
 class Attachment implements Arrayable, \JsonSerializable
 {
@@ -48,13 +51,35 @@ class Attachment implements Arrayable, \JsonSerializable
         $this->filename = $filename;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setDisposition(?string $disposition): void
     {
+        if ($disposition !== null) {
+            try {
+                Assertion::inArray($disposition, ['inline', 'attachment'], 'Disposition must be either "inline" or "attachment".');
+            } catch (AssertionFailedException $e) {
+                throw new MailerSendAssertException($e->getMessage());
+            }
+        }
+
         $this->disposition = $disposition;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setId(?string $id): void
     {
+        if ($id !== null) {
+            try {
+                Assertion::maxLength($id, 256, 'Attachment id may not be greater than 256 characters.');
+            } catch (AssertionFailedException $e) {
+                throw new MailerSendAssertException($e->getMessage());
+            }
+        }
+
         $this->id = $id;
     }
 

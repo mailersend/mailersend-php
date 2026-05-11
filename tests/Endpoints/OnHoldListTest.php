@@ -54,9 +54,9 @@ class OnHoldListTest extends TestCase
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
         self::assertEquals(Arr::get($params, 'page'), Arr::get($query, 'page'));
         self::assertEquals(Arr::get($params, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
     }
 
     /**
@@ -109,6 +109,18 @@ class OnHoldListTest extends TestCase
         self::assertSame(Arr::get($params, 'domain_id'), Arr::get($request_body, 'domain_id'));
     }
 
+    public function test_delete_excludes_ids_when_deleting_all(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->delete(null, true);
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/on-hold-list');
+
+        self::assertTrue($body['all']);
+        $this->assertBodyExcludes(['ids'], $body);
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
@@ -121,16 +133,39 @@ class OnHoldListTest extends TestCase
         $this->onHoldList->delete();
     }
 
+    public function test_get_all_forwards_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->getAll('some-domain-id', 1, 10);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('GET', $request->getMethod());
+        self::assertEquals('/v1/suppressions/on-hold-list', $request->getUri()->getPath());
+        self::assertEquals('some-domain-id', $query['domain_id']);
+        self::assertEquals('1', $query['page']);
+        self::assertEquals('10', $query['limit']);
+    }
+
+    public function test_delete_forwards_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->onHoldList->delete(['id_1'], false, 'some-domain-id');
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/on-hold-list');
+
+        self::assertEquals(['id_1'], $body['ids']);
+        self::assertEquals('some-domain-id', $body['domain_id']);
+    }
+
     public static function validGetAllDataProvider(): array
     {
         return [
             'empty request' => [
                 'params' => [],
-            ],
-            'with domain id' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                ],
             ],
             'with limit' => [
                 'params' => [
@@ -140,6 +175,11 @@ class OnHoldListTest extends TestCase
             'with page' => [
                 'params' => [
                     'page' => 1,
+                ],
+            ],
+            'with domain_id' => [
+                'params' => [
+                    'domain_id' => 'domain_id',
                 ],
             ],
             'complete request' => [
@@ -178,6 +218,12 @@ class OnHoldListTest extends TestCase
             'with ids' => [
                 'params' => [
                     'ids' => ['id'],
+                ],
+            ],
+            'with ids and domain_id' => [
+                'params' => [
+                    'ids' => ['id'],
+                    'domain_id' => 'domain_id',
                 ],
             ],
             'all' => [

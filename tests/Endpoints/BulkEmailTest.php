@@ -6,60 +6,24 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\BulkEmail;
 use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Exceptions\MailerSendValidationException;
 use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\Attachment;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Helpers\Builder\Recipient;
 use MailerSend\Tests\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class BulkEmailTest extends TestCase
 {
     protected BulkEmail $bulkEmail;
-    protected ResponseInterface $defaultResponse;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->client = new Client();
-
         $this->bulkEmail = new BulkEmail(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-
-        $this->defaultResponse = $this->createStub(ResponseInterface::class);
-        $this->defaultResponse->method('getStatusCode')->willReturn(200);
-    }
-
-    public function test_bulk_send_request_validation_error(): void
-    {
-        $this->expectException(MailerSendValidationException::class);
-        $this->expectExceptionMessage('Validation Error');
-
-        $responseBody = $this->createStub(StreamInterface::class);
-        $responseBody->method('getContents')->willReturn('{"message": "Validation Error", "errors": []}');
-
-        $validationErrorResponse = $this->createStub(ResponseInterface::class);
-        $validationErrorResponse->method('getStatusCode')->willReturn(422);
-        $validationErrorResponse->method('getBody')->willReturn($responseBody);
-        $validationErrorResponse->method('getHeaders')->willReturn([]);
-        $this->client->addResponse($validationErrorResponse);
-
-        $bulkEmailParams[] = (new EmailParams())
-            ->setFrom('test@mailersend.com')
-            ->setFromName('Sender')
-            ->setRecipients([
-                [
-                    'wrong recipient'
-                ]
-            ])
-            ->setSubject('Subject')
-            ->setText('TEXT');
-
-        $this->bulkEmail->send($bulkEmailParams);
     }
 
     /**
@@ -72,18 +36,12 @@ class BulkEmailTest extends TestCase
     #[DataProvider('validEmailParamsProvider')]
     public function test_send_email(array $bulkEmailParams): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->bulkEmail->send($bulkEmailParams);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $request_body = $this->assertRequest('POST', '/v1/bulk-email');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/bulk-email', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
         foreach ($bulkEmailParams as $key => $emailParams) {
@@ -141,27 +99,7 @@ class BulkEmailTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider invalidEmailParamsProvider
-     * @param array $emailParams
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    #[DataProvider('invalidEmailParamsProvider')]
-    public function test_send_email_with_errors(array $bulkEmailParams)
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $httpLayer = $this->createStub(HttpLayer::class);
-        $httpLayer->method('post')
-            ->withAnyParameters()
-            ->willReturn([]);
-
-        $this->bulkEmail->send($bulkEmailParams);
-    }
-
-    public static function validEmailParamsProvider()
+    public static function validEmailParamsProvider(): array
     {
         return [
             'simple request' => [
@@ -378,7 +316,6 @@ class BulkEmailTest extends TestCase
                         ->setText('TEXT'),
                 ]
             ],
-
             'without html' => [
                 [
                     (new EmailParams())
@@ -428,7 +365,7 @@ class BulkEmailTest extends TestCase
                         ->setTags([
                             'tag'
                         ])
-                        ->setSendAt(1665626400),
+                        ->setSendAt(time() + 3600),
                 ],
             ],
             'with precedence header' => [
@@ -494,11 +431,32 @@ class BulkEmailTest extends TestCase
         ];
     }
 
-    public static function invalidEmailParamsProvider()
+    /**
+     * @dataProvider invalidEmailParamsProvider
+     * @param array $bulkEmailParams
+     * @param string $expectedMessage
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    #[DataProvider('invalidEmailParamsProvider')]
+    public function test_send_rejects_invalid_params(array $bulkEmailParams, string $expectedMessage): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $httpLayer = $this->createStub(HttpLayer::class);
+        $httpLayer->method('post')->withAnyParameters()->willReturn([]);
+
+        (new BulkEmail($httpLayer, self::OPTIONS))->send($bulkEmailParams);
+    }
+
+    public static function invalidEmailParamsProvider(): array
     {
         return [
             'no emails added' => [
-                []
+                [],
+                'Bulk params should contain at least 1 email',
             ],
             'one of the emails has error' => [
                 [
@@ -525,7 +483,8 @@ class BulkEmailTest extends TestCase
                         ->setSubject('Subject')
                         ->setHtml('HTML')
                         ->setText('Text'),
-                ]
+                ],
+                'was expected to be a valid e-mail address',
             ],
             'template id, html and text missing' => [
                 [
@@ -533,14 +492,13 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([
                             new Recipient('recipient@mailersend.com', 'Recipient')
                         ])
-                ]
+                ],
+                'One of template_id, html or text must be supplied',
             ],
             'from is required' => [
                 [
                     (new EmailParams())
                         ->setFromName('Sender')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
                         ->setRecipients([
                             [
                                 'name' => 'Recipient',
@@ -549,14 +507,13 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML')
-                ]
+                ],
+                'was expected to be a valid e-mail address',
             ],
             'from name is required' => [
                 [
                     (new EmailParams())
                         ->setFrom('sender@mailersend.com')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
                         ->setRecipients([
                             [
                                 'name' => 'Recipient',
@@ -565,15 +522,14 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML')
-                ]
+                ],
+                'expected to be string, type NULL given',
             ],
             'subject is required' => [
                 [
                     (new EmailParams())
                         ->setFrom('sender@mailersend.com')
                         ->setFromName('Sender')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
                         ->setRecipients([
                             [
                                 'name' => 'Recipient',
@@ -581,19 +537,19 @@ class BulkEmailTest extends TestCase
                             ]
                         ])
                         ->setHtml('HTML')
-                ]
+                ],
+                'expected to be string, type NULL given',
             ],
-            'at least one recipients' => [
+            'at least one recipient required' => [
                 [
                     (new EmailParams())
                         ->setFrom('sender@mailersend.com')
                         ->setFromName('Sender')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
                         ->setRecipients([])
                         ->setSubject('Subject')
                         ->setHtml('HTML')
-                ]
+                ],
+                'List should have at least 1 elements',
             ],
             'wrongly formed cc' => [
                 [
@@ -610,7 +566,8 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not contain the email parameter',
             ],
             'too many cc recipients' => [
                 [
@@ -635,7 +592,8 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'List should have at most 10 elements',
             ],
             'cc recipient without email' => [
                 [
@@ -652,9 +610,10 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not contain the email parameter',
             ],
-            'cc recipient name with ,' => [
+            'cc recipient name with comma' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')
@@ -667,9 +626,10 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not equal expected value',
             ],
-            'cc recipient name with ;' => [
+            'cc recipient name with semicolon' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')
@@ -682,7 +642,8 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not equal expected value',
             ],
             'wrongly formed bcc' => [
                 [
@@ -699,7 +660,8 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not contain the email parameter',
             ],
             'too many bcc recipients' => [
                 [
@@ -724,7 +686,8 @@ class BulkEmailTest extends TestCase
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'List should have at most 10 elements',
             ],
             'bcc recipient without email' => [
                 [
@@ -734,16 +697,17 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([
                             new Recipient('recipient@mailersend.com', 'Recipient')
                         ])
-                        ->setCc([
+                        ->setBcc([
                             [
                                 'name' => 'BCC'
                             ]
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not contain the email parameter',
             ],
-            'bcc recipient name with ,' => [
+            'bcc recipient name with comma' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')
@@ -751,14 +715,15 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([
                             new Recipient('recipient@mailersend.com', 'Recipient')
                         ])
-                        ->setCc([
+                        ->setBcc([
                             new Recipient('bcc@mailersend.com', 'BCC,'),
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not equal expected value',
             ],
-            'bcc recipient name with ;' => [
+            'bcc recipient name with semicolon' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')
@@ -766,21 +731,19 @@ class BulkEmailTest extends TestCase
                         ->setRecipients([
                             new Recipient('recipient@mailersend.com', 'Recipient')
                         ])
-                        ->setCc([
+                        ->setBcc([
                             new Recipient('bcc@mailersend.com', 'BCC;'),
                         ])
                         ->setSubject('Subject')
                         ->setHtml('HTML'),
-                ]
+                ],
+                'does not equal expected value',
             ],
-
-            'without text param' => [
+            'text missing when no template id' => [
                 [
                     (new EmailParams())
                         ->setFrom('test@mailersend.com')
                         ->setFromName('Sender')
-                        ->setReplyTo('reply-to@mailersend.com')
-                        ->setReplyToName('Reply To')
                         ->setRecipients([
                             [
                                 'name' => 'Recipient',
@@ -788,20 +751,349 @@ class BulkEmailTest extends TestCase
                             ]
                         ])
                         ->setSubject('Subject')
-                ]
+                ],
+                'One of template_id, html or text must be supplied',
+            ],
+            'too many recipients' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients(array_map(
+                            fn ($i) => new Recipient("recipient{$i}@mailersend.com", "Recipient {$i}"),
+                            range(1, 51)
+                        ))
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'Recipients list should not contain more than 50 items.',
+            ],
+            'subject too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject(str_repeat('a', 999))
+                        ->setHtml('HTML'),
+                ],
+                'Subject may not be greater than 998 characters.',
+            ],
+            'too many tags' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setTags(['tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6']),
+                ],
+                'Tags list should not contain more than 5 items.',
+            ],
+            'tag too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setTags([str_repeat('a', 192)]),
+                ],
+                'Each tag may not be greater than 191 characters.',
+            ],
+            'send_at in the past' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setSendAt(time() - 3600),
+                ],
+                'Send at must not be in the past.',
+            ],
+            'send_at more than 72 hours in the future' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setSendAt(time() + 259201),
+                ],
+                'Send at may not be more than 72 hours in the future.',
+            ],
+            'in_reply_to too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setInReplyToHeader(str_repeat('a', 999)),
+                ],
+                'In reply to may not be greater than 998 characters.',
+            ],
+            'list_unsubscribe too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setListUnsubscribe(str_repeat('a', 991)),
+                ],
+                'List unsubscribe may not be greater than 990 characters.',
             ],
         ];
     }
 
-    /**
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
+    public function test_get_status_returns_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->bulkEmail->getStatus('bulk-email-id-123');
+
+        $body = $this->assertRequest('GET', '/v1/bulk-email/bulk-email-id-123');
+        self::assertEmpty($body);
+    }
+
     public function test_get_status_requires_bulk_email_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Bulk email id is required.');
 
         $this->bulkEmail->getStatus('');
+    }
+
+    public function test_send_with_template_id_only(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setTemplateId('template-abc')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ]),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertEquals('template-abc', $body[0]['template_id']);
+        $this->assertBodyExcludes(['subject', 'from'], $body[0]);
+    }
+
+    public function test_send_with_tracking_settings(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setTrackClicks(true)
+                ->setTrackOpens(false)
+                ->setTrackContent(true),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertTrue($body[0]['settings']['track_clicks']);
+        self::assertFalse($body[0]['settings']['track_opens']);
+        self::assertTrue($body[0]['settings']['track_content']);
+    }
+
+    public function test_send_with_headers(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setHeaders([['name' => 'X-Custom-Header', 'value' => 'custom-value']]),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertNotEmpty($body[0]['headers']);
+        self::assertEquals('X-Custom-Header', $body[0]['headers'][0]['name']);
+        self::assertEquals('custom-value', $body[0]['headers'][0]['value']);
+    }
+
+    public function test_send_with_references_header(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setReferencesHeader(['<ref1@mailersend.com>', '<ref2@mailersend.com>']),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertEquals(['<ref1@mailersend.com>', '<ref2@mailersend.com>'], $body[0]['references']);
+    }
+
+    public function test_send_with_list_unsubscribe(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setListUnsubscribe('https://unsubscribe.example.com'),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertEquals('https://unsubscribe.example.com', $body[0]['list_unsubscribe']);
+    }
+
+    public function test_send_with_rcpt_to(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setRcptTo([
+                    new Recipient('rcpt@mailersend.com', 'RCPT To')
+                ]),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertNotEmpty($body[0]['rcptTo']);
+        self::assertEquals('rcpt@mailersend.com', $body[0]['rcptTo'][0]['email']);
+    }
+
+    public function test_send_at_accepts_string_value(): void
+    {
+        $this->addSuccessResponse();
+
+        $sendAt = '2026-01-01T10:00:00+00:00';
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setSendAt($sendAt),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertEquals($sendAt, $body[0]['send_at']);
+    }
+
+    public function test_send_includes_precedence_bulk_false(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setPrecedenceBulkHeader(false),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertArrayHasKey('precedence_bulk', $body[0]);
+        self::assertFalse($body[0]['precedence_bulk']);
+    }
+
+    public function test_send_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->bulkEmail->send([
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                ->setSubject('Subject')
+                ->setText('Text'),
+        ]);
+
+        $this->assertRequest('POST', '/v1/bulk-email');
+    }
+
+    public function test_send_forwards_status_code(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->bulkEmail->send([
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                ->setSubject('Subject')
+                ->setText('Text'),
+        ]);
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_send_requires_at_least_one_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Bulk params should contain at least 1 email');
+
+        $this->bulkEmail->send([]);
     }
 }

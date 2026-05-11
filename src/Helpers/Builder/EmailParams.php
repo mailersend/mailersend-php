@@ -18,7 +18,8 @@ class EmailParams
     protected array $tags = [];
     protected array $attachments = [];
     protected array $personalization = [];
-    protected ?int $send_at = null;
+    /** @var int|string|null */
+    protected $send_at = null;
     protected ?bool $precedenceBulkHeader = null;
     protected ?string $inReplyToHeader = null;
     protected ?bool $trackClicks = null;
@@ -27,6 +28,7 @@ class EmailParams
     protected array $headers = [];
     protected array $referencesHeader = [];
     protected ?string $listUnsubscribe = null;
+    protected array $rcptTo = [];
 
     public function getFrom(): ?string
     {
@@ -182,12 +184,16 @@ class EmailParams
         return $this;
     }
 
-    public function getSendAt(): ?int
+    /** @return int|string|null */
+    public function getSendAt()
     {
         return $this->send_at;
     }
 
-    public function setSendAt(?int $send_at): self
+    /**
+     * @param int|string|null $send_at
+     */
+    public function setSendAt($send_at): self
     {
         $this->send_at = $send_at;
 
@@ -284,6 +290,17 @@ class EmailParams
     public function setListUnsubscribe(string $listUnsubscribe): EmailParams
     {
         $this->listUnsubscribe = $listUnsubscribe;
+        return $this;
+    }
+
+    public function getRcptTo(): array
+    {
+        return $this->rcptTo;
+    }
+
+    public function setRcptTo(array $rcptTo): EmailParams
+    {
+        $this->rcptTo = $rcptTo;
         return $this;
     }
 }

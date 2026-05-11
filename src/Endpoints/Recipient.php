@@ -32,7 +32,7 @@ class Recipient extends AbstractEndpoint
             );
         }
 
-        if ($domainId) {
+        if ($domainId !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::minLength($domainId, 1, 'Domain id cannot be empty.')
             );

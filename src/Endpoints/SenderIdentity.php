@@ -16,8 +16,14 @@ class SenderIdentity extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function getAll(?string $domainId = null, ?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
-    {
+    public function getAll(
+        ?string $domainId = null,
+        ?int $page = null,
+        ?int $limit = Constants::DEFAULT_LIMIT,
+        ?string $query = null,
+        ?string $orderBy = null,
+        ?string $order = null
+    ): array {
         if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
@@ -29,12 +35,31 @@ class SenderIdentity extends AbstractEndpoint
             );
         }
 
+        if ($orderBy) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray(
+                    $orderBy,
+                    ['email', 'created_at', 'verified_at'],
+                    'order_by must be one of: email, created_at, verified_at.'
+                )
+            );
+        }
+
+        if ($order) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray($order, ['asc', 'desc'], 'order must be asc or desc.')
+            );
+        }
+
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint, [
+            $this->buildUri($this->endpoint, array_filter([
                 'domain_id' => $domainId,
                 'page' => $page,
                 'limit' => $limit,
-            ])
+                'query' => $query,
+                'order_by' => $orderBy,
+                'order' => $order,
+            ], fn ($v) => $v !== null))
         );
     }
 
@@ -57,9 +82,24 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function create(SenderIdentityBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
+        );
+
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($params->getEmail(), 1, 'Email is required.')
+        );
+
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
+
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
             $params->toArray(),
@@ -69,12 +109,23 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function update(string $identityId, SenderIdentityBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($identityId, 1, 'Sender identity id is required.')
+        );
+
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
+
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$identityId"),
-            $params->toArray(),
+            $params->toUpdateArray(),
         );
     }
 
@@ -113,6 +164,7 @@ class SenderIdentity extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function updateByEmail(string $email, SenderIdentityBuilder $params): array
     {
@@ -120,9 +172,15 @@ class SenderIdentity extends AbstractEndpoint
             fn () => Assertion::email($email, 'Valid email is required.')
         );
 
+        if (!empty($params->getReplyToName())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::minLength($params->getReplyToEmail() ?? '', 1, 'Reply to email is required when reply to name is set.')
+            );
+        }
+
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/email/$email"),
-            $params->toArray(),
+            $params->toUpdateArray(),
         );
     }
 
@@ -139,6 +197,23 @@ class SenderIdentity extends AbstractEndpoint
 
         return $this->httpLayer->delete(
             $this->buildUri("$this->endpoint/email/$email")
+        );
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     */
+    public function resend(string $identityId): array
+    {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($identityId, 1, 'Sender identity id is required.')
+        );
+
+        return $this->httpLayer->post(
+            $this->buildUri("$this->endpoint/$identityId/resend"),
+            []
         );
     }
 }

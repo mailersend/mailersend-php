@@ -4,12 +4,9 @@ namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
-use MailerSend\Common\Roles;
 use MailerSend\Endpoints\Invite;
-use MailerSend\Endpoints\User;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Arr;
-use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -40,10 +37,7 @@ class InviteTest extends TestCase
     #[DataProvider('validInviteRoutingListDataProvider')]
     public function test_get_all(array $params, array $expected): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->invite->getAll(
             Arr::get($params, 'page'),
@@ -64,19 +58,38 @@ class InviteTest extends TestCase
 
     /**
      * @dataProvider invalidInviteRoutingListDataProvider
+     * @param array $params
+     * @param string $message
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('invalidInviteRoutingListDataProvider')]
-    public function test_get_all_with_errors(array $params): void
+    public function test_get_all_with_errors(array $params, string $message): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
 
         $this->invite->getAll(
             Arr::get($params, 'page'),
             Arr::get($params, 'limit'),
         );
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws MailerSendAssertException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_find(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->invite->find('inviteId');
+
+        $this->assertRequest('GET', '/v1/invites/inviteId');
+
+        self::assertEquals(200, $response['status_code']);
     }
 
     /**
@@ -87,6 +100,7 @@ class InviteTest extends TestCase
     public function test_find_requires_invite_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invite id is required.');
 
         $this->invite->find('');
     }
@@ -98,17 +112,12 @@ class InviteTest extends TestCase
      */
     public function test_resend(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->invite->resend('inviteId');
 
-        $request = $this->client->getLastRequest();
+        $this->assertRequest('POST', '/v1/invites/inviteId/resend');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/invites/inviteId/resend', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
@@ -119,6 +128,7 @@ class InviteTest extends TestCase
     public function test_resend_required_inviteId(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invite id is required.');
 
         $this->invite->resend('');
     }
@@ -130,17 +140,12 @@ class InviteTest extends TestCase
      */
     public function test_cancel(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(204);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse(204);
 
         $response = $this->invite->cancel('inviteId');
 
-        $request = $this->client->getLastRequest();
+        $this->assertRequest('DELETE', '/v1/invites/inviteId');
 
-        self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/invites/inviteId', $request->getUri()->getPath());
         self::assertEquals(204, $response['status_code']);
     }
 
@@ -151,6 +156,7 @@ class InviteTest extends TestCase
     public function test_cancel_required_inviteId(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invite id is required.');
 
         $this->invite->cancel('');
     }
@@ -200,15 +206,13 @@ class InviteTest extends TestCase
     {
         return [
             'with limit under 10' => [
-                [
-                    'limit' => 9,
-                ],
+                ['limit' => 9],
+                'Limit is supposed to be between 10 and 100.',
             ],
             'with limit over 100' => [
-                [
-                    'limit' => 101,
-                ],
-            ]
+                ['limit' => 101],
+                'Limit is supposed to be between 10 and 100.',
+            ],
         ];
     }
 }

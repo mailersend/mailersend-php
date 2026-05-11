@@ -3,10 +3,11 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Message;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 
 class MessageTest extends TestCase
@@ -25,51 +26,90 @@ class MessageTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    public function test_get_messages_min_limit_is_validated()
+    public function test_get_sends_correct_method_and_path(): void
     {
-        $this->expectExceptionMessage('Minimum limit is ' . Message::MIN_LIMIT . '.');
+        $this->addSuccessResponse();
 
-        $this->messages->get(9);
-    }
+        $response = $this->messages->get();
 
-    public function test_get_messages_max_limit_is_validated()
-    {
-        $this->expectExceptionMessage('Maximum limit is ' . Message::MAX_LIMIT . '.');
-
-        $this->messages->get(101);
-    }
-
-    public function test_get_messages()
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
-
-        $response = $this->messages->get(30, 2);
-
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
-
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/messages', $request->getUri()->getPath());
+        $this->assertRequest('GET', '/v1/messages');
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame(30, Arr::get($request_body, 'limit'));
-        self::assertSame(2, Arr::get($request_body, 'page'));
     }
 
-    public function test_find_message()
+    public function test_get_with_limit_and_page(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
+
+        $this->messages->get(30, 2);
+
+        $body = $this->assertRequest('GET', '/v1/messages');
+        $this->assertBodyContains(['limit' => 30, 'page' => 2], $body);
+    }
+
+    public function test_get_with_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->messages->get(25, null, 'domain-id');
+
+        $body = $this->assertRequest('GET', '/v1/messages');
+        $this->assertBodyContains(['domain_id' => 'domain-id'], $body);
+    }
+
+    public function test_get_excludes_domain_id_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->messages->get(25, 1);
+
+        $body = $this->assertRequest('GET', '/v1/messages');
+        $this->assertBodyExcludes(['domain_id'], $body);
+    }
+
+    public function test_get_excludes_page_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->messages->get(25, null);
+
+        $body = $this->assertRequest('GET', '/v1/messages');
+        $this->assertBodyExcludes(['page'], $body);
+    }
+
+    /**
+     * @dataProvider invalidLimitProvider
+     */
+    #[DataProvider('invalidLimitProvider')]
+    public function test_get_rejects_invalid_limit(int $limit, string $message): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
+
+        $this->messages->get($limit);
+    }
+
+    public static function invalidLimitProvider(): array
+    {
+        return [
+            'limit below minimum' => [9, 'Minimum limit is ' . Message::MIN_LIMIT . '.'],
+            'limit above maximum' => [101, 'Maximum limit is ' . Message::MAX_LIMIT . '.'],
+        ];
+    }
+
+    public function test_find_sends_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
 
         $response = $this->messages->find('random_id');
 
-        $request = $this->client->getLastRequest();
+        $this->assertRequest('GET', '/v1/messages/random_id');
+        self::assertEquals(200, $response['status_code']);
+    }
 
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/messages/random_id', $request->getUri()->getPath());
+    public function test_find_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+        $response = $this->messages->find('message-id');
         self::assertEquals(200, $response['status_code']);
     }
 }

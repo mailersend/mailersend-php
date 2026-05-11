@@ -30,6 +30,8 @@ class SmsNumberTest extends TestCase
 
     /**
      * @dataProvider validSmsNumberListDataProvider
+     * @param array $smsNumberParams
+     * @param array $expected
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
@@ -37,10 +39,7 @@ class SmsNumberTest extends TestCase
     #[DataProvider('validSmsNumberListDataProvider')]
     public function test_get_all(array $smsNumberParams, array $expected): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsNumber->getAll(
             $smsNumberParams['page'] ?? null,
@@ -61,61 +60,103 @@ class SmsNumberTest extends TestCase
         self::assertEquals(Arr::get($expected, 'paused'), Arr::get($query, 'paused'));
     }
 
+    public function test_get_all_excludes_optional_params_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsNumber->getAll(null, null, null);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('page', $query);
+        self::assertArrayNotHasKey('limit', $query);
+        self::assertArrayNotHasKey('paused', $query);
+    }
+
     /**
      * @dataProvider invalidSmsNumberListDataProvider
+     * @param int $limit
+     * @param string $expectedMessage
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('invalidSmsNumberListDataProvider')]
-    public function test_get_all_with_errors(array $smsNumberParams): void
+    public function test_get_all_rejects_invalid_limit(int $limit, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
-        $this->smsNumber->getAll(
-            $smsNumberParams['page'] ?? null,
-            $smsNumberParams['limit'] ?? null,
-            $smsNumberParams['paused'] ?? null
-        );
+        $this->smsNumber->getAll(null, $limit);
     }
 
-    public function test_find_requires_sms_number_id()
+    public function test_find_requires_sms_number_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS number id is required.');
 
         $this->smsNumber->find('');
     }
 
-    public function test_delete_requires_sms_number_id()
+    public function test_find_sms_number(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->smsNumber->find('hashed_sms_number_id');
+
+        $this->assertRequest('GET', '/v1/sms-numbers/hashed_sms_number_id');
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_delete_requires_sms_number_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Sms number id is required.');
 
         $this->smsNumber->delete('');
     }
 
-    public function test_update_sms_number_requires_id()
+    public function test_delete_sms_number(): void
     {
+        $this->addSuccessResponse();
+
+        $response = $this->smsNumber->delete('hashed_sms_number_id');
+
+        $this->assertRequest('DELETE', '/v1/sms-numbers/hashed_sms_number_id');
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_update_requires_sms_number_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('SMS number id is required.');
 
         $this->smsNumber->update('', true);
     }
 
-    public function test_update_sms_number()
+    public function test_update_with_paused_true(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsNumber->update('random_id', true);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('PUT', '/v1/sms-numbers/random_id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/sms-numbers/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
+        self::assertSame(true, Arr::get($body, 'paused'));
+    }
 
-        self::assertSame(true, Arr::get($request_body, 'paused'));
+    public function test_update_with_paused_false(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->smsNumber->update('random_id', false);
+
+        $body = $this->assertRequest('PUT', '/v1/sms-numbers/random_id');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertFalse($body['paused']);
     }
 
     public static function validSmsNumberListDataProvider(): array
@@ -169,7 +210,7 @@ class SmsNumberTest extends TestCase
                     'paused' => 0,
                 ],
             ],
-            'complete request' => [
+            'with all params' => [
                 [
                     'page' => 1,
                     'limit' => 10,
@@ -187,16 +228,14 @@ class SmsNumberTest extends TestCase
     public static function invalidSmsNumberListDataProvider(): array
     {
         return [
-            'with limit under 10' => [
-                [
-                    'limit' => 9,
-                ],
+            'limit below minimum' => [
+                9,
+                'Limit is supposed to be between 10 and 100.',
             ],
-            'with limit over 100' => [
-                [
-                    'limit' => 101,
-                ],
-            ]
+            'limit above maximum' => [
+                101,
+                'Limit is supposed to be between 10 and 100.',
+            ],
         ];
     }
 }

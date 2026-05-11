@@ -14,11 +14,14 @@ class WebhookParams implements Arrayable, \JsonSerializable
     private array $events;
     private ?bool $enabled;
     private string $domainId;
+    private ?int $version = null;
+    private ?bool $editable = null;
 
     public const ACTIVITY_SENT = 'activity.sent';
     public const ACTIVITY_DELIVERED = 'activity.delivered';
     public const ACTIVITY_SOFT_BOUNCED = 'activity.soft_bounced';
     public const ACTIVITY_HARD_BOUNCED = 'activity.hard_bounced';
+    public const ACTIVITY_DEFERRED = 'activity.deferred';
     public const ACTIVITY_OPENED = 'activity.opened';
     public const ACTIVITY_OPENED_UNIQUE = 'activity.opened_unique';
     public const ACTIVITY_CLICKED = 'activity.clicked';
@@ -39,7 +42,7 @@ class WebhookParams implements Arrayable, \JsonSerializable
 
     public const ALL_ACTIVITIES = [
         self::ACTIVITY_SENT, self::ACTIVITY_DELIVERED,
-        self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED,
+        self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED, self::ACTIVITY_DEFERRED,
         self::ACTIVITY_OPENED, self::ACTIVITY_OPENED_UNIQUE,
         self::ACTIVITY_CLICKED, self::ACTIVITY_CLICKED_UNIQUE,
         self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT,
@@ -58,15 +61,19 @@ class WebhookParams implements Arrayable, \JsonSerializable
      * @param array $events
      * @param string $domainId
      * @param bool|null $enabled
+     * @param int|null $version
+     * @param bool|null $editable
      * @throws MailerSendAssertException
      */
-    public function __construct(string $url, string $name, array $events, string $domainId, ?bool $enabled = null)
+    public function __construct(string $url, string $name, array $events, string $domainId, ?bool $enabled = null, ?int $version = null, ?bool $editable = null)
     {
         $this->setUrl($url)
             ->setName($name)
             ->setEvents($events)
             ->setEnabled($enabled)
-            ->setDomainId($domainId);
+            ->setDomainId($domainId)
+            ->setVersion($version)
+            ->setEditable($editable);
     }
 
     /**
@@ -129,9 +136,9 @@ class WebhookParams implements Arrayable, \JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return bool|null
      */
-    public function getEnabled(): ?string
+    public function getEnabled(): ?bool
     {
         return $this->enabled;
     }
@@ -164,6 +171,42 @@ class WebhookParams implements Arrayable, \JsonSerializable
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getVersion(): ?int
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param int|null $version
+     * @return WebhookParams
+     */
+    public function setVersion(?int $version): WebhookParams
+    {
+        $this->version = $version;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getEditable(): ?bool
+    {
+        return $this->editable;
+    }
+
+    /**
+     * @param bool|null $editable
+     * @return WebhookParams
+     */
+    public function setEditable(?bool $editable): WebhookParams
+    {
+        $this->editable = $editable;
+        return $this;
+    }
+
 
     public function toArray()
     {
@@ -173,6 +216,8 @@ class WebhookParams implements Arrayable, \JsonSerializable
             'events' => $this->getEvents(),
             'enabled' => $this->getEnabled(),
             'domain_id' => $this->getDomainId(),
+            'version' => $this->getVersion(),
+            'editable' => $this->getEditable(),
         ];
     }
 

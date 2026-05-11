@@ -50,7 +50,6 @@ class Blocklist extends AbstractEndpoint
                 array_filter([$params->getRecipients(), $params->getPatterns()], fn ($v) => !empty($v)),
                 'Either recipients or patterns must be provided.'
             )
-            && Assertion::minLength($params->getDomainId(), 1, 'Domain id is required.')
         );
 
         return $this->httpLayer->post(

@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use JsonException;
+use MailerSend\Common\Constants;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\WebhookParams;
 use MailerSend\Helpers\GeneralHelpers;
@@ -23,15 +24,17 @@ class Webhook extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::url($webhookParams->getUrl(), 'Invalid URL.') &&
+                Assertion::maxLength($webhookParams->getUrl(), 191, 'Webhook url cannot be longer than 191 characters.') &&
                 Assertion::minLength($webhookParams->getName(), 1, 'Webhook name is required.') &&
-                Assertion::maxLength($webhookParams->getName(), 191, 'Webhook name cannot be longer than 191 character.') &&
+                Assertion::maxLength($webhookParams->getName(), 50, 'Webhook name cannot be longer than 50 characters.') &&
                 Assertion::minCount($webhookParams->getEvents(), 1, 'Webhook events are required.') &&
-                Assertion::minLength($webhookParams->getDomainId(), 1, 'Webhook domain id is required.')
+                Assertion::minLength($webhookParams->getDomainId(), 1, 'Webhook domain id is required.') &&
+                ($webhookParams->getVersion() === null || Assertion::inArray($webhookParams->getVersion(), [1, 2], 'Webhook version must be 1 or 2.'))
         );
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            array_filter($webhookParams->toArray())
+            array_filter($webhookParams->toArray(), fn ($v) => $v !== null)
         );
     }
 
@@ -41,19 +44,29 @@ class Webhook extends AbstractEndpoint
      * @param string $name
      * @param array $events
      * @param bool|null $enabled
+     * @param int|null $version
      * @return array
      * @throws ClientExceptionInterface
      * @throws JsonException
      * @throws MailerSendAssertException
      */
-    public function update(string $id, string $url, string $name, array $events, ?bool $enabled = null): array
-    {
+    public function update(
+        string $id,
+        ?string $url = null,
+        ?string $name = null,
+        ?array $events = null,
+        ?bool $enabled = null,
+        ?int $version = null
+    ): array {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($id, 1, 'Webhook id is required.') &&
-                Assertion::url($url, 'Invalid URL.') &&
-                Assertion::minLength($name, 1, 'Webhook name is required.') &&
-                Assertion::minCount($events, 1, 'Webhook events are required.') &&
-                Assertion::allInArray($events, WebhookParams::ALL_ACTIVITIES, 'One or multiple invalid events.')
+                ($url === null || Assertion::url($url, 'Invalid URL.')) &&
+                ($url === null || Assertion::maxLength($url, 191, 'Webhook url cannot be longer than 191 characters.')) &&
+                ($name === null || Assertion::minLength($name, 1, 'Webhook name is required.')) &&
+                ($name === null || Assertion::maxLength($name, 50, 'Webhook name cannot be longer than 50 characters.')) &&
+                ($events === null || Assertion::minCount($events, 1, 'Webhook events are required.')) &&
+                ($events === null || Assertion::allInArray($events, WebhookParams::ALL_ACTIVITIES, 'One or multiple invalid events.')) &&
+                ($version === null || Assertion::inArray($version, [1, 2], 'Webhook version must be 1 or 2.'))
         );
 
         return $this->httpLayer->put(
@@ -63,27 +76,41 @@ class Webhook extends AbstractEndpoint
                 'name' => $name,
                 'events' => $events,
                 'enabled' => $enabled,
-            ])
+                'version' => $version,
+            ], fn ($v) => $v !== null)
         );
     }
 
     /**
      * @param string $domainId
+     * @param int|null $limit
      * @return array
      * @throws JsonException
      * @throws MailerSendAssertException
      * @throws ClientExceptionInterface
      */
-    public function get(string $domainId): array
+    public function get(string $domainId, ?int $limit = null, ?int $page = null): array
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
         );
 
+        if ($limit) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $limit,
+                    Constants::MIN_LIMIT,
+                    Constants::MAX_LIMIT,
+                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                )
+            );
+        }
+
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint),
-            array_filter([
-                'domain_id' => $domainId
+            $this->buildUri($this->endpoint, [
+                'domain_id' => $domainId,
+                'limit' => $limit,
+                'page' => $page,
             ])
         );
     }

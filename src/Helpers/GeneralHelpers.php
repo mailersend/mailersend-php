@@ -44,6 +44,33 @@ class GeneralHelpers
             self::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
         }
 
+        self::assert(fn () => Assertion::maxCount($params->getRecipients(), 50, 'Recipients list should not contain more than 50 items.'));
+
+        if ($params->getSubject() !== null) {
+            self::assert(fn () => Assertion::maxLength($params->getSubject(), 998, 'Subject may not be greater than 998 characters.'));
+        }
+
+        if (count($params->getTags()) > 0) {
+            self::assert(fn () => Assertion::maxCount($params->getTags(), 5, 'Tags list should not contain more than 5 items.'));
+            foreach ($params->getTags() as $tag) {
+                self::assert(fn () => Assertion::maxLength($tag, 191, 'Each tag may not be greater than 191 characters.'));
+            }
+        }
+
+        if (is_int($params->getSendAt())) {
+            $now = time();
+            self::assert(fn () => Assertion::greaterOrEqualThan($params->getSendAt(), $now, 'Send at must not be in the past.'));
+            self::assert(fn () => Assertion::lessOrEqualThan($params->getSendAt(), $now + 259200, 'Send at may not be more than 72 hours in the future.'));
+        }
+
+        if ($params->getInReplyToHeader() !== null) {
+            self::assert(fn () => Assertion::maxLength($params->getInReplyToHeader(), 998, 'In reply to may not be greater than 998 characters.'));
+        }
+
+        if ($params->getListUnsubscribe() !== null) {
+            self::assert(fn () => Assertion::maxLength($params->getListUnsubscribe(), 990, 'List unsubscribe may not be greater than 990 characters.'));
+        }
+
         if (count($params->getCc()) > 0) {
             self::assert(fn () => Assertion::maxCount($params->getCc(), 10));
             foreach ($params->getCc() as $key => $cc) {
