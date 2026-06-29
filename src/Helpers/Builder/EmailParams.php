@@ -15,6 +15,7 @@ class EmailParams
     protected ?string $html = null;
     protected ?string $text = null;
     protected ?string $template_id = null;
+    protected ?string $language = null;
     protected array $tags = [];
     protected array $attachments = [];
     protected array $personalization = [];
@@ -148,6 +149,17 @@ class EmailParams
     public function setTemplateId(?string $template_id): EmailParams
     {
         $this->template_id = $template_id;
+        return $this;
+    }
+
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(?string $language): EmailParams
+    {
+        $this->language = $language;
         return $this;
     }
 

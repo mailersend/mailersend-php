@@ -51,6 +51,52 @@ class EmailTest extends TestCase
         self::assertEquals([], $response);
     }
 
+    public function test_language_is_included_in_payload_when_set(): void
+    {
+        $recipients = [
+            new Recipient('recipient@mailersend.com', 'Recipient')
+        ];
+
+        $emailParams = (new EmailParams())
+            ->setRecipients($recipients)
+            ->setTemplateId('templateId')
+            ->setLanguage('de');
+
+        $httpLayer = $this->createStub(HttpLayer::class);
+        $httpLayer->method('post')
+            ->with('https://api.mailersend.com/v1/email', [
+                'to' => [
+                    $recipients[0]->toArray()
+                ],
+                'template_id' => 'templateId',
+                'language' => 'de',
+            ])
+            ->willReturn([]);
+
+        $response = (new Email($httpLayer, self::OPTIONS))->send($emailParams);
+
+        self::assertEquals([], $response);
+    }
+
+    public function test_language_is_absent_from_payload_when_not_set(): void
+    {
+        $recipients = [
+            new Recipient('recipient@mailersend.com', 'Recipient')
+        ];
+
+        $emailParams = (new EmailParams())
+            ->setRecipients($recipients)
+            ->setTemplateId('templateId');
+
+        $this->addSuccessResponse();
+
+        $this->email->send($emailParams);
+
+        $request_body = $this->assertRequest('POST', '/v1/email');
+
+        self::assertArrayNotHasKey('language', $request_body);
+    }
+
     /**
      * @dataProvider validEmailParamsProvider
      * @param EmailParams $emailParams

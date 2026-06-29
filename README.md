@@ -329,6 +329,21 @@ $emailParams = (new EmailParams())
 $mailersend->email->send($emailParams);
 ```
 
+You can also send a template in a specific language using a language code (e.g. `de`, `fr`, `pt-BR`). When set, the template's published translation for that language is used, falling back to the base content if none exists. This is only meaningful when a `template_id` is set.
+
+```php
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setRecipients($recipients)
+    ->setSubject('Subject')
+    ->setTemplateId('ss243wdasd')
+    ->setLanguage('de')
+    ->setTags($tags);
+
+$mailersend->email->send($emailParams);
+```
+
 <a name="personalization"></a>
 
 ### Personalization
