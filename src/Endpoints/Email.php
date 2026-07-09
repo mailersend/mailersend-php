@@ -45,6 +45,7 @@ class Email extends AbstractEndpoint
                     'bcc' => $bcc_mapped,
                     'subject' => $params->getSubject(),
                     'template_id' => $params->getTemplateId(),
+                    'language' => $params->getLanguage(),
                     'text' => $params->getText(),
                     'html' => $params->getHtml(),
                     'tags' => $params->getTags(),
