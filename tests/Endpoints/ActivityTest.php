@@ -87,6 +87,17 @@ class ActivityTest extends TestCase
         $this->assertQueryParams(['event' => ['queued', 'sent']], $query);
     }
 
+    public function test_get_all_sends_suppressed_event_param(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->activity->getAll('domainId', (new ActivityParams())->setEvent(['suppressed']));
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['event' => ['suppressed']], $query);
+    }
+
     public function test_get_all_accepts_date_from_without_date_to(): void
     {
         $this->addSuccessResponse();
