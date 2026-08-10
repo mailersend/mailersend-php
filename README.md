@@ -899,10 +899,12 @@ $activityParams = (new ActivityParams())
                     ->setLimit(15)
                     ->setDateFrom(1623073576)
                     ->setDateTo(1623074976)
-                    ->setEvent(['queued', 'sent', 'survey_opened', 'survey_submitted', 'deferred']);
+                    ->setEvent(['queued', 'sent', 'survey_opened', 'survey_submitted', 'deferred', 'suppressed']);
 
 $mailersend->activity->getAll('domainId', $activityParams);
 ```
+
+> **Note:** The `suppressed` event is available on the Starter plan and above, otherwise the API returns error code `MS42240`. Activities of that type also include a `suppression_reason` field, one of `on_hold`, `hard_bounced`, `unsubscribed`, `spam_complained`, `blocklisted`.
 
 <a name="#get-a-single-activity"></a>
 
