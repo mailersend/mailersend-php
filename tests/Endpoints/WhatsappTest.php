@@ -30,6 +30,13 @@ class WhatsappTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(202);
     }
 
+    /**
+     * @dataProvider validWhatsappParamsProvider
+     * @param WhatsappParams $params
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
     #[DataProvider('validWhatsappParamsProvider')]
     public function test_send_whatsapp(WhatsappParams $params): void
     {
@@ -53,6 +60,13 @@ class WhatsappTest extends TestCase
         self::assertCount(count($params->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
     }
 
+    /**
+     * @dataProvider invalidWhatsappParamsProvider
+     * @param WhatsappParams $params
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
     #[DataProvider('invalidWhatsappParamsProvider')]
     public function test_send_whatsapp_with_errors(WhatsappParams $params): void
     {
