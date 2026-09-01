@@ -34,6 +34,7 @@ use MailerSend\Endpoints\SpamComplaint;
 use MailerSend\Endpoints\Unsubscribe;
 use MailerSend\Endpoints\User;
 use MailerSend\Endpoints\Webhook;
+use MailerSend\Endpoints\Whatsapp;
 use MailerSend\Endpoints\Token;
 use MailerSend\Endpoints\Recipient;
 use MailerSend\Exceptions\MailerSendException;
@@ -81,6 +82,7 @@ class MailerSend
     public SmsRecipient $smsRecipient;
     public SmsWebhook $smsWebhook;
     public SmsInbound $smsInbound;
+    public Whatsapp $whatsapp;
     public SenderIdentity $senderIdentity;
     public ApiQuota $apiQuota;
     public OnHoldList $onHoldList;
@@ -128,6 +130,7 @@ class MailerSend
         $this->smsRecipient = new SmsRecipient($this->httpLayer, $this->options);
         $this->smsWebhook = new SmsWebhook($this->httpLayer, $this->options);
         $this->smsInbound = new SmsInbound($this->httpLayer, $this->options);
+        $this->whatsapp = new Whatsapp($this->httpLayer, $this->options);
         $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
         $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
         $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
