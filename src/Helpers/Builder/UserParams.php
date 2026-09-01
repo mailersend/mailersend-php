@@ -2,7 +2,12 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
+use MailerSend\Common\Roles;
 use MailerSend\Contracts\Arrayable;
+use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\GeneralHelpers;
+use MailerSend\Helpers\MailerSendAssertion;
 
 class UserParams implements Arrayable, \JsonSerializable
 {
@@ -14,13 +19,18 @@ class UserParams implements Arrayable, \JsonSerializable
     protected ?bool $requires_periodic_password_change = false;
 
     /**
-     * @param string $email
-     * @param string $role
+     * @param string|null $email
+     * @param string|null $role
+     * @throws MailerSendAssertException
      */
     public function __construct(?string $email = null, ?string $role = null)
     {
-        $this->email = $email;
-        $this->role = $role;
+        if ($email !== null) {
+            $this->setEmail($email);
+        }
+        if ($role !== null) {
+            $this->setRole($role);
+        }
     }
 
     public function getEmail(): ?string
@@ -28,8 +38,18 @@ class UserParams implements Arrayable, \JsonSerializable
         return $this->email;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setEmail(string $email): self
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::maxLength($email, 320, 'Email may not be greater than 320 characters.')
+        );
+        GeneralHelpers::assert(
+            fn () => MailerSendAssertion::email($email)
+        );
+
         $this->email = $email;
         return $this;
     }
@@ -39,8 +59,15 @@ class UserParams implements Arrayable, \JsonSerializable
         return $this->role;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setRole(string $role): self
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::inArray($role, Roles::ALL_ROLES, 'Invalid role.')
+        );
+
         $this->role = $role;
         return $this;
     }

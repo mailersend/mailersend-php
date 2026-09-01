@@ -52,7 +52,7 @@ class Token extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($tokenParams->getName(), 1, 'Token name is required.') &&
-                Assertion::minLength($tokenParams->getDomainId(), 1, 'Token domain id is required.') &&
+                Assertion::maxLength($tokenParams->getName(), 50, 'Token name must not exceed 50 characters.') &&
                 Assertion::minCount($tokenParams->getScopes(), 1, 'Token scopes are required.')
         );
 
@@ -70,23 +70,36 @@ class Token extends AbstractEndpoint
 
     /**
      * @param string $id
-     * @param string $status
+     * @param string|null $status
+     * @param string|null $name
      * @return array
      * @throws ClientExceptionInterface
      * @throws JsonException
      * @throws MailerSendAssertException
      */
-    public function update(string $id, string $status): array
+    public function update(string $id, ?string $status = null, ?string $name = null): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($id, 'Token id is required.') &&
-                Assertion::inArray($status, TokenParams::STATUS_ALL)
+            fn () => Assertion::notEmpty($id, 'Token id is required.')
         );
 
+        if ($status !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::inArray($status, TokenParams::STATUS_ALL)
+            );
+        }
+
+        if ($name !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::maxLength($name, 50, 'Token name must not exceed 50 characters.')
+            );
+        }
+
         return $this->httpLayer->put(
-            $this->buildUri($this->endpoint . '/' . $id . '/settings'),
+            $this->buildUri($this->endpoint . '/' . $id),
             array_filter(
                 [
+                    'name' => $name,
                     'status' => $status,
                 ],
             ),
@@ -105,7 +118,8 @@ class Token extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::notEmpty($id, 'Token id is required.') &&
-                Assertion::notEmpty($name, 'Token name is required.')
+                Assertion::notEmpty($name, 'Token name is required.') &&
+                Assertion::maxLength($name, 50, 'Token name must not exceed 50 characters.')
         );
 
         return $this->httpLayer->put(

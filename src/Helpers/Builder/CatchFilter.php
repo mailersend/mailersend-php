@@ -2,7 +2,11 @@
 
 namespace MailerSend\Helpers\Builder;
 
+use Assert\Assertion;
+use Assert\AssertionFailedException;
+use MailerSend\Common\Constants;
 use MailerSend\Contracts\Arrayable;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Arr;
 
 class CatchFilter implements Arrayable, \JsonSerializable
@@ -10,9 +14,17 @@ class CatchFilter implements Arrayable, \JsonSerializable
     protected string $type;
     protected array $filters = [];
 
+    public const VALID_TYPES = [
+        Constants::TYPE_CATCH_ALL,
+        Constants::TYPE_CATCH_RECIPIENT,
+    ];
+
+    /**
+     * @throws MailerSendAssertException
+     */
     public function __construct(string $type)
     {
-        $this->type = $type;
+        $this->setType($type);
     }
 
     public function getType(): string
@@ -20,8 +32,17 @@ class CatchFilter implements Arrayable, \JsonSerializable
         return $this->type;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setType(string $type): self
     {
+        try {
+            Assertion::inArray($type, self::VALID_TYPES, 'CatchFilter type must be one of: ' . implode(', ', self::VALID_TYPES) . '.');
+        } catch (AssertionFailedException $e) {
+            throw new MailerSendAssertException($e->getMessage());
+        }
+
         $this->type = $type;
 
         return $this;
@@ -32,15 +53,33 @@ class CatchFilter implements Arrayable, \JsonSerializable
         return $this->filters;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function setFilters(array $filters): self
     {
+        try {
+            Assertion::maxCount($filters, 5, 'CatchFilter filters cannot contain more than 5 items.');
+        } catch (AssertionFailedException $e) {
+            throw new MailerSendAssertException($e->getMessage());
+        }
+
         $this->filters = $filters;
 
         return $this;
     }
 
+    /**
+     * @throws MailerSendAssertException
+     */
     public function addFilter(Filter $filter): self
     {
+        try {
+            Assertion::maxCount($this->filters, 4, 'CatchFilter filters cannot contain more than 5 items.');
+        } catch (AssertionFailedException $e) {
+            throw new MailerSendAssertException($e->getMessage());
+        }
+
         $this->filters[] = $filter;
 
         return $this;

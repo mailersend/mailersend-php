@@ -10,13 +10,10 @@ use MailerSend\Helpers\Builder\SmsParams;
 use MailerSend\Helpers\Builder\SmsPersonalization;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Http\Message\ResponseInterface;
-use MailerSend\Helpers\Arr;
 
 class SmsTest extends TestCase
 {
     protected Sms $sms;
-    protected ResponseInterface $defaultResponse;
 
     public function setUp(): void
     {
@@ -25,9 +22,6 @@ class SmsTest extends TestCase
         $this->client = new Client();
 
         $this->sms = new Sms(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-
-        $this->defaultResponse = $this->createStub(ResponseInterface::class);
-        $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
     /**
@@ -38,47 +32,79 @@ class SmsTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('validSmsParamsProvider')]
-    public function test_send_sms(SmsParams $smsParams): void
+    public function test_send(SmsParams $smsParams): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->sms->send($smsParams);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('POST', '/v1/sms');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/sms', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
+        self::assertEquals($smsParams->getFrom(), $body['from'] ?? null);
+        self::assertEquals($smsParams->getTo(), $body['to'] ?? null);
+        self::assertEquals($smsParams->getText(), $body['text'] ?? null);
 
-        self::assertEquals($smsParams->getFrom(), Arr::get($request_body, 'from'));
-        self::assertEquals($smsParams->getTo(), Arr::get($request_body, 'to'));
-        self::assertEquals($smsParams->getText(), Arr::get($request_body, 'text'));
-        self::assertCount(count($smsParams->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
-
-        foreach ($smsParams->getPersonalization() as $key => $personalization) {
-            $personalization = !is_array($personalization) ? $personalization->toArray() : $personalization;
-            self::assertEquals($personalization['phone_number'], Arr::get($request_body, "personalization.$key.phone_number"));
-            foreach ($personalization['data'] as $variableKey => $variableValue) {
-                self::assertEquals($personalization['data'][$variableKey], Arr::get($request_body, "personalization.$key.data.$variableKey"));
-            }
+        if (!empty($smsParams->getPersonalization())) {
+            self::assertCount(count($smsParams->getPersonalization()), $body['personalization'] ?? []);
         }
+    }
+
+    public function test_send_includes_personalization_when_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsParams())
+            ->setFrom('+1111111111')
+            ->addRecipient('+2222222222')
+            ->setText('TEXT')
+            ->setPersonalization([
+                new SmsPersonalization('+2222222222', [
+                    'var' => 'variable',
+                    'number' => 123,
+                ]),
+            ]);
+
+        $this->sms->send($params);
+
+        $body = $this->assertRequest('POST', '/v1/sms');
+
+        self::assertArrayHasKey('personalization', $body);
+        self::assertCount(1, $body['personalization']);
+        self::assertSame('+2222222222', $body['personalization'][0]['phone_number']);
+        self::assertSame('variable', $body['personalization'][0]['data']['var'] ?? null);
+        self::assertSame(123, $body['personalization'][0]['data']['number'] ?? null);
+    }
+
+    public function test_send_excludes_personalization_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsParams())
+            ->setFrom('+1111111111')
+            ->addRecipient('+2222222222')
+            ->setText('TEXT');
+
+        $this->sms->send($params);
+
+        $body = $this->assertRequest('POST', '/v1/sms');
+
+        $this->assertBodyExcludes(['personalization'], $body);
     }
 
     /**
      * @dataProvider invalidSmsParamsProvider
      * @param SmsParams $smsParams
+     * @param string $expectedMessage
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('invalidSmsParamsProvider')]
-    public function test_send_email_with_errors(SmsParams $smsParams)
+    public function test_send_rejects_invalid_params(SmsParams $smsParams, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
         $httpLayer = $this->createStub(HttpLayer::class);
         $httpLayer->method('post')
@@ -98,36 +124,20 @@ class SmsTest extends TestCase
                         '+2222222222',
                         '+3333333333',
                     ])
-                    ->setText('Text')
+                    ->setText('Text'),
             ],
-            'using recipients helper' => [
+            'using addRecipient helper' => [
                 (new SmsParams())
                     ->setFrom('+1111111111')
                     ->addRecipient('+2222222222')
                     ->setText('TEXT'),
             ],
-            'using personalization helper' => [
+            'with multiple recipients' => [
                 (new SmsParams())
                     ->setFrom('+1111111111')
                     ->addRecipient('+2222222222')
-                    ->setText('TEXT')
-                    ->setPersonalization([
-                        new SmsPersonalization('+2222222222', [
-                            'var' => 'variable',
-                            'number' => 123,
-                            'object' => [
-                                'key' => 'object-value'
-                            ],
-                            'objectCollection' => [
-                                [
-                                    'name' => 'John'
-                                ],
-                                [
-                                    'name' => 'Patrick'
-                                ]
-                            ],
-                        ])
-                    ]),
+                    ->addRecipient('+3333333333')
+                    ->setText('TEXT'),
             ],
         ];
     }
@@ -138,19 +148,36 @@ class SmsTest extends TestCase
             'from is required' => [
                 (new SmsParams())
                     ->setTo(['+222222222'])
-                    ->setText('TEXT')
+                    ->setText('TEXT'),
+                'From phone number is required',
             ],
-            'at least one recipients' => [
+            'from must start with plus' => [
+                (new SmsParams())
+                    ->setFrom('1111111111')
+                    ->setTo(['+2222222222'])
+                    ->setText('TEXT'),
+                'From phone number must start with +',
+            ],
+            'at least one recipient required' => [
                 (new SmsParams())
                     ->setFrom('+1111111111')
                     ->setTo([])
-                    ->setText('TEXT')
+                    ->setText('TEXT'),
+                'At least one recipient is required',
+            ],
+            'recipient must start with plus' => [
+                (new SmsParams())
+                    ->setFrom('+1111111111')
+                    ->setTo(['2222222222'])
+                    ->setText('TEXT'),
+                'Recipient phone number must start with +',
             ],
             'text is required' => [
                 (new SmsParams())
                     ->setFrom('+1111111111')
                     ->setTo(['+2222222222'])
-                    ->setText('')
+                    ->setText(''),
+                'Text cannot be empty',
             ],
         ];
     }

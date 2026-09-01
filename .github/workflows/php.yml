@@ -17,10 +17,10 @@ jobs:
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: setup-php/setup-php@46ae35f3338b644fa11efcbbcd5d739c34372ae8
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, pdo, pdo_mysql, intl, zip
@@ -28,7 +28,7 @@ jobs:
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
       with:
         path: vendor
         key: ${{ runner.os }}-${{ matrix.php-versions }}-php-${{ hashFiles('**/composer.json') }}

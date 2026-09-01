@@ -8,19 +8,21 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class BuildUriTest extends TestCase
 {
-    /** @dataProvider build_uri_provider */
-    #[DataProvider('build_uri_provider')]
+    /**
+     * @dataProvider buildUriProvider
+     */
+    #[DataProvider('buildUriProvider')]
     public function test_execute_build_uri(array $options, string $path, array $params, string $expected): void
     {
-        $build_uri = (new BuildUri($options))->execute($path, $params);
+        $buildUri = (new BuildUri($options))->execute($path, $params);
 
-        $this->assertEquals($expected, $build_uri);
+        $this->assertEquals($expected, $buildUri);
     }
 
-    public static function build_uri_provider(): array
+    public static function buildUriProvider(): array
     {
         return [
-            [
+            'no query params' => [
                 [
                     'host' => 'api.mailersend.com',
                     'protocol' => 'https',
@@ -28,9 +30,9 @@ class BuildUriTest extends TestCase
                 ],
                 'endpoint',
                 [],
-                'https://api.mailersend.com/v1/endpoint'
+                'https://api.mailersend.com/v1/endpoint',
             ],
-            [
+            'custom protocol and host' => [
                 [
                     'host' => 'mailersend.local',
                     'protocol' => 'http',
@@ -38,9 +40,9 @@ class BuildUriTest extends TestCase
                 ],
                 'endpoint',
                 [],
-                'http://mailersend.local/api/v1/endpoint'
+                'http://mailersend.local/api/v1/endpoint',
             ],
-            [
+            'scalar query params' => [
                 [
                     'host' => 'mailersend.local',
                     'protocol' => 'http',
@@ -49,10 +51,22 @@ class BuildUriTest extends TestCase
                 'endpoint',
                 [
                     'first' => 'param',
-                    'second' => 'param'
+                    'second' => 'param',
                 ],
                 'http://mailersend.local/api/v1/endpoint?first=param&second=param',
-            ]
+            ],
+            'array query param is joined with commas' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'ids' => ['aaa', 'bbb', 'ccc'],
+                ],
+                'https://api.mailersend.com/v1/endpoint?ids=aaa,bbb,ccc',
+            ],
         ];
     }
 }

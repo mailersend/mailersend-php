@@ -79,38 +79,86 @@ class BlocklistTest extends TestCase
         );
     }
 
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
-     * @throws MailerSendAssertException
-     */
-    public function test_create(): void
+    public function test_create_uses_correct_method_and_path(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $this->addSuccessResponse();
 
-        $this->client->addResponse($response);
+        $this->blocklist->create(
+            (new BlocklistParams())
+                ->setDomainId('domain_id')
+                ->setRecipients(['recipient'])
+                ->setPatterns(['pattern'])
+        );
+
+        $this->assertRequest('POST', '/v1/suppressions/blocklist');
+    }
+
+    public function test_create_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
 
         $response = $this->blocklist->create(
             (new BlocklistParams())
                 ->setDomainId('domain_id')
-                ->setRecipients([
-                    'recipient'
-                ])
-                ->setPatterns([
-                    'pattern'
-                ])
+                ->setRecipients(['recipient'])
+                ->setPatterns(['pattern'])
         );
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/suppressions/blocklist', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
-        self::assertSame(['recipient'], Arr::get($request_body, 'recipients'));
-        self::assertSame(['pattern'], Arr::get($request_body, 'patterns'));
+    }
+
+    public function test_create_sends_all_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklist->create(
+            (new BlocklistParams())
+                ->setDomainId('domain_id')
+                ->setRecipients(['recipient'])
+                ->setPatterns(['pattern'])
+        );
+
+        $body = $this->assertRequest('POST', '/v1/suppressions/blocklist');
+
+        $this->assertBodyContains([
+            'domain_id'  => 'domain_id',
+            'recipients' => ['recipient'],
+            'patterns'   => ['pattern'],
+        ], $body);
+    }
+
+    public function test_create_with_only_recipients(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->blocklist->create(
+            (new BlocklistParams())
+                ->setRecipients(['recipient@example.com'])
+        );
+
+        $body = $this->assertRequest('POST', '/v1/suppressions/blocklist');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame(['recipient@example.com'], $body['recipients']);
+        self::assertNull(Arr::get($body, 'domain_id'));
+        self::assertSame([], $body['patterns']);
+    }
+
+    public function test_create_with_only_patterns(): void
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->blocklist->create(
+            (new BlocklistParams())
+                ->setPatterns(['*.spam.com'])
+        );
+
+        $body = $this->assertRequest('POST', '/v1/suppressions/blocklist');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame(['*.spam.com'], $body['patterns']);
+        self::assertNull(Arr::get($body, 'domain_id'));
+        self::assertSame([], $body['recipients']);
     }
 
     public function test_create_requires_either_recipients_or_patterns(): void
@@ -122,6 +170,24 @@ class BlocklistTest extends TestCase
             (new BlocklistParams())
                 ->setDomainId('domain_id')
         );
+    }
+
+    public function test_delete_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklist->delete(['id_1']);
+
+        $this->assertRequest('DELETE', '/v1/suppressions/blocklist');
+    }
+
+    public function test_delete_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->blocklist->delete(['id_1']);
+
+        self::assertEquals(200, $response['status_code']);
     }
 
     /**
@@ -153,6 +219,41 @@ class BlocklistTest extends TestCase
         self::assertSame(Arr::get($params, 'ids'), Arr::get($request_body, 'ids'));
         self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
         self::assertSame(Arr::get($params, 'domain_id'), Arr::get($request_body, 'domain_id'));
+    }
+
+    public function test_delete_by_ids_excludes_domain_id_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklist->delete(['id_1']);
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/blocklist');
+
+        self::assertSame(['id_1'], $body['ids']);
+        $this->assertBodyExcludes(['domain_id'], $body);
+    }
+
+    public function test_delete_all_excludes_ids_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklist->delete(null, true);
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/blocklist');
+
+        self::assertTrue($body['all']);
+        $this->assertBodyExcludes(['ids'], $body);
+    }
+
+    public function test_delete_by_ids_includes_all_as_false(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->blocklist->delete(['id_1']);
+
+        $body = $this->assertRequest('DELETE', '/v1/suppressions/blocklist');
+
+        self::assertFalse($body['all']);
     }
 
     /**

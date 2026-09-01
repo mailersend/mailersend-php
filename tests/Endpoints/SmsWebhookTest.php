@@ -5,8 +5,10 @@ namespace MailerSend\Tests\Endpoints;
 use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\SmsWebhook;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SmsWebhookParams;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
 use MailerSend\Helpers\Arr;
 
@@ -28,6 +30,7 @@ class SmsWebhookTest extends TestCase
 
     public function test_get_webhooks_sms_number_id_is_required()
     {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('SMS number id is required.');
 
         $this->smsWebhook->get('');
@@ -35,6 +38,7 @@ class SmsWebhookTest extends TestCase
 
     public function test_find_webhook_is_validated()
     {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('SMS webhook id is required.');
 
         $this->smsWebhook->find('');
@@ -42,6 +46,7 @@ class SmsWebhookTest extends TestCase
 
     public function test_delete_webhook_is_validated()
     {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('SMS webhook id is required.');
 
         $this->smsWebhook->delete('');
@@ -49,81 +54,116 @@ class SmsWebhookTest extends TestCase
 
     public function test_get_sms_webhooks()
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->get('hashed_sms_number_id');
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
 
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame('hashed_sms_number_id', Arr::get($request_body, 'sms_number_id'));
+        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
     }
 
-    public function test_find_webhook()
+    public function test_get_sms_webhooks_with_limit()
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
+
+        $response = $this->smsWebhook->get('hashed_sms_number_id', 10);
+
+        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
+        self::assertSame(10, Arr::get($body, 'limit'));
+    }
+
+    public function test_get_sms_webhooks_with_page()
+    {
+        $this->addSuccessResponse();
+
+        $response = $this->smsWebhook->get('hashed_sms_number_id', null, 2);
+
+        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+
+        self::assertEquals(200, $response['status_code']);
+        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
+        self::assertSame(2, Arr::get($body, 'page'));
+    }
+
+    public function test_get_sms_webhooks_excludes_null_limit_and_page(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsWebhook->get('hashed_sms_number_id');
+
+        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+
+        $this->assertBodyExcludes(['limit', 'page'], $body);
+    }
+
+    public function test_find_webhook(): void
+    {
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->find('hashed_sms_webhook_id');
 
-        $request = $this->client->getLastRequest();
+        $this->assertRequest('GET', '/v1/sms-webhooks/hashed_sms_webhook_id');
 
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks/hashed_sms_webhook_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
-    public function test_delete_sms_webhook()
+    public function test_delete_sms_webhook(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->delete('hashed_sms_webhook_id');
 
-        $request = $this->client->getLastRequest();
+        $this->assertRequest('DELETE', '/v1/sms-webhooks/hashed_sms_webhook_id');
 
-        self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks/hashed_sms_webhook_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
     }
 
-    public function test_url_is_validated_when_creating_sms_webhooks()
+    /**
+     * @dataProvider invalidCreateParamsProvider
+     */
+    #[DataProvider('invalidCreateParamsProvider')]
+    public function test_create_rejects_invalid_params(SmsWebhookParams $params, string $exceptionMessage): void
     {
-        $this->expectExceptionMessage('Invalid URL.');
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $this->smsWebhook->create(
-            new SmsWebhookParams('invalid_url', 'SMS webhook name', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id')
-        );
+        $this->smsWebhook->create($params);
     }
 
-    public function test_name_is_required_when_creating_sms_webhooks()
+    public static function invalidCreateParamsProvider(): array
     {
-        $this->expectExceptionMessage('Webhook name is required.');
-
-        $this->smsWebhook->create(
-            new SmsWebhookParams('https://link.com/webhook', '', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id')
-        );
+        return [
+            'invalid url' => [
+                new SmsWebhookParams('invalid_url', 'SMS webhook name', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id'),
+                'Invalid URL.',
+            ],
+            'missing name' => [
+                new SmsWebhookParams('https://link.com/webhook', '', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id'),
+                'Webhook name is required.',
+            ],
+            'name too long' => [
+                new SmsWebhookParams('https://link.com/webhook', str_repeat('a', 192), SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id'),
+                'Webhook name cannot be longer than 191 character.',
+            ],
+            'missing events' => [
+                new SmsWebhookParams('https://link.com/webhook', 'webhook name', [], 'hashed_sms_number_id'),
+                'Webhook events are required.',
+            ],
+            'missing sms number id' => [
+                new SmsWebhookParams('https://link.com/webhook', 'webhook name', SmsWebhookParams::ALL_ACTIVITIES, ''),
+                'SMS number id is required.',
+            ],
+        ];
     }
 
-    public function test_events_are_required_when_creating_sms_webhooks()
+    public function test_create_rejects_invalid_events(): void
     {
-        $this->expectExceptionMessage('Webhook events are required.');
-
-        $this->smsWebhook->create(
-            new SmsWebhookParams('https://link.com/webhook', 'webhook name', [], 'hashed_sms_number_id')
-        );
-    }
-
-    public function test_events_are_validated_when_creating_sms_webhooks()
-    {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('One or multiple invalid events.');
 
         $this->smsWebhook->create(
@@ -131,89 +171,57 @@ class SmsWebhookTest extends TestCase
         );
     }
 
-    public function test_domain_id_is_required_when_creating_sms_webhooks()
+    public function test_create_sms_webhooks(): void
     {
-        $this->expectExceptionMessage('SMS number id is required.');
-
-        $this->smsWebhook->create(
-            new SmsWebhookParams('https://link.com/webhook', 'webhook name', SmsWebhookParams::ALL_ACTIVITIES, '')
-        );
-    }
-
-    public function test_create_sms_webhooks()
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->create(
             new SmsWebhookParams('https://link.com/webhook', 'webhook name', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id')
         );
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('POST', '/v1/sms-webhooks');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame('https://link.com/webhook', Arr::get($request_body, 'url'));
-        self::assertSame('webhook name', Arr::get($request_body, 'name'));
-        self::assertSame(SmsWebhookParams::ALL_ACTIVITIES, Arr::get($request_body, 'events'));
-        self::assertSame('hashed_sms_number_id', Arr::get($request_body, 'sms_number_id'));
-        self::assertNull(Arr::get($request_body, 'enabled'));
+        $this->assertBodyContains([
+            'url' => 'https://link.com/webhook',
+            'name' => 'webhook name',
+            'sms_number_id' => 'hashed_sms_number_id',
+        ], $body);
+        self::assertSame(SmsWebhookParams::ALL_ACTIVITIES, Arr::get($body, 'events'));
+        $this->assertBodyExcludes(['enabled'], $body);
     }
 
-    public function test_create_disabled_sms_webhooks()
+    public function test_create_disabled_sms_webhooks(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->create(
             new SmsWebhookParams('https://link.com/webhook', 'webhook name', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id', false)
         );
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('POST', '/v1/sms-webhooks');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame('https://link.com/webhook', Arr::get($request_body, 'url'));
-        self::assertSame('webhook name', Arr::get($request_body, 'name'));
-        self::assertSame(SmsWebhookParams::ALL_ACTIVITIES, Arr::get($request_body, 'events'));
-        self::assertSame('hashed_sms_number_id', Arr::get($request_body, 'sms_number_id'));
-        self::assertEquals(false, Arr::get($request_body, 'enabled'));
+        self::assertFalse(Arr::get($body, 'enabled'));
     }
 
-    public function test_create_enabled_sms_webhooks()
+    public function test_create_enabled_sms_webhooks(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->create(
             new SmsWebhookParams('https://link.com/webhook', 'webhook name', SmsWebhookParams::ALL_ACTIVITIES, 'hashed_sms_number_id', true)
         );
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('POST', '/v1/sms-webhooks');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame('https://link.com/webhook', Arr::get($request_body, 'url'));
-        self::assertSame('webhook name', Arr::get($request_body, 'name'));
-        self::assertSame(SmsWebhookParams::ALL_ACTIVITIES, Arr::get($request_body, 'events'));
-        self::assertSame('hashed_sms_number_id', Arr::get($request_body, 'sms_number_id'));
-        self::assertEquals(true, Arr::get($request_body, 'enabled'));
+        self::assertTrue(Arr::get($body, 'enabled'));
     }
 
     public function test_update_sms_webhook_requires_id()
     {
+        $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('SMS webhook id is required.');
 
         $this->smsWebhook->update(
@@ -226,69 +234,69 @@ class SmsWebhookTest extends TestCase
         );
     }
 
-    public function test_update_sms_webhooks()
+    public function test_update_sms_webhooks(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsWebhook->update(
             'random_id',
             new SmsWebhookParams('https://link.com/webhook', 'Webhook name', [SmsWebhookParams::SMS_FAILED, SmsWebhookParams::SMS_SENT])
         );
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('PUT', '/v1/sms-webhooks/random_id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertSame('https://link.com/webhook', Arr::get($request_body, 'url'));
-        self::assertSame('Webhook name', Arr::get($request_body, 'name'));
-        self::assertSame([SmsWebhookParams::SMS_FAILED, SmsWebhookParams::SMS_SENT], Arr::get($request_body, 'events'));
-        self::assertNull(Arr::get($request_body, 'enabled'));
+        $this->assertBodyContains([
+            'url' => 'https://link.com/webhook',
+            'name' => 'Webhook name',
+        ], $body);
+        self::assertSame([SmsWebhookParams::SMS_FAILED, SmsWebhookParams::SMS_SENT], Arr::get($body, 'events'));
+        $this->assertBodyExcludes(['enabled'], $body);
     }
 
-    public function test_enable_sms_webhooks()
+    public function test_update_sms_webhooks_excludes_null_optional_fields(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
+
+        $this->smsWebhook->update(
+            'random_id',
+            new SmsWebhookParams()
+        );
+
+        $body = $this->assertRequest('PUT', '/v1/sms-webhooks/random_id');
+
+        $this->assertBodyExcludes(['url', 'name', 'events', 'enabled', 'sms_number_id'], $body);
+    }
+
+    public function test_enable_sms_webhooks(): void
+    {
+        $this->addSuccessResponse();
 
         $smsWebhookParams = new SmsWebhookParams();
         $smsWebhookParams->setEnabled(true);
 
         $response = $this->smsWebhook->update('random_id', $smsWebhookParams);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('PUT', '/v1/sms-webhooks/random_id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertEquals(true, Arr::get($request_body, 'enabled'));
+        self::assertTrue(Arr::get($body, 'enabled'));
+        $this->assertBodyExcludes(['url', 'name', 'events', 'sms_number_id'], $body);
     }
 
-    public function test_disable_sms_webhooks()
+    public function test_disable_sms_webhooks(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $smsWebhookParams = new SmsWebhookParams();
         $smsWebhookParams->setEnabled(false);
 
         $response = $this->smsWebhook->update('random_id', $smsWebhookParams);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $body = $this->assertRequest('PUT', '/v1/sms-webhooks/random_id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/sms-webhooks/random_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-
-        self::assertEquals(false, Arr::get($request_body, 'enabled'));
+        self::assertFalse(Arr::get($body, 'enabled'));
+        $this->assertBodyExcludes(['url', 'name', 'events', 'sms_number_id'], $body);
     }
 }

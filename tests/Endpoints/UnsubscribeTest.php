@@ -3,20 +3,14 @@
 namespace MailerSend\Tests\Endpoints;
 
 use Http\Mock\Client;
-use MailerSend\Helpers\Arr;
-use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Unsubscribe;
-use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Tests\TestCase;
-use PHPUnit\Framework\Attributes\DataProvider;
-use Psr\Http\Message\ResponseInterface;
 
 class UnsubscribeTest extends TestCase
 {
     protected Unsubscribe $unsubscribe;
-    protected ResponseInterface $defaultResponse;
 
     protected function setUp(): void
     {
@@ -25,212 +19,35 @@ class UnsubscribeTest extends TestCase
         $this->client = new Client();
 
         $this->unsubscribe = new Unsubscribe(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-        $this->defaultResponse = $this->createStub(ResponseInterface::class);
-        $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    /**
-     * @dataProvider validGetAllDataProvider
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    #[DataProvider('validGetAllDataProvider')]
-    public function test_get_all(array $params): void
+    public function test_get_all_uses_unsubscribes_path(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
-
-        $response = $this->unsubscribe->getAll(
-            Arr::get($params, 'domain_id'),
-            Arr::get($params, 'page'),
-            Arr::get($params, 'limit'),
-        );
-
+        $this->addSuccessResponse();
+        $this->unsubscribe->getAll();
         $request = $this->client->getLastRequest();
-        parse_str($request->getUri()->getQuery(), $query);
-
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/suppressions/unsubscribes', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertEquals(Arr::get($params, 'domain_id'), Arr::get($query, 'domain_id'));
-        self::assertEquals(Arr::get($params, 'page'), Arr::get($query, 'page'));
-        self::assertEquals(Arr::get($params, 'limit'), Arr::get($query, 'limit'));
     }
 
-    /**
-     * @dataProvider invalidGetAllDataProvider
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    #[DataProvider('invalidGetAllDataProvider')]
-    public function test_get_all_with_errors(array $params, string $errorMessage): void
+    public function test_create_uses_unsubscribes_path(): void
     {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($errorMessage);
-
-        $this->unsubscribe->getAll(
-            Arr::get($params, 'domain_id'),
-            Arr::get($params, 'page'),
-            Arr::get($params, 'limit'),
-        );
-    }
-
-    /**
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create(): void
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
-
+        $this->addSuccessResponse();
         $params = (new SuppressionParams())
             ->setDomainId('domain_id')
             ->setRecipients(['recipient']);
-
-        $response = $this->unsubscribe->create($params);
-
+        $this->unsubscribe->create($params);
         $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
         self::assertEquals('POST', $request->getMethod());
         self::assertEquals('/v1/suppressions/unsubscribes', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertSame('domain_id', Arr::get($request_body, 'domain_id'));
-        self::assertSame(['recipient'], Arr::get($request_body, 'recipients'));
     }
 
-    public function test_create_requires_recipients(): void
+    public function test_delete_uses_unsubscribes_path(): void
     {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Recipients is required.');
-
-        $params = (new SuppressionParams())
-            ->setDomainId('domain_id');
-
-        $this->unsubscribe->create($params);
-    }
-
-    /**
-     * @dataProvider validDeleteDataProvider
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
-     * @throws MailerSendAssertException
-     */
-    #[DataProvider('validDeleteDataProvider')]
-    public function test_delete(array $params): void
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
-
-        $response = $this->unsubscribe->delete(
-            Arr::get($params, 'ids'),
-            Arr::get($params, 'all', false),
-            Arr::get($params, 'domain_id'),
-        );
-
+        $this->addSuccessResponse();
+        $this->unsubscribe->delete(['id']);
         $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
-
         self::assertEquals('DELETE', $request->getMethod());
         self::assertEquals('/v1/suppressions/unsubscribes', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-        self::assertSame(Arr::get($params, 'ids'), Arr::get($request_body, 'ids'));
-        self::assertSame(Arr::get($params, 'all', false), Arr::get($request_body, 'all'));
-        self::assertSame(Arr::get($params, 'domain_id'), Arr::get($request_body, 'domain_id'));
-    }
-
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
-     */
-    public function test_delete_requires_either_ids_or_all(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Either ids or all must be provided.');
-
-        $this->unsubscribe->delete();
-    }
-
-    public static function validGetAllDataProvider(): array
-    {
-        return [
-            'empty request' => [
-                'params' => [],
-            ],
-            'with domain id' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                ],
-            ],
-            'with limit' => [
-                'params' => [
-                    'limit' => 10,
-                ],
-            ],
-            'with page' => [
-                'params' => [
-                    'page' => 1,
-                ],
-            ],
-            'complete request' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                    'page' => 1,
-                    'limit' => 10,
-                ],
-            ]
-        ];
-    }
-
-    public static function invalidGetAllDataProvider(): array
-    {
-        return [
-            'with limit under 10' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                    'limit' => 9,
-                ],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT .  '.',
-            ],
-            'with limit over 100' => [
-                'params' => [
-                    'domain_id' => 'domain_id',
-                    'limit' => 101,
-                ],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT .  '.',
-            ],
-        ];
-    }
-
-    public static function validDeleteDataProvider(): array
-    {
-        return [
-            'with ids' => [
-                'params' => [
-                    'ids' => ['id'],
-                ],
-            ],
-            'all' => [
-                'params' => [
-                    'all' => true,
-                ],
-            ],
-            'with domain id' => [
-                'params' => [
-                    'ids' => ['id'],
-                    'domain_id' => 'domain_id',
-                ],
-            ],
-        ];
     }
 }

@@ -10,7 +10,6 @@ use MailerSend\Helpers\Builder\SmsActivityParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
-use MailerSend\Helpers\Arr;
 
 class SmsActivityTest extends TestCase
 {
@@ -29,114 +28,311 @@ class SmsActivityTest extends TestCase
         $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    /**
-     * @dataProvider validSmsActivityParamsProvider
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    #[DataProvider('validSmsActivityParamsProvider')]
-    public function test_get_all(SmsActivityParams $smsActivityParams): void
+    public function test_getAll_uses_get_method_and_correct_uri(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $this->addSuccessResponse();
 
-        $this->client->addResponse($response);
+        $this->smsActivity->getAll(new SmsActivityParams());
 
-        $response = $this->smsActivity->getAll($smsActivityParams);
+        $this->assertRequest('GET', '/v1/sms-activity');
+    }
+
+    public function test_getAll_with_sms_number_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())->setSmsNumberId('hashed_sms_number_id');
+        $this->smsActivity->getAll($params);
 
         $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
 
+        self::assertEquals('hashed_sms_number_id', $query['sms_number_id'] ?? null);
+    }
+
+    public function test_getAll_without_sms_number_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->getAll(new SmsActivityParams());
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('sms_number_id', $query);
+    }
+
+    public function test_getAll_with_page(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())->setPage(3);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(3, $query['page'] ?? null);
+    }
+
+    public function test_getAll_without_page(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->getAll(new SmsActivityParams());
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('page', $query);
+    }
+
+    public function test_getAll_with_limit(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())->setLimit(15);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(15, $query['limit'] ?? null);
+    }
+
+    public function test_getAll_without_limit(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->getAll(new SmsActivityParams());
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('limit', $query);
+    }
+
+    public function test_getAll_with_date_from_and_date_to(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())
+            ->setDateFrom(1623073576)
+            ->setDateTo(1623074976);
+
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(1623073576, $query['date_from'] ?? null);
+        self::assertEquals(1623074976, $query['date_to'] ?? null);
+    }
+
+    public function test_getAll_with_only_date_from_skips_date_range_validation(): void
+    {
+        $this->addSuccessResponse();
+
+        // Only date_from set — the greaterThan validation must NOT fire.
+        $params = (new SmsActivityParams())->setDateFrom(1623073576);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(1623073576, $query['date_from'] ?? null);
+        self::assertArrayNotHasKey('date_to', $query);
+    }
+
+    public function test_getAll_with_only_date_to_skips_date_range_validation(): void
+    {
+        $this->addSuccessResponse();
+
+        // Only date_to set — the greaterThan validation must NOT fire.
+        $params = (new SmsActivityParams())->setDateTo(1623074976);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(1623074976, $query['date_to'] ?? null);
+        self::assertArrayNotHasKey('date_from', $query);
+    }
+
+    public function test_getAll_without_dates(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->getAll(new SmsActivityParams());
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('date_from', $query);
+        self::assertArrayNotHasKey('date_to', $query);
+    }
+
+    public function test_getAll_with_status(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())->setStatus(['queued', 'sent']);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(['queued', 'sent'], $query['status'] ?? null);
+    }
+
+    public function test_getAll_with_processed_status(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())->setStatus(['processed']);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals(['processed'], $query['status'] ?? null);
+    }
+
+    public function test_getAll_with_all_valid_statuses(): void
+    {
+        $this->addSuccessResponse();
+
+        $allStatuses = ['processed', 'queued', 'sent', 'delivered', 'failed'];
+        $params = (new SmsActivityParams())->setStatus($allStatuses);
+        $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals($allStatuses, $query['status'] ?? null);
+    }
+
+    public function test_getAll_without_status(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->getAll(new SmsActivityParams());
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('status', $query);
+    }
+
+    public function test_getAll_with_all_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setPage(3)
+            ->setLimit(15)
+            ->setDateFrom(1623073576)
+            ->setDateTo(1623074976)
+            ->setStatus(['queued', 'sent']);
+
+        $response = $this->smsActivity->getAll($params);
+
+        $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
 
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/sms-activity', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
+        self::assertEquals('hashed_sms_number_id', $query['sms_number_id'] ?? null);
+        self::assertEquals(3, $query['page'] ?? null);
+        self::assertEquals(15, $query['limit'] ?? null);
+        self::assertEquals(1623073576, $query['date_from'] ?? null);
+        self::assertEquals(1623074976, $query['date_to'] ?? null);
+        self::assertEquals(['queued', 'sent'], $query['status'] ?? null);
+    }
 
-        self::assertEquals($smsActivityParams->getSmsNumberId(), Arr::get($query, 'sms_number_id'));
-        self::assertEquals($smsActivityParams->getPage(), Arr::get($query, 'page'));
-        self::assertEquals($smsActivityParams->getLimit(), Arr::get($query, 'limit'));
-        self::assertEquals($smsActivityParams->getDateFrom(), Arr::get($query, 'date_from'));
-        self::assertEquals($smsActivityParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertEquals($smsActivityParams->getStatus(), Arr::get($query, 'status', []));
+    public function test_find_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsActivity->find('sms-message-id');
+
+        $this->assertRequest('GET', '/v1/sms-messages/sms-message-id');
+    }
+
+    public function test_find_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->smsActivity->find('sms-message-id');
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_find_requires_sms_message_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS message id is required.');
+
+        $this->smsActivity->find('');
     }
 
     /**
      * @dataProvider invalidSmsActivityParamsProvider
+     * @param SmsActivityParams $smsActivityParams
+     * @param string $expectedMessage
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
     #[DataProvider('invalidSmsActivityParamsProvider')]
-    public function test_get_all_with_errors(SmsActivityParams $smsActivityParams): void
+    public function test_getAll_rejects_invalid_params(SmsActivityParams $smsActivityParams, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
-        $httpLayer = $this->createStub(HttpLayer::class);
-        $httpLayer->method('get')
-            ->withAnyParameters()
-            ->willReturn([]);
-
-        (new SmsActivity($httpLayer, self::OPTIONS))->getAll($smsActivityParams);
-    }
-
-    public static function validSmsActivityParamsProvider(): array
-    {
-        return [
-            'no params' => [
-                (new SmsActivityParams()),
-            ],
-            'with sms number id' => [
-                (new SmsActivityParams())
-                    ->setSmsNumberId('hashed_sms_number_id'),
-            ],
-            'with page' => [
-                (new SmsActivityParams())
-                    ->setPage(3),
-            ],
-            'with limit' => [
-                (new SmsActivityParams())
-                    ->setLimit(15),
-            ],
-            'with dates' => [
-                (new SmsActivityParams())
-                    ->setDateFrom(1623073576)
-                    ->setDateTo(1623074976),
-            ],
-            'with events' => [
-                (new SmsActivityParams())
-                    ->setStatus(['queued', 'sent']),
-            ],
-            'with all' => [
-                (new SmsActivityParams())
-                    ->setSmsNumberId('hashed_sms_number_id')
-                    ->setPage(3)
-                    ->setLimit(15)
-                    ->setDateFrom(1623073576)
-                    ->setDateTo(1623074976)
-                    ->setStatus(['queued', 'sent']),
-            ]
-        ];
+        $this->smsActivity->getAll($smsActivityParams);
     }
 
     public static function invalidSmsActivityParamsProvider(): array
     {
         return [
-            'limit under 10' => [
+            'limit below minimum' => [
                 (new SmsActivityParams())
                     ->setLimit(9),
+                'Limit is supposed to be between10 and 100.',
             ],
-            'limit over 100' => [
+            'limit above maximum' => [
                 (new SmsActivityParams())
                     ->setLimit(101),
+                'Limit is supposed to be between10 and 100.',
             ],
             'date_from greater than date_to' => [
                 (new SmsActivityParams())
                     ->setDateFrom(1623074976)
                     ->setDateTo(1623074975),
+                'Provided "1623074975" is not greater than "1623074976".',
             ],
-            'status is not a possible type' => [
+            'date_from equals date_to' => [
+                (new SmsActivityParams())
+                    ->setDateFrom(1623074976)
+                    ->setDateTo(1623074976),
+                'Provided "1623074976" is not greater than "1623074976".',
+            ],
+            'status contains single invalid value' => [
                 (new SmsActivityParams())
                     ->setStatus(['invalid_type', 'queued']),
+                'The following statuses are invalid: invalid_type',
+            ],
+            'status contains multiple invalid values' => [
+                (new SmsActivityParams())
+                    ->setStatus(['bad_one', 'bad_two']),
+                'The following statuses are invalid: bad_one, bad_two',
+            ],
+            'empty sms number id' => [
+                (new SmsActivityParams())
+                    ->setSmsNumberId(''),
+                'Sms number id is wrong.',
             ],
         ];
     }

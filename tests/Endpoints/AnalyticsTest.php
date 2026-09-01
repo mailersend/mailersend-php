@@ -2,22 +2,19 @@
 
 namespace MailerSend\Tests\Endpoints;
 
-use MailerSend\Helpers\Arr;
-use MailerSend\Common\Constants;
-use MailerSend\Exceptions\MailerSendAssertException;
-use MailerSend\Helpers\Builder\OpensAnalyticsParams;
-use MailerSend\Tests\TestCase;
 use Http\Mock\Client;
+use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Analytics;
+use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\ActivityAnalyticsParams;
-use Psr\Http\Message\ResponseInterface;
+use MailerSend\Helpers\Builder\OpensAnalyticsParams;
+use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class AnalyticsTest extends TestCase
 {
     protected Analytics $analytics;
-    protected ResponseInterface $defaultResponse;
 
     public function setUp(): void
     {
@@ -26,212 +23,369 @@ class AnalyticsTest extends TestCase
         $this->client = new Client();
 
         $this->analytics = new Analytics(new HttpLayer(self::OPTIONS, $this->client), self::OPTIONS);
-
-        $this->defaultResponse = $this->createStub(ResponseInterface::class);
-        $this->defaultResponse->method('getStatusCode')->willReturn(200);
     }
 
-    /**
-     * @dataProvider validActivityAnalyticsProvider
-     */
-    #[DataProvider('validActivityAnalyticsProvider')]
-    public function test_get_activity_by_date(ActivityAnalyticsParams $activityAnalyticsParams): void
+    public function test_activity_by_date_uses_correct_method_and_path(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $this->addSuccessResponse();
 
-        $this->client->addResponse($response);
-
-        $response = $this->analytics->activityDataByDate($activityAnalyticsParams);
+        $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))->setEvent(['sent'])
+        );
 
         $request = $this->client->getLastRequest();
-
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/analytics/date', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
+    }
 
+    public function test_activity_by_date_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))->setEvent(['sent'])
+        );
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_activity_by_date_sends_required_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))->setEvent(['queued', 'sent'])
+        );
+
+        $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
 
-        self::assertEquals($activityAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
-        self::assertEquals($activityAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
-        self::assertEquals($activityAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertEquals($activityAnalyticsParams->getGroupBy(), Arr::get($query, 'group_by'));
-        self::assertCount(count($activityAnalyticsParams->getTags()), Arr::get($query, 'tags') ?? []);
-        self::assertCount(count($activityAnalyticsParams->getEvent()), Arr::get($query, 'event') ?? []);
-        foreach ($activityAnalyticsParams->getTags() as $key => $tag) {
-            self::assertEquals($tag, Arr::get($query, "tags.$key"));
-        }
-        foreach ($activityAnalyticsParams->getEvent() as $key => $event) {
-            self::assertEquals($event, Arr::get($query, "event.$key"));
-        }
+        $this->assertQueryParams(['date_from' => '100', 'date_to' => '101'], $query);
+        $this->assertQueryParams(['event' => ['queued', 'sent']], $query);
+    }
+
+    public function test_activity_by_date_sends_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))
+                ->setDomainId('domain_id')
+                ->setEvent(['sent'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $query);
+    }
+
+    public function test_activity_by_date_sends_group_by(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))
+                ->setGroupBy(Constants::GROUP_BY_DAYS)
+                ->setEvent(['sent'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['group_by' => 'days'], $query);
+    }
+
+    public function test_activity_by_date_sends_tags(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->activityDataByDate(
+            (new ActivityAnalyticsParams(100, 101))
+                ->setTags(['tag1', 'tag2'])
+                ->setEvent(['sent'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['tags' => ['tag1', 'tag2']], $query);
     }
 
     /**
-     * @dataProvider invalidActivityAnalyticsProvider
+     * @dataProvider invalidActivityByDateParamsProvider
+     * @param ActivityAnalyticsParams $params
+     * @param string $exceptionMessage
      */
-    #[DataProvider('invalidActivityAnalyticsProvider')]
-    public function test_get_activities_by_date_with_errors(ActivityAnalyticsParams $activityAnalyticsParams): void
+    #[DataProvider('invalidActivityByDateParamsProvider')]
+    public function test_activity_by_date_rejects_invalid_params(ActivityAnalyticsParams $params, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
         $httpLayer = $this->createStub(HttpLayer::class);
-        $httpLayer->method('get')
-            ->withAnyParameters()
-            ->willReturn([]);
+        $httpLayer->method('get')->withAnyParameters()->willReturn([]);
 
-        (new Analytics($httpLayer, self::OPTIONS))->activityDataByDate($activityAnalyticsParams);
+        (new Analytics($httpLayer, self::OPTIONS))->activityDataByDate($params);
     }
 
-    public static function validActivityAnalyticsProvider(): array
+    public function test_opens_by_country_uses_correct_method_and_path(): void
     {
-        return [
-            'basic request' => [
-                (new ActivityAnalyticsParams(100, 101))
-                    ->setEvent(['queued', 'sent']),
-            ],
-            'complete request' => [
-                (new ActivityAnalyticsParams(100, 101))
-                    ->setDomainId('domain_id')
-                    ->setGroupBy(Constants::GROUP_BY_DAYS)
-                    ->setTags(['tag'])
-                    ->setEvent(['queued', 'sent']),
-            ],
-            'with domain id' => [
-                (new ActivityAnalyticsParams(100, 101))
-                    ->setDomainId('domain_id')
-                    ->setEvent(['queued', 'sent']),
-            ],
-            'with group by' => [
-                (new ActivityAnalyticsParams(100, 101))
-                    ->setGroupBy('days')
-                    ->setEvent(['queued', 'sent']),
-            ],
-            'with tag' => [
-                (new ActivityAnalyticsParams(100, 101))
-                    ->setTags(['tag'])
-                    ->setEvent(['queued', 'sent']),
-            ],
-        ];
-    }
+        $this->addSuccessResponse();
 
-    public static function invalidActivityAnalyticsProvider(): array
-    {
-        return [
-            'event array is empty' => [
-                (new ActivityAnalyticsParams(100, 101)),
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider validOpensAnalyticsProvider
-     */
-    #[DataProvider('validOpensAnalyticsProvider')]
-    public function test_opens_by_country(OpensAnalyticsParams $opensAnalyticsParams)
-    {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
-
-        $response = $this->analytics->opensByCountry($opensAnalyticsParams);
+        $this->analytics->opensByCountry(new OpensAnalyticsParams(100, 101));
 
         $request = $this->client->getLastRequest();
-
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/analytics/country', $request->getUri()->getPath());
+    }
+
+    public function test_opens_by_country_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->analytics->opensByCountry(new OpensAnalyticsParams(100, 101));
+
         self::assertEquals(200, $response['status_code']);
+    }
 
+    public function test_opens_by_country_sends_required_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByCountry(new OpensAnalyticsParams(100, 101));
+
+        $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['date_from' => '100', 'date_to' => '101'], $query);
+    }
 
-        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
-        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
-        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertCount(count($opensAnalyticsParams->getTags()), Arr::get($query, 'tags') ?? []);
-        foreach ($opensAnalyticsParams->getTags() as $key => $tag) {
-            self::assertEquals($tag, Arr::get($query, "tags.$key"));
-        }
+    public function test_opens_by_country_sends_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByCountry(
+            (new OpensAnalyticsParams(100, 101))->setDomainId('domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $query);
+    }
+
+    public function test_opens_by_country_sends_tags(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByCountry(
+            (new OpensAnalyticsParams(100, 101))->setTags(['tag1', 'tag2'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['tags' => ['tag1', 'tag2']], $query);
     }
 
     /**
-     * @dataProvider validOpensAnalyticsProvider
+     * @dataProvider invalidOpensDateParamsProvider
+     * @param OpensAnalyticsParams $params
+     * @param string $exceptionMessage
      */
-    #[DataProvider('validOpensAnalyticsProvider')]
-    public function test_opens_by_user_agent(OpensAnalyticsParams $opensAnalyticsParams)
+    #[DataProvider('invalidOpensDateParamsProvider')]
+    public function test_opens_by_country_rejects_invalid_dates(OpensAnalyticsParams $params, string $exceptionMessage): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $this->client->addResponse($response);
+        $httpLayer = $this->createStub(HttpLayer::class);
+        $httpLayer->method('get')->withAnyParameters()->willReturn([]);
 
-        $response = $this->analytics->opensByUserAgentName($opensAnalyticsParams);
+        (new Analytics($httpLayer, self::OPTIONS))->opensByCountry($params);
+    }
+
+    public function test_opens_by_user_agent_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByUserAgentName(new OpensAnalyticsParams(100, 101));
 
         $request = $this->client->getLastRequest();
-
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/analytics/ua-name', $request->getUri()->getPath());
+    }
+
+    public function test_opens_by_user_agent_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->analytics->opensByUserAgentName(new OpensAnalyticsParams(100, 101));
+
         self::assertEquals(200, $response['status_code']);
+    }
 
+    public function test_opens_by_user_agent_sends_required_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByUserAgentName(new OpensAnalyticsParams(100, 101));
+
+        $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['date_from' => '100', 'date_to' => '101'], $query);
+    }
 
-        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
-        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
-        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertCount(count($opensAnalyticsParams->getTags()), Arr::get($query, 'tags') ?? []);
-        foreach ($opensAnalyticsParams->getTags() as $key => $tag) {
-            self::assertEquals($tag, Arr::get($query, "tags.$key"));
-        }
+    public function test_opens_by_user_agent_sends_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByUserAgentName(
+            (new OpensAnalyticsParams(100, 101))->setDomainId('domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $query);
+    }
+
+    public function test_opens_by_user_agent_sends_tags(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByUserAgentName(
+            (new OpensAnalyticsParams(100, 101))->setTags(['tag1'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['tags' => ['tag1']], $query);
     }
 
     /**
-     * @dataProvider validOpensAnalyticsProvider
+     * @dataProvider invalidOpensDateParamsProvider
+     * @param OpensAnalyticsParams $params
+     * @param string $exceptionMessage
      */
-    #[DataProvider('validOpensAnalyticsProvider')]
-    public function test_opens_by_reading_environment(OpensAnalyticsParams $opensAnalyticsParams)
+    #[DataProvider('invalidOpensDateParamsProvider')]
+    public function test_opens_by_user_agent_rejects_invalid_dates(OpensAnalyticsParams $params, string $exceptionMessage): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $this->client->addResponse($response);
+        $httpLayer = $this->createStub(HttpLayer::class);
+        $httpLayer->method('get')->withAnyParameters()->willReturn([]);
 
-        $response = $this->analytics->opensByReadingEnvironment($opensAnalyticsParams);
+        (new Analytics($httpLayer, self::OPTIONS))->opensByUserAgentName($params);
+    }
+
+    public function test_opens_by_reading_environment_uses_correct_method_and_path(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByReadingEnvironment(new OpensAnalyticsParams(100, 101));
 
         $request = $this->client->getLastRequest();
-
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/analytics/ua-type', $request->getUri()->getPath());
-        self::assertEquals(200, $response['status_code']);
-
-        parse_str($request->getUri()->getQuery(), $query);
-
-        self::assertEquals($opensAnalyticsParams->getDomainId(), Arr::get($query, 'domain_id'));
-        self::assertEquals($opensAnalyticsParams->getDateFrom(), Arr::get($query, 'date_from'));
-        self::assertEquals($opensAnalyticsParams->getDateTo(), Arr::get($query, 'date_to'));
-        self::assertCount(count($opensAnalyticsParams->getTags()), Arr::get($query, 'tags') ?? []);
-        foreach ($opensAnalyticsParams->getTags() as $key => $tag) {
-            self::assertEquals($tag, Arr::get($query, "tags.$key"));
-        }
     }
 
-    public static function validOpensAnalyticsProvider(): array
+    public function test_opens_by_reading_environment_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+
+        $response = $this->analytics->opensByReadingEnvironment(new OpensAnalyticsParams(100, 101));
+
+        self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_opens_by_reading_environment_sends_required_params(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByReadingEnvironment(new OpensAnalyticsParams(100, 101));
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['date_from' => '100', 'date_to' => '101'], $query);
+    }
+
+    public function test_opens_by_reading_environment_sends_domain_id(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByReadingEnvironment(
+            (new OpensAnalyticsParams(100, 101))->setDomainId('domain_id')
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $query);
+    }
+
+    public function test_opens_by_reading_environment_sends_tags(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->opensByReadingEnvironment(
+            (new OpensAnalyticsParams(100, 101))->setTags(['tag1'])
+        );
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['tags' => ['tag1']], $query);
+    }
+
+    /**
+     * @dataProvider invalidOpensDateParamsProvider
+     * @param OpensAnalyticsParams $params
+     * @param string $exceptionMessage
+     */
+    #[DataProvider('invalidOpensDateParamsProvider')]
+    public function test_opens_by_reading_environment_rejects_invalid_dates(OpensAnalyticsParams $params, string $exceptionMessage): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $httpLayer = $this->createStub(HttpLayer::class);
+        $httpLayer->method('get')->withAnyParameters()->willReturn([]);
+
+        (new Analytics($httpLayer, self::OPTIONS))->opensByReadingEnvironment($params);
+    }
+
+    public static function invalidActivityByDateParamsProvider(): array
     {
         return [
-            'basic request' => [
-                new OpensAnalyticsParams(100, 101)
+            'missing event' => [
+                new ActivityAnalyticsParams(100, 101),
+                'The event[] is a required parameter.',
             ],
-            'complete request' => [
-                (new OpensAnalyticsParams(100, 101))
-                    ->setDomainId('domain_id')
-                    ->setTags(['tag']),
+            'date_to less than date_from' => [
+                (new ActivityAnalyticsParams(101, 100))->setEvent(['sent']),
+                'The parameter date_to must be greater than date_from.',
             ],
-            'with domain id' => [
-                (new OpensAnalyticsParams(100, 101))
-                    ->setDomainId('domain_id'),
+            'date_to equal to date_from' => [
+                (new ActivityAnalyticsParams(100, 100))->setEvent(['sent']),
+                'The parameter date_to must be greater than date_from.',
             ],
-            'with tag' => [
-                (new OpensAnalyticsParams(100, 101))
-                    ->setTags(['tag']),
-            ]
+            'invalid event type' => [
+                (new ActivityAnalyticsParams(100, 101))->setEvent(['invalid_type']),
+                'The following types are invalid: invalid_type',
+            ],
+            'invalid group_by' => [
+                (new ActivityAnalyticsParams(100, 101))->setEvent(['sent'])->setGroupBy('invalid_group'),
+                'Value "invalid_group" is not an element of the valid values',
+            ],
         ];
     }
+
+    public static function invalidOpensDateParamsProvider(): array
+    {
+        return [
+            'date_to less than date_from' => [
+                new OpensAnalyticsParams(101, 100),
+                'The parameter date_to must be greater than date_from.',
+            ],
+            'date_to equal to date_from' => [
+                new OpensAnalyticsParams(100, 100),
+                'The parameter date_to must be greater than date_from.',
+            ],
+        ];
+    }
+
 }

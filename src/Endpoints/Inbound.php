@@ -69,9 +69,14 @@ class Inbound extends AbstractEndpoint
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
     public function update(string $inboundId, InboundBuilder $params): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($inboundId, 1, 'Inbound id is required.')
+        );
+
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$inboundId"),
             $params->toArray(),

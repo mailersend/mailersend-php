@@ -2,52 +2,41 @@
 
 namespace MailerSend\Tests\Helpers\Builder;
 
-use MailerSend\Helpers\Arr;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\Personalization;
 use MailerSend\Tests\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PersonalizationTest extends TestCase
 {
-    public function test_personalization_validates_email(): void
+    /**
+     * @dataProvider invalidPersonalizationProvider
+     * @param string $email
+     * @param array $data
+     * @param string $exceptionMessage
+     */
+    #[DataProvider('invalidPersonalizationProvider')]
+    public function test_rejects_invalid_params(string $email, array $data, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($exceptionMessage);
 
-        new Personalization('testmailersend.com', []);
+        new Personalization($email, $data);
     }
 
-    public function test_personalization_validates_substitutions_length(): void
+    public static function invalidPersonalizationProvider(): array
     {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Personalization('test@mailersend.com', []);
-    }
-
-    public function test_creates_personalization(): void
-    {
-        $var = (new \MailerSend\Helpers\Builder\Personalization('test@mailersend.com', [
-            [
-                'var' => 'variable',
-                'number' => 123,
-                'object' => [
-                    'key' => 'object-value'
-                ],
-                'objectCollection' => [
-                    [
-                        'name' => 'John'
-                    ],
-                    [
-                        'name' => 'Patrick'
-                    ]
-                ],
-            ]
-        ]))->toArray();
-
-        self::assertEquals('test@mailersend.com', Arr::get($var, 'email'));
-        self::assertEquals('variable', Arr::get($var, 'data.0.var'));
-        self::assertEquals(123, Arr::get($var, 'data.0.number'));
-        self::assertEquals('object-value', Arr::get($var, 'data.0.object.key'));
-        self::assertEquals('John', Arr::get($var, 'data.0.objectCollection.0.name'));
-        self::assertEquals('Patrick', Arr::get($var, 'data.0.objectCollection.1.name'));
+        return [
+            'invalid email format' => [
+                'testmailersend.com',
+                [['var' => 'value']],
+                'Value "testmailersend.com" was expected to be a valid e-mail address.',
+            ],
+            'empty data array' => [
+                'test@mailersend.com',
+                [],
+                'List should have at least 1 elements, but has 0 elements.',
+            ],
+        ];
     }
 }

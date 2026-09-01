@@ -15,6 +15,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.40.0] - 2026 08 10
+
+### Added
+
+- Added suppressed activity
+
+## [0.39.0] - 2026 07 09
+
+### Added
+
+- Add optional language field to email send
+
+## [0.37.0] - 2026 04 06
+
+### Added
+
+- Added DMARC monitoring endpoint
+- Added webhook events: `email_single.verified`, `email_list.verified`, `bulk_email.completed`, `recipient.on_hold_added`, `recipient.on_hold_removed`
+
 ## [0.36.0] - 2026 02 02
 
 ### Changed

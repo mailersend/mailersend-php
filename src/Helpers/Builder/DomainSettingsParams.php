@@ -10,7 +10,9 @@ class DomainSettingsParams
     protected ?bool $track_unsubscribe = null;
     protected ?bool $track_content = null;
     protected ?string $track_unsubscribe_html = null;
+    protected ?bool $track_unsubscribe_html_enabled = null;
     protected ?string $track_unsubscribe_plain = null;
+    protected ?bool $track_unsubscribe_plain_enabled = null;
     protected ?bool $custom_tracking_enabled = null;
     protected ?string $custom_tracking_subdomain = null;
     protected ?bool $precedence_bulk = null;
@@ -82,6 +84,17 @@ class DomainSettingsParams
         return $this;
     }
 
+    public function getTrackUnsubscribeHtmlEnabled(): ?bool
+    {
+        return $this->track_unsubscribe_html_enabled;
+    }
+
+    public function setTrackUnsubscribeHtmlEnabled(?bool $track_unsubscribe_html_enabled): DomainSettingsParams
+    {
+        $this->track_unsubscribe_html_enabled = $track_unsubscribe_html_enabled;
+        return $this;
+    }
+
     public function getTrackUnsubscribePlain(): ?string
     {
         return $this->track_unsubscribe_plain;
@@ -90,6 +103,17 @@ class DomainSettingsParams
     public function setTrackUnsubscribePlain(?string $track_unsubscribe_plain): DomainSettingsParams
     {
         $this->track_unsubscribe_plain = $track_unsubscribe_plain;
+        return $this;
+    }
+
+    public function getTrackUnsubscribePlainEnabled(): ?bool
+    {
+        return $this->track_unsubscribe_plain_enabled;
+    }
+
+    public function setTrackUnsubscribePlainEnabled(?bool $track_unsubscribe_plain_enabled): DomainSettingsParams
+    {
+        $this->track_unsubscribe_plain_enabled = $track_unsubscribe_plain_enabled;
         return $this;
     }
 
@@ -146,7 +170,9 @@ class DomainSettingsParams
              'track_unsubscribe' => $this->getTrackUnsubscribe(),
              'track_content' => $this->getTrackContent(),
              'track_unsubscribe_html' => $this->getTrackUnsubscribeHtml(),
+             'track_unsubscribe_html_enabled' => $this->getTrackUnsubscribeHtmlEnabled(),
              'track_unsubscribe_plain' => $this->getTrackUnsubscribePlain(),
+             'track_unsubscribe_plain_enabled' => $this->getTrackUnsubscribePlainEnabled(),
              'custom_tracking_enabled' => $this->getCustomTrackingEnabled(),
              'custom_tracking_subdomain' => $this->getCustomTrackingSubdomain(),
              'precedence_bulk' => $this->getPrecedenceBulk(),

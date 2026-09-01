@@ -18,7 +18,7 @@ class SmsInboundTest extends TestCase
     protected SmsInbound $smsInbound;
     protected ResponseInterface $defaultResponse;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,17 +32,17 @@ class SmsInboundTest extends TestCase
 
     /**
      * @dataProvider validSmsInboundListDataProvider
+     * @param array $params
+     * @param array $expected
+     * @param array $excluded
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('validSmsInboundListDataProvider')]
-    public function test_get_all(array $params, array $expected): void
+    public function test_get_all(array $params, array $expected, array $excluded): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsInbound->getAll(
             Arr::get($params, 'sms_number_id'),
@@ -52,36 +52,49 @@ class SmsInboundTest extends TestCase
         );
 
         $request = $this->client->getLastRequest();
-
         parse_str($request->getUri()->getQuery(), $query);
 
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals('/v1/sms-inbounds', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
-        self::assertEquals(Arr::get($expected, 'sms_number_id'), Arr::get($query, 'sms_number_id'));
-        self::assertEquals(Arr::get($expected, 'enabled'), Arr::get($query, 'enabled'));
-        self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
-        self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        $this->assertQueryParams($expected, $query);
+
+        foreach ($excluded as $key) {
+            self::assertArrayNotHasKey($key, $query);
+        }
+    }
+
+    public function test_get_all_excludes_optional_params_when_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smsInbound->getAll(null, null, null, null);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('sms_number_id', $query);
+        self::assertArrayNotHasKey('enabled', $query);
+        self::assertArrayNotHasKey('page', $query);
+        self::assertArrayNotHasKey('limit', $query);
     }
 
     /**
      * @dataProvider invalidSmsInboundListDataProvider
+     * @param int $limit
+     * @param string $message
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('invalidSmsInboundListDataProvider')]
-    public function test_get_all_with_errors(array $params): void
+    public function test_get_all_rejects_invalid_limit(int $limit, string $message): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($message);
 
-        $this->smsInbound->getAll(
-            Arr::get($params, 'domain_id'),
-            Arr::get($params, 'enabled'),
-            Arr::get($params, 'page'),
-            Arr::get($params, 'limit'),
-        );
+        $this->smsInbound->getAll(null, null, null, $limit);
     }
 
     /**
@@ -92,6 +105,7 @@ class SmsInboundTest extends TestCase
     public function test_find_requires_sms_inbound_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS inbound id is required.');
 
         $this->smsInbound->find('');
     }
@@ -103,45 +117,39 @@ class SmsInboundTest extends TestCase
      */
     public function test_find_sms_inbound_id(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsInbound->find('hashed_sms_inbound_id');
 
-        $request = $this->client->getLastRequest();
-
-        self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/sms-inbounds/hashed_sms_inbound_id', $request->getUri()->getPath());
+        $this->assertRequest('GET', '/v1/sms-inbounds/hashed_sms_inbound_id');
         self::assertEquals(200, $response['status_code']);
     }
 
     /**
      * @dataProvider validSmsInboundCreateDataProvider
+     * @param SmsInboundBuilder $params
+     * @param array $expected
+     * @param array $excluded
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('validSmsInboundCreateDataProvider')]
-    public function test_create_sms_inbound(SmsInboundBuilder $params, array $expected): void
+    public function test_create_sms_inbound(SmsInboundBuilder $params, array $expected, array $excluded): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsInbound->create($params);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $body = $this->assertRequest('POST', '/v1/sms-inbounds');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/sms-inbounds', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertSame(Arr::get($expected, 'sms_number_id'), Arr::get($request_body, 'sms_number_id'));
-        self::assertSame(Arr::get($expected, 'name'), Arr::get($request_body, 'name'));
-        self::assertSame(Arr::get($expected, 'filter'), Arr::get($request_body, 'filter'));
-        self::assertSame(Arr::get($expected, 'forward_url'), Arr::get($request_body, 'forward_url'));
-        self::assertSame(Arr::get($expected, 'enabled'), Arr::get($request_body, 'enabled'));
+        $this->assertBodyContains($expected, $body);
+        $this->assertBodyExcludes($excluded, $body);
+
+        if ($params->getFilter() !== null) {
+            self::assertSame($params->getFilter()->toArray()['comparer'], Arr::get($body, 'filter.comparer'));
+            self::assertSame($params->getFilter()->toArray()['value'], Arr::get($body, 'filter.value'));
+        }
     }
 
     /**
@@ -150,35 +158,41 @@ class SmsInboundTest extends TestCase
      */
     public function test_update_sms_inbound(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $params = (new SmsInboundBuilder())
-        ->setSmsNumberId('hashed_sms_number_id')
-        ->setName('Updated')
-        ->setForwardUrl('https://mailersend.com/updated')
-        ->setFilter(new SmsInboundFilter('starts-with', 'value'))
-        ->setEnabled(false);
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Updated')
+            ->setForwardUrl('https://mailersend.com/updated')
+            ->setFilter(new SmsInboundFilter('starts-with', 'value'))
+            ->setEnabled(false);
 
-        $response = $this->smsInbound->update(
-            'hashed_sms_inbound_id',
-            $params,
-        );
+        $response = $this->smsInbound->update('hashed_sms_inbound_id', $params);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string)$request->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $body = $this->assertRequest('PUT', '/v1/sms-inbounds/hashed_sms_inbound_id');
 
-        self::assertEquals('PUT', $request->getMethod());
-        self::assertEquals('/v1/sms-inbounds/hashed_sms_inbound_id', $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('hashed_sms_number_id', Arr::get($request_body, 'sms_number_id'));
-        self::assertSame('Updated', Arr::get($request_body, 'name'));
-        self::assertSame('https://mailersend.com/updated', Arr::get($request_body, 'forward_url'));
-        self::assertSame('starts-with', Arr::get($request_body, 'filter.comparer'));
-        self::assertSame('value', Arr::get($request_body, 'filter.value'));
-        self::assertFalse(Arr::get($request_body, 'enabled'));
+        $this->assertBodyContains([
+            'sms_number_id' => 'hashed_sms_number_id',
+            'name' => 'Updated',
+            'forward_url' => 'https://mailersend.com/updated',
+        ], $body);
+        self::assertSame('starts-with', Arr::get($body, 'filter.comparer'));
+        self::assertSame('value', Arr::get($body, 'filter.value'));
+        self::assertFalse(Arr::get($body, 'enabled'));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     */
+    public function test_update_requires_sms_inbound_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS inbound id is required.');
+
+        $this->smsInbound->update('', new SmsInboundBuilder());
     }
 
     /**
@@ -188,17 +202,11 @@ class SmsInboundTest extends TestCase
      */
     public function test_delete_sms_inbound(): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse();
 
         $response = $this->smsInbound->delete('hashedSmsInboundId');
 
-        $request = $this->client->getLastRequest();
-
-        self::assertEquals('DELETE', $request->getMethod());
-        self::assertEquals('/v1/sms-inbounds/hashedSmsInboundId', $request->getUri()->getPath());
+        $this->assertRequest('DELETE', '/v1/sms-inbounds/hashedSmsInboundId');
         self::assertEquals(200, $response['status_code']);
     }
 
@@ -206,11 +214,124 @@ class SmsInboundTest extends TestCase
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    public function test_delete_sms_inbound_required_sms_inbound_id(): void
+    public function test_delete_requires_sms_inbound_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS inbound id is required.');
 
         $this->smsInbound->delete('');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_requires_sms_number_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS number id is required.');
+
+        $params = (new SmsInboundBuilder())
+            ->setName('Test name')
+            ->setForwardUrl('https://mailersend.com/inbound');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_requires_name(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS inbound name is required');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setForwardUrl('https://mailersend.com/inbound');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_requires_valid_forward_url(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid URL.');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Test name')
+            ->setForwardUrl('not-a-valid-url');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_rejects_invalid_filter_comparer(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid filter comparer.');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Test name')
+            ->setForwardUrl('https://mailersend.com/inbound')
+            ->setFilter(new SmsInboundFilter('invalid-comparer', 'value'));
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_update_without_filter(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Updated')
+            ->setForwardUrl('https://mailersend.com/updated')
+            ->setEnabled(true);
+
+        $response = $this->smsInbound->update('hashed_sms_inbound_id', $params);
+
+        $body = $this->assertRequest('PUT', '/v1/sms-inbounds/hashed_sms_inbound_id');
+
+        self::assertEquals(200, $response['status_code']);
+        $this->assertBodyExcludes(['filter'], $body);
+        $this->assertBodyContains([
+            'sms_number_id' => 'hashed_sms_number_id',
+            'name' => 'Updated',
+        ], $body);
+        self::assertTrue($body['enabled']);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_update_rejects_invalid_filter_comparer(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid filter comparer.');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Updated')
+            ->setForwardUrl('https://mailersend.com/updated')
+            ->setFilter(new SmsInboundFilter('bad-comparer', 'value'));
+
+        $this->smsInbound->update('hashed_sms_inbound_id', $params);
     }
 
     public static function validSmsInboundListDataProvider(): array
@@ -218,12 +339,8 @@ class SmsInboundTest extends TestCase
         return [
             'empty request' => [
                 'params' => [],
-                'expected' => [
-                    'sms_number_id' => null,
-                    'enabled' => null,
-                    'page' => null,
-                    'limit' => null,
-                ],
+                'expected' => [],
+                'excluded' => ['sms_number_id', 'enabled', 'page', 'limit'],
             ],
             'with sms number id' => [
                 'params' => [
@@ -231,57 +348,59 @@ class SmsInboundTest extends TestCase
                 ],
                 'expected' => [
                     'sms_number_id' => 'hashed_sms_number_id',
-                    'enabled' => null,
-                    'page' => null,
-                    'limit' => null,
                 ],
+                'excluded' => ['enabled', 'page', 'limit'],
             ],
-            'with enabled' => [
-                [
+            'with enabled false' => [
+                'params' => [
                     'enabled' => false,
                 ],
-                [
-                    'sms_number_id' => null,
-                    'enabled' => 0,
-                    'page' => null,
-                    'limit' => null,
+                'expected' => [
+                    'enabled' => '0',
                 ],
+                'excluded' => ['sms_number_id', 'page', 'limit'],
+            ],
+            'with enabled true' => [
+                'params' => [
+                    'enabled' => true,
+                ],
+                'expected' => [
+                    'enabled' => '1',
+                ],
+                'excluded' => ['sms_number_id', 'page', 'limit'],
             ],
             'with page' => [
-                [
+                'params' => [
                     'page' => 1,
                 ],
-                [
-                    'sms_number_id' => null,
-                    'enabled' => null,
-                    'page' => 1,
-                    'limit' => null,
+                'expected' => [
+                    'page' => '1',
                 ],
+                'excluded' => ['sms_number_id', 'enabled', 'limit'],
             ],
             'with limit' => [
-                [
+                'params' => [
                     'limit' => 10,
                 ],
-                [
-                    'sms_number_id' => null,
-                    'enabled' => null,
-                    'page' => null,
-                    'limit' => 10,
+                'expected' => [
+                    'limit' => '10',
                 ],
+                'excluded' => ['sms_number_id', 'enabled', 'page'],
             ],
             'complete request' => [
-                [
+                'params' => [
                     'sms_number_id' => 'hashed_sms_number_id',
                     'enabled' => false,
                     'page' => 1,
                     'limit' => 10,
                 ],
-                [
+                'expected' => [
                     'sms_number_id' => 'hashed_sms_number_id',
-                    'enabled' => 0,
-                    'page' => 1,
-                    'limit' => 10,
+                    'enabled' => '0',
+                    'page' => '1',
+                    'limit' => '10',
                 ],
+                'excluded' => [],
             ],
         ];
     }
@@ -289,41 +408,30 @@ class SmsInboundTest extends TestCase
     public static function invalidSmsInboundListDataProvider(): array
     {
         return [
-            'with limit under 10' => [
-                [
-                    'limit' => 9,
-                ],
-            ],
-            'with limit over 100' => [
-                [
-                    'limit' => 101,
-                ],
-            ]
+            'limit below minimum' => [9, 'Limit is supposed to be between 10 and 100.'],
+            'limit above maximum' => [101, 'Limit is supposed to be between 10 and 100.'],
         ];
     }
 
     public static function validSmsInboundCreateDataProvider(): array
     {
         return [
-            'enabled, with filter' => [
+            'with filter enabled' => [
                 'params' => (new SmsInboundBuilder())
                     ->setSmsNumberId('hashed_sms_number_id')
                     ->setName('Test name')
                     ->setForwardUrl('https://www.mailersend.com/inbound_webhook')
-                    ->setFilter(new SmsInboundFilter('equals', 'value'))
+                    ->setFilter(new SmsInboundFilter('equal', 'value'))
                     ->setEnabled(true),
                 'expected' => [
                     'sms_number_id' => 'hashed_sms_number_id',
                     'name' => 'Test name',
                     'forward_url' => 'https://www.mailersend.com/inbound_webhook',
-                    'filter' => [
-                        'comparer' => 'equals',
-                        'value' => 'value',
-                    ],
                     'enabled' => true,
                 ],
+                'excluded' => [],
             ],
-            'disabled, w/o filter' => [
+            'without filter disabled' => [
                 'params' => (new SmsInboundBuilder())
                     ->setSmsNumberId('hashed_sms_number_id')
                     ->setName('Test name')
@@ -333,10 +441,24 @@ class SmsInboundTest extends TestCase
                     'sms_number_id' => 'hashed_sms_number_id',
                     'name' => 'Test name',
                     'forward_url' => 'https://www.mailersend.com/inbound_webhook',
-                    'filter' => null,
                     'enabled' => false,
                 ],
-            ]
+                'excluded' => ['filter'],
+            ],
+            'without filter enabled' => [
+                'params' => (new SmsInboundBuilder())
+                    ->setSmsNumberId('hashed_sms_number_id')
+                    ->setName('Test name')
+                    ->setForwardUrl('https://www.mailersend.com/inbound_webhook')
+                    ->setEnabled(true),
+                'expected' => [
+                    'sms_number_id' => 'hashed_sms_number_id',
+                    'name' => 'Test name',
+                    'forward_url' => 'https://www.mailersend.com/inbound_webhook',
+                    'enabled' => true,
+                ],
+                'excluded' => ['filter'],
+            ],
         ];
     }
 }
