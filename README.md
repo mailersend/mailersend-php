@@ -738,8 +738,8 @@ $mailersend->emails->getAll($emailsParams);
 | `setDomainId()`          | `string`            | yes      | A domain that belongs to your account. An unknown domain returns `404`.                                             |
 | `setDateFrom()`          | `int\|string`       | yes      | Unix timestamp (`1623073576`) or datetime (`'2015-10-01 00:00:00'`), assumed `UTC`. Must be lower than `date_to`.    |
 | `setDateTo()`            | `int\|string`       | yes      | Unix timestamp or datetime. Must be higher than `date_from` and must not be in the future.                           |
-| `setPage()`              | `int`               | no       | Min: `1`, Max: `1000`, Default: `1`. See [Pagination](#emails-pagination).                                           |
-| `setLimit()`             | `int`               | no       | Min: `10`, Max: `100`, Default: `25`.                                                                               |
+| `setPage()`              | `int`               | no       | Min: `1`, Max: `100`, Default: `1`. See [Pagination](#emails-pagination).                                            |
+| `setLimit()`             | `int`               | no       | Min: `10`, Max: `1000`, Default: `25`.                                                                              |
 | `setStatus()`            | `string[]`          | no       | Any of `queued`, `sent`, `rejected`, `delivered`. See `Constants::POSSIBLE_EMAIL_STATUSES`.                          |
 | `setInteraction()`       | `string[]`          | no       | Any of `opened`, `clicked`, `unsubscribed`, `complained`, `no_interaction`. See `Constants::POSSIBLE_EMAIL_INTERACTIONS`. |
 | `setRecipientEmail()`    | `string`            | no       | Exact, case-insensitive match. An unknown address returns `200` with an empty `data` array.                          |

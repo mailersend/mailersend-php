@@ -66,7 +66,7 @@ class EmailsParams
     }
 
     /**
-     * @param int|null $page Min: 1, Max: 1000, Default: 1
+     * @param int|null $page Min: 1, Max: 100, Default: 1
      */
     public function setPage(?int $page): EmailsParams
     {
