@@ -25,6 +25,10 @@ MailerSend PHP SDK
     * [Bulk emails API](#bulk-email-api)
         * [Send bulk email](#send-bulk-email)
         * [Get bulk email status](#get-bulk-email-status)
+    * [Emails API](#emails-api)
+        * [Get a list of emails](#get-a-list-of-emails)
+        * [Pagination](#emails-pagination)
+        * [Get a single email](#get-a-single-email)
     * [Inbound routing](#inbound-routing)
         * [Get a list of inbound routes](#get-a-list-of-inbound-routes)
         * [Get a single inbound route](#get-a-single-inbound-route)
@@ -700,6 +704,141 @@ $mailersend = new MailerSend();
 
 $mailersend->bulkEmail->getStatus('bulk_email_id');
 ```
+
+<a name="emails-api"></a>
+
+## Emails API
+
+An email is the record of a message delivered to one recipient. Use these endpoints to build a searchable sending log,
+and to retrieve a single email together with its activity events.
+
+<a name="get-a-list-of-emails"></a>
+
+### Get a list of emails
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\EmailsParams;
+
+$mailersend = new MailerSend();
+
+$emailsParams = (new EmailsParams())
+                    ->setDomainId('domain_id')
+                    ->setDateFrom(1623073576)
+                    ->setDateTo(1623074976)
+                    ->setPage(1)
+                    ->setLimit(50)
+                    ->setStatus(['sent', 'delivered'])
+                    ->setInteraction(['opened']);
+
+$mailersend->emails->getAll($emailsParams);
+```
+
+`setDomainId()`, `setDateFrom()` and `setDateTo()` are required. Emails are returned newest first.
+
+| `EmailsParams` setter    | Type                | Required | Details                                                                                                            |
+|--------------------------|---------------------|----------|--------------------------------------------------------------------------------------------------------------------|
+| `setDomainId()`          | `string`            | yes      | A domain that belongs to your account. An unknown domain returns `404`.                                             |
+| `setDateFrom()`          | `int\|string`       | yes      | Unix timestamp (`1623073576`) or datetime (`'2015-10-01 00:00:00'`), assumed `UTC`. Must be lower than `date_to`.    |
+| `setDateTo()`            | `int\|string`       | yes      | Unix timestamp or datetime. Must be higher than `date_from` and must not be in the future.                           |
+| `setPage()`              | `int`               | no       | Min: `1`, Max: `100`, Default: `1`. See [Pagination](#emails-pagination).                                            |
+| `setLimit()`             | `int`               | no       | Min: `10`, Max: `1000`, Default: `25`.                                                                              |
+| `setStatus()`            | `string[]`          | no       | Any of `queued`, `sent`, `rejected`, `delivered`. See `Constants::POSSIBLE_EMAIL_STATUSES`.                          |
+| `setInteraction()`       | `string[]`          | no       | Any of `opened`, `clicked`, `unsubscribed`, `complained`, `no_interaction`. See `Constants::POSSIBLE_EMAIL_INTERACTIONS`. |
+| `setRecipientEmail()`    | `string`            | no       | Exact, case-insensitive match. An unknown address returns `200` with an empty `data` array.                          |
+| `setMessageId()`         | `string`            | no       | Exact match.                                                                                                        |
+| `setTemplateId()`        | `string`            | no       | Exact match.                                                                                                        |
+| `setSubject()`           | `string`            | no       | Min: `3` characters. Partial, case-insensitive match.                                                                |
+| `setTag()`               | `string`            | no       | Exact match against a value in the email's `tags` array.                                                             |
+
+Values inside `setStatus()` are combined with `OR`, values inside `setInteraction()` are combined with `OR`, and the two
+filters are combined with `AND`.
+
+> **Note:** This endpoint requires a token with one of the `activity_read` or `activity_full` scopes, and is limited to
+> 10 requests/minute shared with [`GET` /v1/activity](#get-a-list-of-activities). Requests to either endpoint count
+> against the same budget.
+
+Each row in `data` contains `id`, `from`, `to`, `subject`, `text`, `html`, `template_id`, `domain_id`, `message_id`,
+`status`, `tags`, `interaction`, `suppression_reason`, `created_at`, `updated_at` and `headers`. `text` and `html` are
+always `null` in a list row — use [`emails->find()`](#get-a-single-email) to retrieve the message content.
+
+<a name="emails-pagination"></a>
+
+#### Pagination
+
+`emails->getAll()` paginates by page number, the same way [`activity->getAll()`](#get-a-list-of-activities) does. Pass
+the page through `setPage()` and the page size through `setLimit()`.
+
+Alongside `data`, the response body carries `links` and `meta`:
+
+```php
+[
+    'links' => [
+        'first' => 'https://api.mailersend.com/v1/emails?...&page=1',
+        'last' => null,
+        'prev' => null,
+        'next' => 'https://api.mailersend.com/v1/emails?...&page=2',
+    ],
+    'meta' => [
+        'current_page' => 1,
+        'current_page_url' => 'https://api.mailersend.com/v1/emails?...&page=1',
+        'from' => 1,
+        'path' => 'https://api.mailersend.com/v1/emails',
+        'per_page' => 10,
+        'to' => 3,
+    ],
+]
+```
+
+The result set is not counted, so there is no `total` and no `last_page`, and `links.last` is always `null`. To walk
+every page, increment `setPage()` and repeat until `links.next` is `null`, passing the same required parameters and
+filters on every request:
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\EmailsParams;
+
+$mailersend = new MailerSend();
+
+$emailsParams = (new EmailsParams())
+                    ->setDomainId('domain_id')
+                    ->setDateFrom(1623073576)
+                    ->setDateTo(1623074976)
+                    ->setLimit(100);
+
+do {
+    $response = $mailersend->emails->getAll($emailsParams);
+
+    foreach ($response['body']['data'] as $email) {
+        // ...
+    }
+
+    $emailsParams->setPage($response['body']['meta']['current_page'] + 1);
+} while ($response['body']['links']['next'] !== null);
+```
+
+<a name="get-a-single-email"></a>
+
+### Get a single email
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$mailersend->emails->find('email_id');
+```
+
+Pass an `id` returned by [`emails->getAll()`](#get-a-list-of-emails). The response contains the email, its content and
+its `recipient`, plus an `activity` array of the events recorded for it — none of which are present in a list row.
+
+> **Note:** This endpoint requires a token with one of the `email_full`, `activity_read` or `activity_full` scopes.
+
+> **Note:** `activity` events are returned newest first and capped at 200 per email — use
+> [`activity->getAll()`](#get-a-list-of-activities) if you need the complete event history for a domain. `deferred` and
+> `suppressed` events are only included if your plan has those features enabled, and `suppressed` events also carry a
+> `suppression_reason`. The `junk` event type is reported as `soft_bounced`. The array is returned even when content
+> tracking is disabled for the domain, in which case `html` and `text` are `null`.
 
 <a name="inbound-routing"></a>
 
