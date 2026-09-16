@@ -16,6 +16,7 @@ class Inbound implements Arrayable, \JsonSerializable
     protected ?string $catchType = null;
     protected ?string $matchType = null;
     protected ?int $inboundPriority = null;
+    protected ?bool $excludeAttachments = null;
 
     public function __construct(string $domainId, string $name, bool $domainEnabled)
     {
@@ -159,9 +160,21 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this;
     }
 
+    public function getExcludeAttachments(): ?bool
+    {
+        return $this->excludeAttachments;
+    }
+
+    public function setExcludeAttachments(?bool $excludeAttachments): self
+    {
+        $this->excludeAttachments = $excludeAttachments;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
-        return [
+        $data = [
             'domain_id' => $this->getDomainId(),
             'name' => $this->getName(),
             'domain_enabled' => $this->isDomainEnabled(),
@@ -173,6 +186,13 @@ class Inbound implements Arrayable, \JsonSerializable
             'match_type' => $this->getMatchType(),
             'inbound_priority' => $this->getInboundPriority()
         ];
+
+        // The API rejects an explicit null, so only send the key once it has been set
+        if ($this->getExcludeAttachments() !== null) {
+            $data['exclude_attachments'] = $this->getExcludeAttachments();
+        }
+
+        return $data;
     }
 
     #[\ReturnTypeWillChange]
