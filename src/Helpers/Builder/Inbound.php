@@ -165,7 +165,7 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this->excludeAttachments;
     }
 
-    public function setExcludeAttachments(?bool $excludeAttachments): self
+    public function setExcludeAttachments(bool $excludeAttachments): self
     {
         $this->excludeAttachments = $excludeAttachments;
 
