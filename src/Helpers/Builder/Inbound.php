@@ -160,7 +160,7 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this;
     }
 
-    public function getExcludeAttachments(): ?bool
+    public function isExcludeAttachments(): ?bool
     {
         return $this->excludeAttachments;
     }
@@ -187,9 +187,8 @@ class Inbound implements Arrayable, \JsonSerializable
             'inbound_priority' => $this->getInboundPriority()
         ];
 
-        // The API rejects an explicit null, so only send the key once it has been set
-        if ($this->getExcludeAttachments() !== null) {
-            $data['exclude_attachments'] = $this->getExcludeAttachments();
+        if ($this->isExcludeAttachments() !== null) {
+            $data['exclude_attachments'] = $this->isExcludeAttachments();
         }
 
         return $data;
