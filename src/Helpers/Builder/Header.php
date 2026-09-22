@@ -29,6 +29,7 @@ class Header implements Arrayable, \JsonSerializable
         GeneralHelpers::assert(static function () use ($name) {
             Assertion::notEmpty($name);
             Assertion::string($name);
+            Assertion::regex($name, '/\A[^\r\n]*\z/', 'Header name must not contain CR or LF characters.');
         });
 
         $this->name = $name;
@@ -42,6 +43,7 @@ class Header implements Arrayable, \JsonSerializable
         GeneralHelpers::assert(static function () use ($value) {
             Assertion::notEmpty($value);
             Assertion::string($value);
+            Assertion::regex($value, '/\A[^\r\n]*\z/', 'Header value must not contain CR or LF characters.');
         });
 
         $this->value = $value;

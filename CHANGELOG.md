@@ -15,7 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [0.40.0] - 2026 09 10
+## [0.43.0] - 2026 09 22
+
+### Added
+
+- Reject CR and LF characters in `subject`, `in_reply_to`, `references`, `list_unsubscribe`
+  and custom header names and values. These are rejected by the API, so they now fail fast
+  in the SDK with a clear message instead of an opaque HTTP error.
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.42.0] - 2026 09 10
 
 ### Added
 
