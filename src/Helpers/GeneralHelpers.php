@@ -3,6 +3,7 @@
 namespace MailerSend\Helpers;
 
 use Assert\AssertionFailedException;
+use MailerSend\Contracts\Arrayable;
 use MailerSend\Exceptions\MailerSendAssertException;
 use MailerSend\Helpers\Builder\EmailParams;
 use MailerSend\Helpers\Builder\SmsParams;
@@ -22,6 +23,22 @@ class GeneralHelpers
         } catch (AssertionFailedException $e) {
             throw new MailerSendAssertException($e->getMessage());
         }
+    }
+
+    /**
+     * @throws MailerSendAssertException
+     */
+    private static function assertNoLineBreaks($value, string $field): void
+    {
+        if (!is_string($value)) {
+            return;
+        }
+
+        self::assert(fn () => Assertion::regex(
+            $value,
+            '/\A[^\r\n]*\z/',
+            "$field must not contain CR or LF characters."
+        ));
     }
 
     /**
@@ -49,6 +66,7 @@ class GeneralHelpers
 
         if ($params->getSubject() !== null) {
             self::assert(fn () => Assertion::maxLength($params->getSubject(), 998, 'Subject may not be greater than 998 characters.'));
+            self::assertNoLineBreaks($params->getSubject(), 'Subject');
         }
 
         if (count($params->getTags()) > 0) {
@@ -66,10 +84,27 @@ class GeneralHelpers
 
         if ($params->getInReplyToHeader() !== null) {
             self::assert(fn () => Assertion::maxLength($params->getInReplyToHeader(), 998, 'In reply to may not be greater than 998 characters.'));
+            self::assertNoLineBreaks($params->getInReplyToHeader(), 'In reply to');
         }
 
         if ($params->getListUnsubscribe() !== null) {
             self::assert(fn () => Assertion::maxLength($params->getListUnsubscribe(), 990, 'List unsubscribe may not be greater than 990 characters.'));
+            self::assertNoLineBreaks($params->getListUnsubscribe(), 'List unsubscribe');
+        }
+
+        foreach ($params->getReferencesHeader() as $reference) {
+            self::assertNoLineBreaks($reference, 'Each reference');
+        }
+
+        foreach ($params->getHeaders() as $header) {
+            $header = $header instanceof Arrayable ? $header->toArray() : $header;
+
+            if (!is_array($header)) {
+                continue;
+            }
+
+            self::assertNoLineBreaks($header['name'] ?? null, 'Header name');
+            self::assertNoLineBreaks($header['value'] ?? null, 'Header value');
         }
 
         if (count($params->getCc()) > 0) {

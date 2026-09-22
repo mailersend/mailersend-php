@@ -38,6 +38,26 @@ class HeaderTest extends TestCase
                 '',
                 'Value "" is empty, but non empty value was expected.',
             ],
+            'name with CRLF' => [
+                "Custom-Header-1\r\nBcc: attacker@evil.com",
+                'Value 1',
+                'Header name must not contain CR or LF characters.',
+            ],
+            'name with trailing LF' => [
+                "Custom-Header-1\n",
+                'Value 1',
+                'Header name must not contain CR or LF characters.',
+            ],
+            'value with CRLF' => [
+                'Custom-Header-1',
+                "Value 1\r\nBcc: attacker@evil.com",
+                'Header value must not contain CR or LF characters.',
+            ],
+            'value with trailing LF' => [
+                'Custom-Header-1',
+                "Value 1\n",
+                'Header value must not contain CR or LF characters.',
+            ],
         ];
     }
 }

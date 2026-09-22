@@ -839,6 +839,95 @@ class EmailTest extends TestCase
                     ->setListUnsubscribe(str_repeat('a', 991)),
                 'List unsubscribe may not be greater than 990 characters.',
             ],
+            'in_reply_to with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setInReplyToHeader("legit-123\r\nBcc: attacker@evil.com"),
+                'In reply to must not contain CR or LF characters.',
+            ],
+            'in_reply_to with trailing LF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setInReplyToHeader("legit-123\n"),
+                'In reply to must not contain CR or LF characters.',
+            ],
+            'list_unsubscribe with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setListUnsubscribe("https://example.com/u\r\nBcc: attacker@evil.com"),
+                'List unsubscribe must not contain CR or LF characters.',
+            ],
+            'list_unsubscribe with trailing LF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setListUnsubscribe("https://example.com/u\n"),
+                'List unsubscribe must not contain CR or LF characters.',
+            ],
+            'subject with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setHtml('HTML')
+                    ->setSubject("Subject\r\nBcc: attacker@evil.com"),
+                'Subject must not contain CR or LF characters.',
+            ],
+            'references with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setReferencesHeader(["<a@example.com>\r\nBcc: attacker@evil.com"]),
+                'Each reference must not contain CR or LF characters.',
+            ],
+            'header name with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setHeaders([['name' => "X-Custom\r\nBcc: attacker@evil.com", 'value' => 'value']]),
+                'Header name must not contain CR or LF characters.',
+            ],
+            'header value with CRLF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setHeaders([['name' => 'X-Custom', 'value' => "value\r\nBcc: attacker@evil.com"]]),
+                'Header value must not contain CR or LF characters.',
+            ],
+            'header value with trailing LF' => [
+                (new EmailParams())
+                    ->setFrom('test@mailersend.com')
+                    ->setFromName('Sender')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML')
+                    ->setHeaders([['name' => 'X-Custom', 'value' => "value\n"]]),
+                'Header value must not contain CR or LF characters.',
+            ],
         ];
     }
 
