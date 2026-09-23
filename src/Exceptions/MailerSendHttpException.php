@@ -15,6 +15,10 @@ class MailerSendHttpException extends MailerSendException implements RequestExce
         RequestInterface $request,
         ResponseInterface $response
     ) {
+        
+        $this->request  = $request;
+        $this->response = $response;
+        
         $message = sprintf(
             '[url] %s [http method] %s [status code] %s [reason phrase] %s',
             $request->getRequestTarget(),
