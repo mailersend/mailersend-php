@@ -872,6 +872,8 @@ $mailersend->inbound->find('inboundId');
 
 ### Add an inbound route
 
+Call `setIncludeAttachments(false)` to drop attachments before the message is forwarded. It defaults to `true`. Inline (CID) parts count as attachments, so images embedded in an HTML body are dropped too.
+
 Example using only classes:
 
 ```php
@@ -896,6 +898,7 @@ $mailersend->inbound->create(
                 ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'sender@mailersend.com', 'sender')))
         ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
         ->setInboundPriority(50)
+        ->setIncludeAttachments(false)
 );
 ```
 
@@ -988,6 +991,8 @@ $mailersend->inbound->create(
 
 The examples on building the `Inbound` object portrayed in the 'Add an inbound route' also apply in here.
 
+Leaving `setIncludeAttachments()` unset keeps the route's stored value; the API does not reset it to `true`. Pass `false` explicitly to drop attachments.
+
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Inbound;
@@ -1007,6 +1012,7 @@ $mailersend->inbound->update(
         )
         ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
         ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->setIncludeAttachments(false)
 );
 ```
 
