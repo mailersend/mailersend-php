@@ -16,7 +16,7 @@ class Inbound implements Arrayable, \JsonSerializable
     protected ?string $catchType = null;
     protected ?string $matchType = null;
     protected ?int $inboundPriority = null;
-    protected ?bool $excludeAttachments = null;
+    protected ?bool $includeAttachments = null;
 
     public function __construct(string $domainId, string $name, bool $domainEnabled)
     {
@@ -160,14 +160,14 @@ class Inbound implements Arrayable, \JsonSerializable
         return $this;
     }
 
-    public function isExcludeAttachments(): ?bool
+    public function isIncludeAttachments(): ?bool
     {
-        return $this->excludeAttachments;
+        return $this->includeAttachments;
     }
 
-    public function setExcludeAttachments(bool $excludeAttachments): self
+    public function setIncludeAttachments(bool $includeAttachments): self
     {
-        $this->excludeAttachments = $excludeAttachments;
+        $this->includeAttachments = $includeAttachments;
 
         return $this;
     }
@@ -187,8 +187,8 @@ class Inbound implements Arrayable, \JsonSerializable
             'inbound_priority' => $this->getInboundPriority()
         ];
 
-        if ($this->isExcludeAttachments() !== null) {
-            $data['exclude_attachments'] = $this->isExcludeAttachments();
+        if ($this->isIncludeAttachments() !== null) {
+            $data['include_attachments'] = $this->isIncludeAttachments();
         }
 
         return $data;
