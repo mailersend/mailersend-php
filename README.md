@@ -573,7 +573,7 @@ $mailersend->inbound->find('inboundId');
 
 ### Add an inbound route
 
-Call `setIncludeAttachments(false)` to drop attachments before the message is stored or forwarded. It defaults to `true`. Inline (CID) parts count as attachments, so images embedded in an HTML body are dropped too.
+Call `setIncludeAttachments(false)` to drop attachments before the message is forwarded. It defaults to `true`. Inline (CID) parts count as attachments, so images embedded in an HTML body are dropped too.
 
 Example using only classes:
 
