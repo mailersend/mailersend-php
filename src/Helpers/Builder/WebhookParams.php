@@ -39,6 +39,8 @@ class WebhookParams implements Arrayable, \JsonSerializable
     public const ACTIVITY_BULK_EMAIL_COMPLETED = 'bulk_email.completed';
     public const ACTIVITY_RECIPIENT_ON_HOLD_ADDED = 'recipient.on_hold_added';
     public const ACTIVITY_RECIPIENT_ON_HOLD_REMOVED = 'recipient.on_hold_removed';
+    public const ACTIVITY_DOMAIN_REPUTATION_CHANGED = 'domain.reputation_changed';
+    public const ACTIVITY_ACCOUNT_REPUTATION_CHANGED = 'account.reputation_changed';
 
     public const ALL_ACTIVITIES = [
         self::ACTIVITY_SENT, self::ACTIVITY_DELIVERED,
@@ -51,7 +53,8 @@ class WebhookParams implements Arrayable, \JsonSerializable
         self::ACTIVITY_MAINTENANCE_END, self::ACTIVITY_INBOUND_FORWARD_FAILED,
         self::ACTIVITY_EMAIL_SINGLE_VERIFIED, self::ACTIVITY_EMAIL_LIST_VERIFIED,
         self::ACTIVITY_BULK_EMAIL_COMPLETED, self::ACTIVITY_RECIPIENT_ON_HOLD_ADDED,
-        self::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED,
+        self::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED, self::ACTIVITY_DOMAIN_REPUTATION_CHANGED,
+        self::ACTIVITY_ACCOUNT_REPUTATION_CHANGED,
     ];
 
     /**
