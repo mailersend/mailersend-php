@@ -28,6 +28,7 @@ class TokenParams implements Arrayable, JsonSerializable
     public const SUPPRESSIONS_FULL = 'suppressions_full';
     public const SMS_READ = 'sms_read';
     public const SMS_FULL = 'sms_full';
+    public const WHATSAPP_READ = 'whatsapp_read';
     public const WHATSAPP_FULL = 'whatsapp_full';
     public const EMAIL_VERIFICATION_READ = 'email_verification_read';
     public const EMAIL_VERIFICATION_FULL = 'email_verification_full';
@@ -55,7 +56,7 @@ class TokenParams implements Arrayable, JsonSerializable
         self::TEMPLATES_FULL,
         self::SUPPRESSIONS_READ, self::SUPPRESSIONS_FULL,
         self::SMS_READ, self::SMS_FULL,
-        self::WHATSAPP_FULL,
+        self::WHATSAPP_READ, self::WHATSAPP_FULL,
         self::EMAIL_VERIFICATION_READ, self::EMAIL_VERIFICATION_FULL,
         self::INBOUNDS_FULL,
         self::RECIPIENTS_READ, self::RECIPIENTS_FULL,

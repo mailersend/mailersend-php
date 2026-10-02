@@ -14,6 +14,8 @@ class Constants
     public const MIN_EMAIL_SUBJECT_FILTER_LENGTH = 3;
     public const POSSIBLE_SMS_STATUSES = ['processed', 'queued', 'sent', 'delivered', 'failed'];
     public const POSSIBLE_SMS_RECIPIENT_STATUSES = ['active', 'opt_out'];
+    public const POSSIBLE_WHATSAPP_INBOUND_MESSAGE_TYPES = ['text', 'image', 'audio', 'video', 'document', 'sticker', 'location', 'contacts', 'interactive', 'button', 'order', 'reaction', 'system', 'unknown', 'unsupported'];
+    public const POSSIBLE_WHATSAPP_RECIPIENT_STATUSES = ['active', 'invalid', 'suppressed', 'blocked'];
     public const POSSIBLE_GROUP_BY_OPTIONS = ['days', 'weeks', 'months', 'years'];
     public const GROUP_BY_DAYS = 'days';
     public const GROUP_BY_WEEKS = 'weeks';

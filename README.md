@@ -125,6 +125,15 @@ MailerSend PHP SDK
     * [WhatsApp API](#whatsapp-api)
         * [Send a WhatsApp message](#send-whatsapp)
         * [Personalization](#whatsapp-personalization)
+    * [WhatsApp messages API](#whatsapp-messages-api)
+        * [Get a list of WhatsApp messages](#get-a-list-of-whatsapp-messages)
+        * [Get a WhatsApp message](#get-whatsapp-message)
+    * [WhatsApp inbound messages API](#whatsapp-inbound-messages-api)
+        * [Get a list of WhatsApp inbound messages](#get-a-list-of-whatsapp-inbound-messages)
+        * [Get a WhatsApp inbound message](#get-whatsapp-inbound-message)
+    * [WhatsApp recipients API](#whatsapp-recipients-api)
+        * [Get a list of WhatsApp recipients](#get-a-list-of-whatsapp-recipients)
+        * [Get a WhatsApp recipient](#get-whatsapp-recipient)
     * [Sender Identities](#sender-identity-routing)
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
@@ -2417,6 +2426,105 @@ $whatsappParams = (new WhatsappParams())
     ]);
 
 $whatsapp = $mailersend->whatsapp->send($whatsappParams);
+```
+
+<a name="whatsapp-messages-api"></a>
+
+## WhatsApp messages API
+
+<a name="get-a-list-of-whatsapp-messages"></a>
+
+### Get a list of WhatsApp messages
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappMessages = $mailersend->whatsappMessage->getAll($page = 1, $limit = 25);
+```
+
+<a name="get-whatsapp-message"></a>
+
+### Get a WhatsApp message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappMessage = $mailersend->whatsappMessage->find('message_id');
+```
+
+<a name="whatsapp-inbound-messages-api"></a>
+
+## WhatsApp inbound messages API
+
+<a name="get-a-list-of-whatsapp-inbound-messages"></a>
+
+### Get a list of WhatsApp inbound messages
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappInboundMessageParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappInboundMessageParams = (new WhatsappInboundMessageParams())
+    ->setWhatsappAccountId('whatsapp_account_id')
+    ->setType(['text', 'image'])
+    ->setDateFrom(1790000000)
+    ->setDateTo(1790086400)
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappInboundMessages = $mailersend->whatsappInboundMessage->getAll($whatsappInboundMessageParams);
+```
+
+<a name="get-whatsapp-inbound-message"></a>
+
+### Get a WhatsApp inbound message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappInboundMessage = $mailersend->whatsappInboundMessage->find('inbound_message_id');
+```
+
+<a name="whatsapp-recipients-api"></a>
+
+## WhatsApp recipients API
+
+<a name="get-a-list-of-whatsapp-recipients"></a>
+
+### Get a list of WhatsApp recipients
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappRecipientParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappRecipientParams = (new WhatsappRecipientParams())
+    ->setStatus('active')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappRecipients = $mailersend->whatsappRecipient->getAll($whatsappRecipientParams);
+```
+
+<a name="get-whatsapp-recipient"></a>
+
+### Get a WhatsApp recipient
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappRecipient = $mailersend->whatsappRecipient->find('recipient_id');
 ```
 
 <a name="sender-identity-routing"></a>
