@@ -6,6 +6,7 @@ use Http\Mock\Client;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\WhatsappMessage;
 use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\WhatsappMessageParams;
 use MailerSend\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -26,45 +27,92 @@ class WhatsappMessageTest extends TestCase
     {
         $this->addSuccessResponse();
 
-        $response = $this->whatsappMessage->getAll();
+        $response = $this->whatsappMessage->getAll(new WhatsappMessageParams());
 
         $this->assertRequest('GET', '/v1/whatsapp/messages');
         self::assertEquals(200, $response['status_code']);
     }
 
-    public function test_get_all_sends_page_and_limit_params(): void
+    public function test_get_all_sends_all_params(): void
     {
         $this->addSuccessResponse();
 
-        $this->whatsappMessage->getAll(3, 50);
+        $params = (new WhatsappMessageParams())
+            ->setWhatsappAccountId('whatsapp_account_id')
+            ->setFrom('15550001234')
+            ->setTemplateId('template_id')
+            ->setDateFrom(1791936000)
+            ->setDateTo(1792022400)
+            ->setPage(3)
+            ->setLimit(50);
+
+        $this->whatsappMessage->getAll($params);
 
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        $this->assertQueryParams(['page' => '3', 'limit' => '50'], $query);
+        $this->assertQueryParams([
+            'whatsapp_account_id' => 'whatsapp_account_id',
+            'from' => '15550001234',
+            'template_id' => 'template_id',
+            'date_from' => '1791936000',
+            'date_to' => '1792022400',
+            'page' => '3',
+            'limit' => '50',
+        ], $query);
+    }
+
+    public function test_get_all_sends_datetime_string_dates(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new WhatsappMessageParams())
+            ->setDateFrom('2026-10-14T00:00:00Z')
+            ->setDateTo('2026-10-15 00:00:00');
+
+        $this->whatsappMessage->getAll($params);
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams([
+            'date_from' => '2026-10-14T00:00:00Z',
+            'date_to' => '2026-10-15 00:00:00',
+        ], $query);
+    }
+
+    public function test_get_all_accepts_limit_and_page_boundaries(): void
+    {
+        $this->addSuccessResponse();
+        $this->addSuccessResponse();
+
+        $this->whatsappMessage->getAll((new WhatsappMessageParams())->setLimit(1)->setPage(1));
+        $this->whatsappMessage->getAll((new WhatsappMessageParams())->setLimit(100)->setPage(100));
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams(['limit' => '100', 'page' => '100'], $query);
     }
 
     public function test_get_all_excludes_optional_params_when_not_set(): void
     {
         $this->addSuccessResponse();
 
-        $this->whatsappMessage->getAll(null, null);
+        $this->whatsappMessage->getAll(new WhatsappMessageParams());
 
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        self::assertArrayNotHasKey('page', $query);
-        self::assertArrayNotHasKey('limit', $query);
+        self::assertSame([], $query);
     }
 
     /**
-     * @dataProvider invalidLimitDataProvider
+     * @dataProvider invalidParamsDataProvider
      */
-    #[DataProvider('invalidLimitDataProvider')]
-    public function test_get_all_rejects_invalid_limit(int $limit): void
+    #[DataProvider('invalidParamsDataProvider')]
+    public function test_get_all_rejects_invalid_params(WhatsappMessageParams $params, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Limit is supposed to be between 10 and 100.');
+        $this->expectExceptionMessage($expectedMessage);
 
-        $this->whatsappMessage->getAll(null, $limit);
+        $this->whatsappMessage->getAll($params);
     }
 
     public function test_find(): void
@@ -85,11 +133,33 @@ class WhatsappMessageTest extends TestCase
         $this->whatsappMessage->find('');
     }
 
-    public static function invalidLimitDataProvider(): array
+    public static function invalidParamsDataProvider(): array
     {
         return [
-            'limit below minimum' => [9],
-            'limit above maximum' => [101],
+            'empty whatsapp account id' => [
+                (new WhatsappMessageParams())->setWhatsappAccountId(''),
+                'WhatsApp account id cannot be empty.',
+            ],
+            'limit below minimum' => [
+                (new WhatsappMessageParams())->setLimit(0),
+                'Limit is supposed to be between 1 and 100.',
+            ],
+            'limit above maximum' => [
+                (new WhatsappMessageParams())->setLimit(101),
+                'Limit is supposed to be between 1 and 100.',
+            ],
+            'page below minimum' => [
+                (new WhatsappMessageParams())->setPage(0),
+                'Page is supposed to be between 1 and 100.',
+            ],
+            'page above maximum' => [
+                (new WhatsappMessageParams())->setPage(101),
+                'Page is supposed to be between 1 and 100.',
+            ],
+            'date_to not after date_from' => [
+                (new WhatsappMessageParams())->setDateFrom(1792022400)->setDateTo(1792022400),
+                'Date to must be greater than date from.',
+            ],
         ];
     }
 }

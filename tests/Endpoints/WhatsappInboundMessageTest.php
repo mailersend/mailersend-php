@@ -39,6 +39,7 @@ class WhatsappInboundMessageTest extends TestCase
 
         $params = (new WhatsappInboundMessageParams())
             ->setWhatsappAccountId('whatsapp_account_id')
+            ->setFrom('48600000001')
             ->setType(['text', 'image'])
             ->setDateFrom(1790000000)
             ->setDateTo(1790086400)
@@ -51,12 +52,44 @@ class WhatsappInboundMessageTest extends TestCase
 
         $this->assertQueryParams([
             'whatsapp_account_id' => 'whatsapp_account_id',
+            'from' => '48600000001',
             'type' => ['text', 'image'],
             'date_from' => '1790000000',
             'date_to' => '1790086400',
             'page' => '2',
             'limit' => '25',
         ], $query);
+    }
+
+    public function test_get_all_sends_datetime_string_dates(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new WhatsappInboundMessageParams())
+            ->setDateFrom('2026-10-14T00:00:00Z')
+            ->setDateTo('2026-10-15 00:00:00');
+
+        $this->whatsappInboundMessage->getAll($params);
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams([
+            'date_from' => '2026-10-14T00:00:00Z',
+            'date_to' => '2026-10-15 00:00:00',
+        ], $query);
+    }
+
+    public function test_get_all_accepts_limit_and_page_boundaries(): void
+    {
+        $this->addSuccessResponse();
+        $this->addSuccessResponse();
+
+        $this->whatsappInboundMessage->getAll((new WhatsappInboundMessageParams())->setLimit(1)->setPage(1));
+        $this->whatsappInboundMessage->getAll((new WhatsappInboundMessageParams())->setLimit(100)->setPage(100));
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams(['limit' => '100', 'page' => '100'], $query);
     }
 
     public function test_get_all_excludes_optional_params_when_not_set(): void
@@ -108,16 +141,24 @@ class WhatsappInboundMessageTest extends TestCase
                 'WhatsApp account id cannot be empty.',
             ],
             'limit below minimum' => [
-                (new WhatsappInboundMessageParams())->setLimit(9),
-                'Limit is supposed to be between 10 and 100.',
+                (new WhatsappInboundMessageParams())->setLimit(0),
+                'Limit is supposed to be between 1 and 100.',
             ],
             'limit above maximum' => [
                 (new WhatsappInboundMessageParams())->setLimit(101),
-                'Limit is supposed to be between 10 and 100.',
+                'Limit is supposed to be between 1 and 100.',
+            ],
+            'page below minimum' => [
+                (new WhatsappInboundMessageParams())->setPage(0),
+                'Page is supposed to be between 1 and 100.',
+            ],
+            'page above maximum' => [
+                (new WhatsappInboundMessageParams())->setPage(101),
+                'Page is supposed to be between 1 and 100.',
             ],
             'date_to not after date_from' => [
                 (new WhatsappInboundMessageParams())->setDateFrom(1790086400)->setDateTo(1790086400),
-                'Provided "1790086400" is not greater than "1790086400".',
+                'Date to must be greater than date from.',
             ],
             'invalid type' => [
                 (new WhatsappInboundMessageParams())->setType(['text', 'bogus']),

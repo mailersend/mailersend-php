@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Helpers\Builder\WhatsappMessageParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class WhatsappMessage extends AbstractEndpoint
@@ -15,25 +16,51 @@ class WhatsappMessage extends AbstractEndpoint
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      * @throws \JsonException
      */
-    public function getAll(?int $page = null, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(WhatsappMessageParams $whatsappMessageParams): array
     {
-        if ($limit) {
+        if ($whatsappMessageParams->getWhatsappAccountId() !== null) {
             GeneralHelpers::assert(
-                fn () => Assertion::range(
-                    $limit,
-                    Constants::MIN_LIMIT,
-                    Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT .  '.'
+                fn () => Assertion::minLength(
+                    $whatsappMessageParams->getWhatsappAccountId(),
+                    1,
+                    'WhatsApp account id cannot be empty.'
                 )
             );
         }
 
-        return $this->httpLayer->get(
-            $this->url($this->endpoint, [
-                'page' => $page,
-                'limit' => $limit,
-            ])
-        );
+        if ($whatsappMessageParams->getLimit() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $whatsappMessageParams->getLimit(),
+                    Constants::WHATSAPP_MIN_LIMIT,
+                    Constants::MAX_LIMIT,
+                    'Limit is supposed to be between ' . Constants::WHATSAPP_MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                )
+            );
+        }
+
+        if ($whatsappMessageParams->getPage() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $whatsappMessageParams->getPage(),
+                    1,
+                    Constants::WHATSAPP_MAX_PAGE,
+                    'Page is supposed to be between 1 and ' . Constants::WHATSAPP_MAX_PAGE . '.'
+                )
+            );
+        }
+
+        if (is_numeric($whatsappMessageParams->getDateFrom()) && is_numeric($whatsappMessageParams->getDateTo())) {
+            GeneralHelpers::assert(
+                fn () => Assertion::greaterThan(
+                    $whatsappMessageParams->getDateTo(),
+                    $whatsappMessageParams->getDateFrom(),
+                    'Date to must be greater than date from.'
+                )
+            );
+        }
+
+        return $this->httpLayer->get($this->url($this->endpoint, $whatsappMessageParams->toArray()));
     }
 
     /**

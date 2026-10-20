@@ -5,9 +5,12 @@ namespace MailerSend\Helpers\Builder;
 class WhatsappInboundMessageParams
 {
     protected ?string $whatsapp_account_id = null;
+    protected ?string $from = null;
     protected array $type = [];
-    protected ?int $date_from = null;
-    protected ?int $date_to = null;
+    /** @var int|string|null */
+    protected $date_from = null;
+    /** @var int|string|null */
+    protected $date_to = null;
     protected ?int $page = null;
     protected ?int $limit = null;
 
@@ -22,6 +25,17 @@ class WhatsappInboundMessageParams
         return $this;
     }
 
+    public function getFrom(): ?string
+    {
+        return $this->from;
+    }
+
+    public function setFrom(?string $from): WhatsappInboundMessageParams
+    {
+        $this->from = $from;
+        return $this;
+    }
+
     public function getType(): array
     {
         return $this->type;
@@ -33,23 +47,31 @@ class WhatsappInboundMessageParams
         return $this;
     }
 
-    public function getDateFrom(): ?int
+    /** @return int|string|null */
+    public function getDateFrom()
     {
         return $this->date_from;
     }
 
-    public function setDateFrom(?int $date_from): WhatsappInboundMessageParams
+    /**
+     * @param int|string|null $date_from Unix timestamp or datetime string, e.g. 1791936000, '2026-10-14T00:00:00Z' or '2026-10-14 00:00:00'
+     */
+    public function setDateFrom($date_from): WhatsappInboundMessageParams
     {
         $this->date_from = $date_from;
         return $this;
     }
 
-    public function getDateTo(): ?int
+    /** @return int|string|null */
+    public function getDateTo()
     {
         return $this->date_to;
     }
 
-    public function setDateTo(?int $date_to): WhatsappInboundMessageParams
+    /**
+     * @param int|string|null $date_to Unix timestamp or datetime string, e.g. 1792022400, '2026-10-15T00:00:00Z' or '2026-10-15 00:00:00'
+     */
+    public function setDateTo($date_to): WhatsappInboundMessageParams
     {
         $this->date_to = $date_to;
         return $this;
@@ -81,6 +103,7 @@ class WhatsappInboundMessageParams
     {
         return [
             'whatsapp_account_id' => $this->getWhatsappAccountId(),
+            'from' => $this->getFrom(),
             'type' => $this->getType(),
             'date_from' => $this->getDateFrom(),
             'date_to' => $this->getDateTo(),

@@ -5,6 +5,7 @@ namespace MailerSend\Helpers\Builder;
 class WhatsappRecipientParams
 {
     protected ?string $status = null;
+    protected ?string $phone_number = null;
     protected ?int $page = null;
     protected ?int $limit = null;
 
@@ -16,6 +17,17 @@ class WhatsappRecipientParams
     public function setStatus(?string $status): WhatsappRecipientParams
     {
         $this->status = $status;
+        return $this;
+    }
+
+    public function getPhoneNumber(): ?string
+    {
+        return $this->phone_number;
+    }
+
+    public function setPhoneNumber(?string $phone_number): WhatsappRecipientParams
+    {
+        $this->phone_number = $phone_number;
         return $this;
     }
 
@@ -45,6 +57,7 @@ class WhatsappRecipientParams
     {
         return [
             'status' => $this->getStatus(),
+            'phone_number' => $this->getPhoneNumber(),
             'page' => $this->getPage(),
             'limit' => $this->getLimit(),
         ];

@@ -39,6 +39,7 @@ class WhatsappRecipientTest extends TestCase
 
         $params = (new WhatsappRecipientParams())
             ->setStatus('active')
+            ->setPhoneNumber('48600000001')
             ->setPage(2)
             ->setLimit(25);
 
@@ -46,7 +47,25 @@ class WhatsappRecipientTest extends TestCase
 
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        $this->assertQueryParams(['status' => 'active', 'page' => '2', 'limit' => '25'], $query);
+        $this->assertQueryParams([
+            'status' => 'active',
+            'phone_number' => '48600000001',
+            'page' => '2',
+            'limit' => '25',
+        ], $query);
+    }
+
+    public function test_get_all_accepts_limit_and_page_boundaries(): void
+    {
+        $this->addSuccessResponse();
+        $this->addSuccessResponse();
+
+        $this->whatsappRecipient->getAll((new WhatsappRecipientParams())->setLimit(1)->setPage(1));
+        $this->whatsappRecipient->getAll((new WhatsappRecipientParams())->setLimit(100)->setPage(100));
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        $this->assertQueryParams(['limit' => '100', 'page' => '100'], $query);
     }
 
     public function test_get_all_excludes_optional_params_when_not_set(): void
@@ -94,12 +113,20 @@ class WhatsappRecipientTest extends TestCase
     {
         return [
             'limit below minimum' => [
-                (new WhatsappRecipientParams())->setLimit(9),
-                'Limit is supposed to be between 10 and 100.',
+                (new WhatsappRecipientParams())->setLimit(0),
+                'Limit is supposed to be between 1 and 100.',
             ],
             'limit above maximum' => [
                 (new WhatsappRecipientParams())->setLimit(101),
-                'Limit is supposed to be between 10 and 100.',
+                'Limit is supposed to be between 1 and 100.',
+            ],
+            'page below minimum' => [
+                (new WhatsappRecipientParams())->setPage(0),
+                'Page is supposed to be between 1 and 100.',
+            ],
+            'page above maximum' => [
+                (new WhatsappRecipientParams())->setPage(101),
+                'Page is supposed to be between 1 and 100.',
             ],
             'invalid status' => [
                 (new WhatsappRecipientParams())->setStatus('opt_out'),

@@ -18,13 +18,24 @@ class WhatsappRecipient extends AbstractEndpoint
      */
     public function getAll(WhatsappRecipientParams $whatsappRecipientParams): array
     {
-        if ($limit = $whatsappRecipientParams->getLimit()) {
+        if (($limit = $whatsappRecipientParams->getLimit()) !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
-                    Constants::MIN_LIMIT,
+                    Constants::WHATSAPP_MIN_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::WHATSAPP_MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                )
+            );
+        }
+
+        if (($page = $whatsappRecipientParams->getPage()) !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $page,
+                    1,
+                    Constants::WHATSAPP_MAX_PAGE,
+                    'Page is supposed to be between 1 and ' . Constants::WHATSAPP_MAX_PAGE . '.'
                 )
             );
         }

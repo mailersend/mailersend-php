@@ -28,22 +28,34 @@ class WhatsappInboundMessage extends AbstractEndpoint
             );
         }
 
-        if ($whatsappInboundMessageParams->getLimit()) {
+        if ($whatsappInboundMessageParams->getLimit() !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $whatsappInboundMessageParams->getLimit(),
-                    Constants::MIN_LIMIT,
+                    Constants::WHATSAPP_MIN_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::WHATSAPP_MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
             );
         }
 
-        if ($whatsappInboundMessageParams->getDateFrom() && $whatsappInboundMessageParams->getDateTo()) {
+        if ($whatsappInboundMessageParams->getPage() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $whatsappInboundMessageParams->getPage(),
+                    1,
+                    Constants::WHATSAPP_MAX_PAGE,
+                    'Page is supposed to be between 1 and ' . Constants::WHATSAPP_MAX_PAGE . '.'
+                )
+            );
+        }
+
+        if (is_numeric($whatsappInboundMessageParams->getDateFrom()) && is_numeric($whatsappInboundMessageParams->getDateTo())) {
             GeneralHelpers::assert(
                 fn () => Assertion::greaterThan(
                     $whatsappInboundMessageParams->getDateTo(),
-                    $whatsappInboundMessageParams->getDateFrom()
+                    $whatsappInboundMessageParams->getDateFrom(),
+                    'Date to must be greater than date from.'
                 )
             );
         }
