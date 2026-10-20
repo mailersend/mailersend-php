@@ -15,6 +15,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.45.0] - 2026 10 21
+
+### Added
+
+- WhatsApp read endpoints, each with a params builder for its filters:
+  - `whatsappMessage->getAll(WhatsappMessageParams)` and `find()`
+  - `whatsappItem->getAll(WhatsappItemParams)` and `find()`
+  - `whatsappActivity->getAll(WhatsappActivityParams)`
+  - `whatsappInboundMessage->getAll(WhatsappInboundMessageParams)` and `find()`
+  - `whatsappRecipient->getAll(WhatsappRecipientParams)` and `find()`
+  - `whatsappTemplate->getAll(WhatsappTemplateParams)` and `find()`
+- WhatsApp lists accept a `limit` from 1 to 100 and a `page` up to 100, and `date_from` and `date_to`
+  as a Unix timestamp or a datetime string
+
+### Changed
+
+### Fixed
+
+### Removed
+
 ## [0.43.0] - 2026 09 22
 
 ### Added

@@ -4,16 +4,24 @@ namespace MailerSend\Common;
 
 class Constants
 {
-    public const SDK_VERSION = 'v0.43.0';
+    public const SDK_VERSION = 'v0.45.0';
     public const DEFAULT_LIMIT = 25;
     public const MIN_LIMIT = 10;
     public const MAX_LIMIT = 100;
+    public const WHATSAPP_MIN_LIMIT = 1;
+    public const WHATSAPP_MAX_PAGE = 100;
     public const POSSIBLE_EVENT_TYPES = ['queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints', 'opened_unique', 'clicked_unique', 'survey_opened', 'survey_submitted', 'deferred', 'suppressed'];
     public const POSSIBLE_EMAIL_STATUSES = ['queued', 'sent', 'rejected', 'delivered'];
     public const POSSIBLE_EMAIL_INTERACTIONS = ['opened', 'clicked', 'unsubscribed', 'complained', 'no_interaction'];
     public const MIN_EMAIL_SUBJECT_FILTER_LENGTH = 3;
     public const POSSIBLE_SMS_STATUSES = ['processed', 'queued', 'sent', 'delivered', 'failed'];
     public const POSSIBLE_SMS_RECIPIENT_STATUSES = ['active', 'opt_out'];
+    public const POSSIBLE_WHATSAPP_INBOUND_MESSAGE_TYPES = ['text', 'image', 'audio', 'video', 'document', 'sticker', 'location', 'contacts', 'interactive', 'button', 'order', 'reaction', 'system', 'unknown', 'unsupported'];
+    public const POSSIBLE_WHATSAPP_RECIPIENT_STATUSES = ['active', 'invalid', 'suppressed', 'blocked'];
+    public const POSSIBLE_WHATSAPP_ITEM_STATUSES = ['queued', 'sent', 'delivered', 'read', 'failed'];
+    public const POSSIBLE_WHATSAPP_ACTIVITY_TYPES = ['queued', 'sent', 'delivered', 'read', 'failed'];
+    public const POSSIBLE_WHATSAPP_TEMPLATE_STATUSES = ['draft', 'pending', 'approved', 'rejected', 'archived', 'deleted', 'disabled', 'flagged', 'in_appeal', 'limit_exceeded', 'locked', 'paused', 'reinstated', 'pending_deletion'];
+    public const POSSIBLE_WHATSAPP_TEMPLATE_CATEGORIES = ['UTILITY', 'AUTHENTICATION', 'MARKETING'];
     public const POSSIBLE_GROUP_BY_OPTIONS = ['days', 'weeks', 'months', 'years'];
     public const GROUP_BY_DAYS = 'days';
     public const GROUP_BY_WEEKS = 'weeks';
