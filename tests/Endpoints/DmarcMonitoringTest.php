@@ -106,6 +106,10 @@ class DmarcMonitoringTest extends TestCase
                 ['limit' => 10],
                 ['page' => null, 'limit' => '10'],
             ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['page' => null, 'limit' => '1'],
+            ],
             'with page and limit' => [
                 ['page' => 2, 'limit' => 25],
                 ['page' => '2', 'limit' => '25'],
@@ -148,8 +152,8 @@ class DmarcMonitoringTest extends TestCase
     public static function invalidGetAllDataProvider(): array
     {
         return [
-            'limit too low'              => [null, 9,   null, null,      null,  'Limit is supposed to be between 10 and 100.'],
-            'limit too high'             => [null, 101, null, null,      null,  'Limit is supposed to be between 10 and 100.'],
+            'limit too low'              => [null, 0,   null, null,      null,  'Limit is supposed to be between 1 and 100.'],
+            'limit too high'             => [null, 101, null, null,      null,  'Limit is supposed to be between 1 and 100.'],
             'invalid sort_by'            => [null, null, null, 'invalid_field', null, 'sort_by must be one of: created_at, updated_at, dmarc_valid, spf_status.'],
             'invalid order'              => [null, null, null, null,      'random', 'order must be asc or desc.'],
             'query exceeds 255 chars'    => [null, null, str_repeat('a', 256), null, null, 'Query may not be greater than 255 characters.'],
@@ -190,38 +194,24 @@ class DmarcMonitoringTest extends TestCase
         $this->assertBodyContains(['wanted_dmarc_record' => 'v=DMARC1; p=reject;'], $body);
     }
 
-    public function test_update_requires_monitor_id(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Monitor id is required.');
-
-        $this->dmarcMonitoring->update('', new DmarcMonitoringUpdateParams('v=DMARC1; p=reject;'));
-    }
-
-    public function test_update_requires_wanted_dmarc_record(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Wanted DMARC record is required.');
-
-        $this->dmarcMonitoring->update('monitor-id-123', new DmarcMonitoringUpdateParams(''));
-    }
-
     /**
      * @dataProvider invalidUpdateDataProvider
      */
     #[DataProvider('invalidUpdateDataProvider')]
-    public function test_update_rejects_invalid_params(string $wantedDmarcRecord, string $message): void
+    public function test_update_rejects_invalid_params(string $monitorId, string $wantedDmarcRecord, string $message): void
     {
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage($message);
 
-        $this->dmarcMonitoring->update('monitor-id-123', new DmarcMonitoringUpdateParams($wantedDmarcRecord));
+        $this->dmarcMonitoring->update($monitorId, new DmarcMonitoringUpdateParams($wantedDmarcRecord));
     }
 
     public static function invalidUpdateDataProvider(): array
     {
         return [
-            'wanted_dmarc_record exceeds 1000 chars' => [str_repeat('a', 1001), 'Wanted DMARC record may not be greater than 1000 characters.'],
+            'missing monitor id'                     => ['',               'v=DMARC1; p=reject;',  'Monitor id is required.'],
+            'missing wanted_dmarc_record'            => ['monitor-id-123', '',                     'Wanted DMARC record is required.'],
+            'wanted_dmarc_record exceeds 1000 chars' => ['monitor-id-123', str_repeat('a', 1001), 'Wanted DMARC record may not be greater than 1000 characters.'],
         ];
     }
 
@@ -359,13 +349,17 @@ class DmarcMonitoringTest extends TestCase
                 ['limit' => 10],
                 ['limit' => '10'],
             ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['limit' => '1'],
+            ],
             'with date_from' => [
-                ['date_from' => '2024-01-01'],
-                ['date_from' => '2024-01-01'],
+                ['date_from' => '2024-01-01T00:00:00Z'],
+                ['date_from' => '2024-01-01T00:00:00Z'],
             ],
             'with date_to' => [
-                ['date_to' => '2024-01-31'],
-                ['date_to' => '2024-01-31'],
+                ['date_to' => '2024-01-31T23:59:59Z'],
+                ['date_to' => '2024-01-31T23:59:59Z'],
             ],
             'with search' => [
                 ['search' => 'example.com'],
@@ -383,8 +377,8 @@ class DmarcMonitoringTest extends TestCase
                 [
                     'page'          => 1,
                     'limit'         => 25,
-                    'date_from'     => '2024-01-01',
-                    'date_to'       => '2024-01-31',
+                    'date_from'     => '2024-01-01T00:00:00Z',
+                    'date_to'       => '2024-01-31T23:59:59Z',
                     'search'        => 'example.com',
                     'category'      => 'dmarc',
                     'report_source' => 'google.com',
@@ -392,8 +386,8 @@ class DmarcMonitoringTest extends TestCase
                 [
                     'page'          => '1',
                     'limit'         => '25',
-                    'date_from'     => '2024-01-01',
-                    'date_to'       => '2024-01-31',
+                    'date_from'     => '2024-01-01T00:00:00Z',
+                    'date_to'       => '2024-01-31T23:59:59Z',
                     'search'        => 'example.com',
                     'category'      => 'dmarc',
                     'report_source' => 'google.com',
@@ -521,13 +515,17 @@ class DmarcMonitoringTest extends TestCase
                 ['limit' => 10],
                 ['limit' => '10'],
             ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['limit' => '1'],
+            ],
             'with date_from' => [
-                ['date_from' => '2024-01-01'],
-                ['date_from' => '2024-01-01'],
+                ['date_from' => '2024-01-01T00:00:00Z'],
+                ['date_from' => '2024-01-01T00:00:00Z'],
             ],
             'with date_to' => [
-                ['date_to' => '2024-01-31'],
-                ['date_to' => '2024-01-31'],
+                ['date_to' => '2024-01-31T23:59:59Z'],
+                ['date_to' => '2024-01-31T23:59:59Z'],
             ],
             'with search' => [
                 ['search' => 'example.com'],
@@ -545,8 +543,8 @@ class DmarcMonitoringTest extends TestCase
                 [
                     'page'          => 1,
                     'limit'         => 25,
-                    'date_from'     => '2024-01-01',
-                    'date_to'       => '2024-01-31',
+                    'date_from'     => '2024-01-01T00:00:00Z',
+                    'date_to'       => '2024-01-31T23:59:59Z',
                     'search'        => 'example.com',
                     'category'      => 'dmarc',
                     'report_source' => 'google.com',
@@ -554,8 +552,8 @@ class DmarcMonitoringTest extends TestCase
                 [
                     'page'          => '1',
                     'limit'         => '25',
-                    'date_from'     => '2024-01-01',
-                    'date_to'       => '2024-01-31',
+                    'date_from'     => '2024-01-01T00:00:00Z',
+                    'date_to'       => '2024-01-31T23:59:59Z',
                     'search'        => 'example.com',
                     'category'      => 'dmarc',
                     'report_source' => 'google.com',
@@ -569,7 +567,7 @@ class DmarcMonitoringTest extends TestCase
         $this->addSuccessResponse(200);
 
         $monitorId = 'monitor-id-123';
-        $response = $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01', '2024-01-31');
+        $response = $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z');
 
         $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
@@ -577,8 +575,8 @@ class DmarcMonitoringTest extends TestCase
         self::assertEquals('GET', $request->getMethod());
         self::assertEquals("/v1/dmarc-monitoring/$monitorId/report-sources", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
-        self::assertEquals('2024-01-01', Arr::get($query, 'date_from'));
-        self::assertEquals('2024-01-31', Arr::get($query, 'date_to'));
+        self::assertEquals('2024-01-01T00:00:00Z', Arr::get($query, 'date_from'));
+        self::assertEquals('2024-01-31T23:59:59Z', Arr::get($query, 'date_to'));
         self::assertArrayNotHasKey('status', $query);
     }
 
@@ -587,7 +585,7 @@ class DmarcMonitoringTest extends TestCase
         $this->addSuccessResponse(200);
 
         $monitorId = 'monitor-id-123';
-        $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01', '2024-01-31', 'accepted');
+        $this->dmarcMonitoring->getReportSources($monitorId, '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', 'accepted');
 
         $request = $this->client->getLastRequest();
         parse_str($request->getUri()->getQuery(), $query);
@@ -616,19 +614,19 @@ class DmarcMonitoringTest extends TestCase
     {
         return [
             'missing monitor id' => [
-                '', '2024-01-01', '2024-01-31', null,
+                '', '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', null,
                 'Monitor id is required.',
             ],
             'missing date_from' => [
-                'monitor-id-123', '', '2024-01-31', null,
+                'monitor-id-123', '', '2024-01-31T23:59:59Z', null,
                 'date_from is required.',
             ],
             'missing date_to' => [
-                'monitor-id-123', '2024-01-01', '', null,
+                'monitor-id-123', '2024-01-01T00:00:00Z', '', null,
                 'date_to is required.',
             ],
             'invalid status' => [
-                'monitor-id-123', '2024-01-01', '2024-01-31', 'invalid_status',
+                'monitor-id-123', '2024-01-01T00:00:00Z', '2024-01-31T23:59:59Z', 'invalid_status',
                 'status must be one of: accepted, rejected, quarantined.',
             ],
         ];
@@ -643,6 +641,13 @@ class DmarcMonitoringTest extends TestCase
         $this->dmarcMonitoring->markIpAsFavorite($monitorId, $ip);
 
         $this->assertRequest('PUT', "/v1/dmarc-monitoring/$monitorId/favorite/$ip");
+    }
+
+    public function test_mark_ip_as_favorite_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(200);
+        $response = $this->dmarcMonitoring->markIpAsFavorite('monitor-id-123', '1.2.3.4');
+        self::assertEquals(200, $response['status_code']);
     }
 
     /**
@@ -671,6 +676,13 @@ class DmarcMonitoringTest extends TestCase
         $this->assertRequest('DELETE', "/v1/dmarc-monitoring/$monitorId/favorite/$ip");
     }
 
+    public function test_remove_ip_from_favorites_forwards_status_code(): void
+    {
+        $this->addSuccessResponse(204);
+        $response = $this->dmarcMonitoring->removeIpFromFavorites('monitor-id-123', '1.2.3.4');
+        self::assertEquals(204, $response['status_code']);
+    }
+
     /**
      * @dataProvider invalidMonitorIdAndIpDataProvider
      */
@@ -689,8 +701,8 @@ class DmarcMonitoringTest extends TestCase
     public static function invalidLimitDataProvider(): array
     {
         return [
-            'limit too low'  => [9,   'Limit is supposed to be between 10 and 100.'],
-            'limit too high' => [101, 'Limit is supposed to be between 10 and 100.'],
+            'limit too low'  => [0,   'Limit is supposed to be between 1 and 100.'],
+            'limit too high' => [101, 'Limit is supposed to be between 1 and 100.'],
         ];
     }
 

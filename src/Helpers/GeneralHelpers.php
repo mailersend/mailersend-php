@@ -52,16 +52,11 @@ class GeneralHelpers
         ], fn ($v) => $v !== null), 'One of template_id, html or text must be supplied'));
 
         if (!$params->getTemplateId()) {
-            self::assert(
-                fn () => Assertion::email($params->getFrom()) &&
-                    Assertion::minLength($params->getFromName(), 1) &&
-                    Assertion::minLength($params->getSubject(), 1) &&
-                    Assertion::minCount($params->getRecipients(), 1)
-            );
-        } else {
-            self::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
+            self::assert(fn () => Assertion::email($params->getFrom(), 'From email must be a valid email address.'));
+            self::assert(fn () => Assertion::minLength($params->getSubject(), 1, 'Subject is required.'));
         }
 
+        self::assert(fn () => Assertion::minCount($params->getRecipients(), 1, 'At least one recipient is required.'));
         self::assert(fn () => Assertion::maxCount($params->getRecipients(), 50, 'Recipients list should not contain more than 50 items.'));
 
         if ($params->getSubject() !== null) {
@@ -108,30 +103,22 @@ class GeneralHelpers
         }
 
         if (count($params->getCc()) > 0) {
-            self::assert(fn () => Assertion::maxCount($params->getCc(), 10));
+            self::assert(fn () => Assertion::maxCount($params->getCc(), 10, 'CC list should not contain more than 10 items.'));
             foreach ($params->getCc() as $key => $cc) {
                 $cc = !is_array($cc) ? $cc->toArray() : $cc;
                 self::assert(
                     fn () => Assertion::keyExists($cc, 'email', "The element with index $key in CC array does not contain the email parameter.")
                 );
-                if (isset($cc['name'])) {
-                    self::assert(fn () => Assertion::eq(1, count(explode(';', $cc['name']))));
-                    self::assert(fn () => Assertion::eq(1, count(explode(',', $cc['name']))));
-                }
             }
         }
 
         if (count($params->getBcc()) > 0) {
-            self::assert(fn () => Assertion::maxCount($params->getBcc(), 10));
+            self::assert(fn () => Assertion::maxCount($params->getBcc(), 10, 'BCC list should not contain more than 10 items.'));
             foreach ($params->getBcc() as $key => $bcc) {
                 $bcc = !is_array($bcc) ? $bcc->toArray() : $bcc;
                 self::assert(
                     fn () => Assertion::keyExists($bcc, 'email', "The element with index $key in BCC array does not contain the email parameter.")
                 );
-                if (isset($bcc['name'])) {
-                    self::assert(fn () => Assertion::eq(1, count(explode(';', $bcc['name']))));
-                    self::assert(fn () => Assertion::eq(1, count(explode(',', $bcc['name']))));
-                }
             }
         }
     }

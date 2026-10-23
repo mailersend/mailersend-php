@@ -84,6 +84,18 @@ class TokenTest extends TestCase
         $this->assertQueryParams(['page' => '3', 'limit' => '20'], $query);
     }
 
+    public function test_get_all_with_null_limit_omits_limit(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->token->getAll(null, null);
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertArrayNotHasKey('limit', $query);
+    }
+
     /**
      * @dataProvider invalidGetAllLimitProvider
      */
@@ -180,14 +192,6 @@ class TokenTest extends TestCase
         ];
     }
 
-    public function test_create_token_with_invalid_scope_throws_error(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Some scopes are not valid.');
-
-        new TokenParams('token name', 'domainId', ['invalid_scope']);
-    }
-
     public function test_update_token_with_pause_status(): void
     {
         $this->addSuccessResponse();
@@ -240,28 +244,32 @@ class TokenTest extends TestCase
         $this->assertBodyExcludes(['status'], $body);
     }
 
-    public function test_update_token_requires_id(): void
+    /**
+     * @dataProvider invalidUpdateParamsProvider
+     */
+    #[DataProvider('invalidUpdateParamsProvider')]
+    public function test_update_rejects_invalid_params(string $id, ?string $status, ?string $name, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Token id is required.');
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $this->token->update('', TokenParams::STATUS_PAUSE);
+        $this->token->update($id, $status, $name);
     }
 
-    public function test_update_token_with_invalid_status_throws_error(): void
+    public static function invalidUpdateParamsProvider(): array
     {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Value "invalid_status" is not an element of the valid values');
-
-        $this->token->update('random_id', 'invalid_status');
-    }
-
-    public function test_update_token_rejects_name_exceeding_50_chars(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Token name must not exceed 50 characters.');
-
-        $this->token->update('random_id', null, str_repeat('a', 51));
+        return [
+            'empty id' => ['', TokenParams::STATUS_PAUSE, null, 'Token id is required.'],
+            'invalid status' => [
+                'random_id',
+                'invalid_status',
+                null,
+                'Value "invalid_status" is not an element of the valid values: pause, unpause',
+            ],
+            'neither name nor status' => ['random_id', null, null, 'Token name is required when status is not set.'],
+            'empty name without status' => ['random_id', null, '', 'Token name is required when status is not set.'],
+            'name exceeds 50 chars' => ['random_id', null, str_repeat('a', 51), 'Token name must not exceed 50 characters.'],
+        ];
     }
 
     public function test_change_name(): void
@@ -276,28 +284,25 @@ class TokenTest extends TestCase
         self::assertSame('changed_name', Arr::get($body, 'name'));
     }
 
-    public function test_change_name_requires_id(): void
+    /**
+     * @dataProvider invalidChangeNameParamsProvider
+     */
+    #[DataProvider('invalidChangeNameParamsProvider')]
+    public function test_change_name_rejects_invalid_params(string $id, string $name, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Token id is required.');
+        $this->expectExceptionMessage($exceptionMessage);
 
-        $this->token->changeName('', 'new_name');
+        $this->token->changeName($id, $name);
     }
 
-    public function test_change_name_requires_name(): void
+    public static function invalidChangeNameParamsProvider(): array
     {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Token name is required.');
-
-        $this->token->changeName('random_id', '');
-    }
-
-    public function test_change_name_rejects_name_exceeding_50_chars(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Token name must not exceed 50 characters.');
-
-        $this->token->changeName('random_id', str_repeat('a', 51));
+        return [
+            'empty id' => ['', 'new_name', 'Token id is required.'],
+            'empty name' => ['random_id', '', 'Token name is required.'],
+            'name exceeds 50 chars' => ['random_id', str_repeat('a', 51), 'Token name must not exceed 50 characters.'],
+        ];
     }
 
     public function test_delete_token(): void

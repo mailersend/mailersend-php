@@ -170,15 +170,6 @@ class BlocklistMonitoringTest extends TestCase
         $this->assertBodyExcludes(['name', 'notify', 'notify_email', 'notify_address'], $body);
     }
 
-    public function test_create_requires_address(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Address is required.');
-
-        $params = (new BlocklistMonitoringParams(''));
-        $this->blocklistMonitoring->create($params);
-    }
-
     public function test_update_uses_correct_method_and_path(): void
     {
         $this->addSuccessResponse();
@@ -284,36 +275,28 @@ class BlocklistMonitoringTest extends TestCase
         (new BlocklistMonitoringParams('example.com'))->setName(str_repeat('a', 256));
     }
 
-    public function test_create_params_set_notify_email_invalid_format(): void
+    /**
+     * @dataProvider invalidNotifyEmailDataProvider
+     */
+    #[DataProvider('invalidNotifyEmailDataProvider')]
+    public function test_create_params_set_notify_email_rejects_invalid_value(string $notifyEmail, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify email is invalid.');
+        $this->expectExceptionMessage($errorMessage);
 
-        (new BlocklistMonitoringParams('example.com'))->setNotifyEmail('not-an-email');
+        (new BlocklistMonitoringParams('example.com'))->setNotifyEmail($notifyEmail);
     }
 
-    public function test_create_params_set_notify_email_exceeds_255_chars(): void
+    /**
+     * @dataProvider invalidNotifyAddressDataProvider
+     */
+    #[DataProvider('invalidNotifyAddressDataProvider')]
+    public function test_create_params_set_notify_address_rejects_invalid_value(string $notifyAddress, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify email may not be greater than 255 characters.');
+        $this->expectExceptionMessage($errorMessage);
 
-        (new BlocklistMonitoringParams('example.com'))->setNotifyEmail(str_repeat('a', 247) . '@test.com');
-    }
-
-    public function test_create_params_set_notify_address_invalid_url(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify address must be a valid URL.');
-
-        (new BlocklistMonitoringParams('example.com'))->setNotifyAddress('not-a-url');
-    }
-
-    public function test_create_params_set_notify_address_exceeds_500_chars(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify address may not be greater than 500 characters.');
-
-        (new BlocklistMonitoringParams('example.com'))->setNotifyAddress('https://example.com/' . str_repeat('a', 490));
+        (new BlocklistMonitoringParams('example.com'))->setNotifyAddress($notifyAddress);
     }
 
     /**
@@ -336,36 +319,28 @@ class BlocklistMonitoringTest extends TestCase
         (new BlocklistMonitoringUpdateParams())->setName(str_repeat('a', 256));
     }
 
-    public function test_update_params_set_notify_email_invalid_format(): void
+    /**
+     * @dataProvider invalidNotifyEmailDataProvider
+     */
+    #[DataProvider('invalidNotifyEmailDataProvider')]
+    public function test_update_params_set_notify_email_rejects_invalid_value(string $notifyEmail, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify email is invalid.');
+        $this->expectExceptionMessage($errorMessage);
 
-        (new BlocklistMonitoringUpdateParams())->setNotifyEmail('not-an-email');
+        (new BlocklistMonitoringUpdateParams())->setNotifyEmail($notifyEmail);
     }
 
-    public function test_update_params_set_notify_email_exceeds_255_chars(): void
+    /**
+     * @dataProvider invalidNotifyAddressDataProvider
+     */
+    #[DataProvider('invalidNotifyAddressDataProvider')]
+    public function test_update_params_set_notify_address_rejects_invalid_value(string $notifyAddress, string $errorMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify email may not be greater than 255 characters.');
+        $this->expectExceptionMessage($errorMessage);
 
-        (new BlocklistMonitoringUpdateParams())->setNotifyEmail(str_repeat('a', 247) . '@test.com');
-    }
-
-    public function test_update_params_set_notify_address_invalid_url(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify address must be a valid URL.');
-
-        (new BlocklistMonitoringUpdateParams())->setNotifyAddress('not-a-url');
-    }
-
-    public function test_update_params_set_notify_address_exceeds_500_chars(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Notify address may not be greater than 500 characters.');
-
-        (new BlocklistMonitoringUpdateParams())->setNotifyAddress('https://example.com/' . str_repeat('a', 490));
+        (new BlocklistMonitoringUpdateParams())->setNotifyAddress($notifyAddress);
     }
 
     public static function validGetAllDataProvider(): array
@@ -382,6 +357,10 @@ class BlocklistMonitoringTest extends TestCase
             'with limit' => [
                 'params' => ['limit' => 25],
                 'expected' => ['limit' => '25'],
+            ],
+            'with minimum limit' => [
+                'params' => ['limit' => 1],
+                'expected' => ['limit' => '1'],
             ],
             'with query' => [
                 'params' => ['query' => 'example.com'],
@@ -418,12 +397,12 @@ class BlocklistMonitoringTest extends TestCase
     {
         return [
             'limit below minimum' => [
-                'params' => ['limit' => Constants::MIN_LIMIT - 1],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
+                'params' => ['limit' => Constants::MIN_MONITORING_LIMIT - 1],
+                'errorMessage' => 'Limit is supposed to be between 1 and 100.',
             ],
             'limit above maximum' => [
                 'params' => ['limit' => Constants::MAX_LIMIT + 1],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
+                'errorMessage' => 'Limit is supposed to be between 1 and 100.',
             ],
             'invalid sort_by value' => [
                 'params' => ['sort_by' => 'invalid_field'],
@@ -447,6 +426,10 @@ class BlocklistMonitoringTest extends TestCase
     public static function invalidCreateDataProvider(): array
     {
         return [
+            'missing address' => [
+                'params' => new BlocklistMonitoringParams(''),
+                'errorMessage' => 'Address is required.',
+            ],
             'address exceeds 255 chars' => [
                 'params' => new BlocklistMonitoringParams(str_repeat('a', 256)),
                 'errorMessage' => 'Address may not be greater than 255 characters.',
@@ -455,6 +438,34 @@ class BlocklistMonitoringTest extends TestCase
                 'params' => (new BlocklistMonitoringParams('example.com'))
                     ->setNotify(true),
                 'errorMessage' => 'Notify email or notify address is required when notify is enabled.',
+            ],
+        ];
+    }
+
+    public static function invalidNotifyEmailDataProvider(): array
+    {
+        return [
+            'invalid format' => [
+                'notifyEmail' => 'not-an-email',
+                'errorMessage' => 'Notify email is invalid.',
+            ],
+            'exceeds 255 chars' => [
+                'notifyEmail' => str_repeat('a', 247) . '@test.com',
+                'errorMessage' => 'Notify email may not be greater than 255 characters.',
+            ],
+        ];
+    }
+
+    public static function invalidNotifyAddressDataProvider(): array
+    {
+        return [
+            'invalid url' => [
+                'notifyAddress' => 'not-a-url',
+                'errorMessage' => 'Notify address must be a valid URL.',
+            ],
+            'exceeds 500 chars' => [
+                'notifyAddress' => 'https://example.com/' . str_repeat('a', 490),
+                'errorMessage' => 'Notify address may not be greater than 500 characters.',
             ],
         ];
     }

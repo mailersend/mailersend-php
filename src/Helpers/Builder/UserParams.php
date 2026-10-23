@@ -128,6 +128,17 @@ class UserParams implements Arrayable, \JsonSerializable
             ]);
     }
 
+    public function toUpdateArray(): array
+    {
+        return array_filter([
+            'role' => $this->getRole(),
+            'permissions' => $this->getPermissions(),
+            'domains' => $this->getDomains(),
+            'templates' => $this->getTemplates(),
+            'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
+        ]);
+    }
+
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {

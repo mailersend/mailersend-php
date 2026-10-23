@@ -28,13 +28,13 @@ class DmarcMonitoring extends AbstractEndpoint
         ?string $sortBy = null,
         ?string $order = null
     ): array {
-        if ($limit) {
+        if ($limit !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
-                    Constants::MIN_LIMIT,
+                    Constants::MIN_MONITORING_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::MIN_MONITORING_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
             );
         }
@@ -155,13 +155,13 @@ class DmarcMonitoring extends AbstractEndpoint
             fn () => Assertion::minLength($monitorId, 1, 'Monitor id is required.')
         );
 
-        if ($limit) {
+        if ($limit !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
-                    Constants::MIN_LIMIT,
+                    Constants::MIN_MONITORING_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::MIN_MONITORING_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
             );
         }
@@ -221,13 +221,13 @@ class DmarcMonitoring extends AbstractEndpoint
             fn () => Assertion::minLength($ip, 1, 'IP address is required.')
         );
 
-        if ($limit) {
+        if ($limit !== null) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
-                    Constants::MIN_LIMIT,
+                    Constants::MIN_MONITORING_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::MIN_MONITORING_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
             );
         }

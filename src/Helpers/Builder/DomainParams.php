@@ -66,12 +66,12 @@ class DomainParams implements Arrayable, \JsonSerializable
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'name' => $this->getName(),
             'return_path_subdomain' => $this->getReturnPathSubdomain(),
             'custom_tracking_subdomain' => $this->getCustomTrackingSubdomain(),
             'inbound_routing_subdomain' => $this->getInboundRoutingSubdomain(),
-        ];
+        ], fn ($value) => $value !== null);
     }
 
     #[\ReturnTypeWillChange]

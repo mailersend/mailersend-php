@@ -123,8 +123,7 @@ class TemplateTest extends TestCase
             ->setText('Hello')
             ->setDomainId('domain-id')
             ->setCategories(['newsletter'])
-            ->setTags(['tag1'])
-            ->setAutoGenerate(true);
+            ->setTags(['tag1']);
 
         $response = $this->template->create($params);
 
@@ -137,101 +136,71 @@ class TemplateTest extends TestCase
         self::assertSame('domain-id', Arr::get($body, 'domain_id'));
         self::assertSame(['newsletter'], Arr::get($body, 'categories'));
         self::assertSame(['tag1'], Arr::get($body, 'tags'));
-        self::assertTrue(Arr::get($body, 'auto_generate'));
     }
 
     /**
+     * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_create_requires_html(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('HTML is required.');
-
-        $this->template->create(new TemplateParams());
-    }
-
-    /**
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create_name_max_length_is_validated(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Name must be 50 characters or fewer.');
-
-        $params = (new TemplateParams())
-            ->setHtml('<h1>Hello</h1>')
-            ->setName(str_repeat('a', 51));
-
-        $this->template->create($params);
-    }
-
-    /**
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create_requires_text_when_auto_generate_is_not_true(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Text is required when auto_generate is not true.');
-
-        $params = (new TemplateParams())
-            ->setHtml('<h1>Hello</h1>');
-
-        $this->template->create($params);
-    }
-
-    /**
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create_does_not_require_text_when_auto_generate_is_true(): void
+    public function test_create_excludes_auto_generate_from_request_body(): void
     {
         $this->addSuccessResponse();
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
+            ->setText('Hello')
             ->setAutoGenerate(true);
 
-        $response = $this->template->create($params);
+        $this->template->create($params);
 
-        self::assertEquals(200, $response['status_code']);
+        $body = $this->assertRequest('POST', '/v1/templates');
+
+        $this->assertBodyExcludes(['auto_generate'], $body);
     }
 
     /**
+     * @dataProvider invalidCreateParamsProvider
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_create_rejects_more_than_5_tags(): void
+    #[DataProvider('invalidCreateParamsProvider')]
+    public function test_create_rejects_invalid_params(TemplateParams $params, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Tags list should not contain more than 5 items.');
-
-        $params = (new TemplateParams())
-            ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true)
-            ->setTags(['a', 'b', 'c', 'd', 'e', 'f']);
+        $this->expectExceptionMessage($expectedMessage);
 
         $this->template->create($params);
     }
 
-    /**
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create_rejects_tag_exceeding_191_characters(): void
+    public static function invalidCreateParamsProvider(): array
     {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Each tag may not be greater than 191 characters.');
-
-        $params = (new TemplateParams())
-            ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true)
-            ->setTags([str_repeat('a', 192)]);
-
-        $this->template->create($params);
+        return [
+            'html missing' => [
+                (new TemplateParams())->setText('Hello'),
+                'HTML is required.',
+            ],
+            'name longer than 50 characters' => [
+                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setName(str_repeat('a', 51)),
+                'Name must be 50 characters or fewer.',
+            ],
+            'text missing' => [
+                (new TemplateParams())->setHtml('<h1>Hello</h1>'),
+                'Text is required.',
+            ],
+            'text missing with auto_generate true' => [
+                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setAutoGenerate(true),
+                'Text is required.',
+            ],
+            'more than 5 tags' => [
+                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setTags(['a', 'b', 'c', 'd', 'e', 'f']),
+                'Tags list should not contain more than 5 items.',
+            ],
+            'tag longer than 191 characters' => [
+                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setTags([str_repeat('a', 192)]),
+                'Each tag may not be greater than 191 characters.',
+            ],
+        ];
     }
 
     /**
@@ -275,13 +244,13 @@ class TemplateTest extends TestCase
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true);
+            ->setText('Hello');
 
         $this->template->create($params);
 
         $body = $this->assertRequest('POST', '/v1/templates');
 
-        $this->assertBodyExcludes(['name', 'text', 'domain_id', 'categories', 'tags'], $body);
+        $this->assertBodyExcludes(['name', 'domain_id', 'categories', 'tags'], $body);
     }
 
     /**

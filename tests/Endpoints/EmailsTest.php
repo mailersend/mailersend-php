@@ -76,6 +76,17 @@ class EmailsTest extends TestCase
         $this->assertQueryParams(['page' => '3', 'limit' => '25'], $query);
     }
 
+    public function test_get_all_accepts_the_maximum_limit(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->emails->getAll(self::validParams()->setLimit(1000));
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+        $this->assertQueryParams(['limit' => '1000'], $query);
+    }
+
     public function test_get_all_accepts_datetime_strings_for_dates(): void
     {
         $this->addSuccessResponse();
@@ -380,11 +391,11 @@ class EmailsTest extends TestCase
             ],
             'limit below minimum' => [
                 self::validParams()->setLimit(9),
-                'Limit is supposed to be between 10 and 100.',
+                'Limit is supposed to be between 10 and 1000.',
             ],
             'limit above maximum' => [
-                self::validParams()->setLimit(101),
-                'Limit is supposed to be between 10 and 100.',
+                self::validParams()->setLimit(1001),
+                'Limit is supposed to be between 10 and 1000.',
             ],
             'invalid status' => [
                 self::validParams()->setStatus(['invalid_status', 'sent']),

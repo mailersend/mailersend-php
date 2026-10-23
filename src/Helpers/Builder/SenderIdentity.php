@@ -187,11 +187,14 @@ class SenderIdentity implements Arrayable, \JsonSerializable
      */
     public function toUpdateArray(): array
     {
-        return [
-            'name' => $this->getName(),
-            'reply_to_email' => $this->getReplyToEmail(),
-            'reply_to_name' => $this->getReplyToName(),
-        ];
+        return array_filter(
+            [
+                'name' => $this->getName(),
+                'reply_to_email' => $this->getReplyToEmail(),
+                'reply_to_name' => $this->getReplyToName(),
+            ],
+            fn ($v) => $v !== null
+        );
     }
 
     #[\ReturnTypeWillChange]

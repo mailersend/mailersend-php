@@ -31,12 +31,12 @@ class SmsActivity extends AbstractEndpoint
                     $smsActivityParams->getLimit(),
                     Constants::MIN_LIMIT,
                     Constants::MAX_LIMIT,
-                    'Limit is supposed to be between' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
+                    'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.'
                 )
             );
         }
 
-        if ($smsActivityParams->getDateFrom() && $smsActivityParams->getDateTo()) {
+        if (is_numeric($smsActivityParams->getDateFrom()) && is_numeric($smsActivityParams->getDateTo())) {
             GeneralHelpers::assert(
                 fn () => Assertion::greaterThan($smsActivityParams->getDateTo(), $smsActivityParams->getDateFrom())
             );

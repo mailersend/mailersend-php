@@ -51,7 +51,7 @@ class SmsInbound implements Arrayable, \JsonSerializable
     }
 
     /**
-     * @param array|SmsInboundFilter|null $filter
+     * @param SmsInboundFilter|null $filter
      * @return $this
      */
     public function setFilter($filter): SmsInbound

@@ -29,7 +29,6 @@ class BulkEmail extends AbstractEndpoint
             $recipients_mapped = GeneralHelpers::mapToArray($params->getRecipients(), Recipient::class);
             $cc_mapped = GeneralHelpers::mapToArray($params->getCc(), Recipient::class);
             $bcc_mapped = GeneralHelpers::mapToArray($params->getBcc(), Recipient::class);
-            $rcpt_to_mapped = GeneralHelpers::mapToArray($params->getRcptTo(), Recipient::class);
             $attachments_mapped = GeneralHelpers::mapToArray($params->getAttachments(), Attachment::class);
             $personalization_mapped = GeneralHelpers::mapToArray($params->getPersonalization(), Personalization::class);
 
@@ -57,15 +56,14 @@ class BulkEmail extends AbstractEndpoint
                     'send_at' => $params->getSendAt(),
                     'precedence_bulk' => $params->getPrecedenceBulkHeader(),
                     'in_reply_to' => $params->getInReplyToHeader(),
-                    'settings' => [
+                    'settings' => array_filter([
                         'track_clicks' => $params->trackClicks(),
                         'track_opens' => $params->trackOpens(),
                         'track_content' => $params->trackContent(),
-                    ],
+                    ], fn ($v) => $v !== null),
                     'headers' => $params->getHeaders(),
                     'references' => $params->getReferencesHeader(),
                     'list_unsubscribe' => $params->getListUnsubscribe(),
-                    'rcptTo' => $rcpt_to_mapped,
                 ],
                 fn ($v) => is_array($v) ? array_filter($v, fn ($v) => $v !== null) : $v !== null
             );

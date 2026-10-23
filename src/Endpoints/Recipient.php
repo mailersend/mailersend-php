@@ -39,12 +39,11 @@ class Recipient extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri($this->endpoint),
-            array_filter([
+            $this->buildUri($this->endpoint, array_filter([
                 'domain_id' => $domainId,
                 'limit' => $limit,
                 'page' => $page
-            ])
+            ]))
         );
     }
 

@@ -25,10 +25,10 @@ class BlocklistParams extends SuppressionParams
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'domain_id' => $this->getDomainId(),
             'recipients' => $this->getRecipients(),
             'patterns' => $this->getPatterns(),
-        ];
+        ], fn ($value) => $value !== null);
     }
 }

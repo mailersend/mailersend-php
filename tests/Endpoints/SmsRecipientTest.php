@@ -154,20 +154,16 @@ class SmsRecipientTest extends TestCase
         self::assertEquals(200, $response['status_code']);
     }
 
-    public function test_update_requires_sms_recipient_id(): void
+    /**
+     * @dataProvider invalidSmsRecipientUpdateDataProvider
+     */
+    #[DataProvider('invalidSmsRecipientUpdateDataProvider')]
+    public function test_update_rejects_invalid_params(string $smsRecipientId, string $status, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('SMS number id cannot be empty.');
+        $this->expectExceptionMessage($expectedMessage);
 
-        $this->smsRecipient->update('', 'active');
-    }
-
-    public function test_update_rejects_invalid_status(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Value "invalid_status" is not an element of the valid values: active, opt_out');
-
-        $this->smsRecipient->update('sms_number_id', 'invalid_status');
+        $this->smsRecipient->update($smsRecipientId, $status);
     }
 
     public function test_update_sms_recipient_with_active_status(): void
@@ -211,6 +207,22 @@ class SmsRecipientTest extends TestCase
                 (new SmsRecipientParams())
                     ->setStatus('test'),
                 'Value "test" is not an element of the valid values: active, opt_out',
+            ],
+        ];
+    }
+
+    public static function invalidSmsRecipientUpdateDataProvider(): array
+    {
+        return [
+            'missing sms recipient id' => [
+                '',
+                'active',
+                'SMS recipient id cannot be empty.',
+            ],
+            'invalid status' => [
+                'hashed_recipient_id',
+                'invalid_status',
+                'Value "invalid_status" is not an element of the valid values: active, opt_out',
             ],
         ];
     }

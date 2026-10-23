@@ -129,6 +129,50 @@ class SmsActivityTest extends TestCase
         self::assertEquals(1623074976, $query['date_to'] ?? null);
     }
 
+    /**
+     * @dataProvider stringDateFormatsProvider
+     */
+    #[DataProvider('stringDateFormatsProvider')]
+    public function test_getAll_with_string_dates(string $dateFrom, string $dateTo): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())
+            ->setDateFrom($dateFrom)
+            ->setDateTo($dateTo);
+
+        $this->smsActivity->getAll($params);
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        self::assertSame($dateFrom, $query['date_from'] ?? null);
+        self::assertSame($dateTo, $query['date_to'] ?? null);
+    }
+
+    public static function stringDateFormatsProvider(): array
+    {
+        return [
+            'ISO 8601' => ['2015-09-30T22:12:21Z', '2015-10-01T22:12:21Z'],
+            'Y-m-d H:i:s' => ['2015-09-30 22:12:21', '2015-10-01 22:12:21'],
+        ];
+    }
+
+    public function test_getAll_with_non_numeric_dates_skips_date_range_validation(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SmsActivityParams())
+            ->setDateFrom('2015-10-01T00:00:00Z')
+            ->setDateTo('2015-09-30T00:00:00Z');
+
+        $this->smsActivity->getAll($params);
+
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        self::assertSame('2015-10-01T00:00:00Z', $query['date_from'] ?? null);
+        self::assertSame('2015-09-30T00:00:00Z', $query['date_to'] ?? null);
+    }
+
     public function test_getAll_with_only_date_from_skips_date_range_validation(): void
     {
         $this->addSuccessResponse();
@@ -300,12 +344,12 @@ class SmsActivityTest extends TestCase
             'limit below minimum' => [
                 (new SmsActivityParams())
                     ->setLimit(9),
-                'Limit is supposed to be between10 and 100.',
+                'Limit is supposed to be between 10 and 100.',
             ],
             'limit above maximum' => [
                 (new SmsActivityParams())
                     ->setLimit(101),
-                'Limit is supposed to be between10 and 100.',
+                'Limit is supposed to be between 10 and 100.',
             ],
             'date_from greater than date_to' => [
                 (new SmsActivityParams())

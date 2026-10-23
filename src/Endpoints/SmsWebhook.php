@@ -76,12 +76,11 @@ class SmsWebhook extends AbstractEndpoint
         );
 
         return $this->httpLayer->get(
-            $this->url($this->endpoint),
-            array_filter([
+            $this->url($this->endpoint, array_filter([
                 'sms_number_id' => $smsNumberId,
                 'limit' => $limit,
                 'page' => $page,
-            ])
+            ]))
         );
     }
 

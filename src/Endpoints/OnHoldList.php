@@ -5,6 +5,7 @@ namespace MailerSend\Endpoints;
 use Assert\Assertion;
 use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
+use MailerSend\Helpers\Builder\SuppressionParams;
 use MailerSend\Helpers\GeneralHelpers;
 
 class OnHoldList extends Suppression
@@ -40,6 +41,17 @@ class OnHoldList extends Suppression
                 'limit' => $limit,
             ])
         );
+    }
+
+    /**
+     * @deprecated The on-hold list has no create endpoint, so the API rejects this request.
+     * @throws \JsonException
+     * @throws \MailerSend\Exceptions\MailerSendAssertException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function create(SuppressionParams $params): array
+    {
+        return parent::create($params);
     }
 
     /**
