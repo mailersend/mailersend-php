@@ -8,6 +8,7 @@ class Constants
     public const DEFAULT_LIMIT = 25;
     public const MIN_LIMIT = 10;
     public const MAX_LIMIT = 100;
+    public const MIN_MONITORING_LIMIT = 1;
     public const POSSIBLE_EVENT_TYPES = ['queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints', 'opened_unique', 'clicked_unique', 'survey_opened', 'survey_submitted', 'deferred', 'suppressed'];
     public const POSSIBLE_EMAIL_STATUSES = ['queued', 'sent', 'rejected', 'delivered'];
     public const POSSIBLE_EMAIL_INTERACTIONS = ['opened', 'clicked', 'unsubscribed', 'complained', 'no_interaction'];

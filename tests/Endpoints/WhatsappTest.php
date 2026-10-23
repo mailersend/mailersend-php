@@ -40,44 +40,90 @@ class WhatsappTest extends TestCase
     #[DataProvider('validWhatsappParamsProvider')]
     public function test_send_whatsapp(WhatsappParams $params): void
     {
-        $response = $this->createStub(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(202);
-
-        $this->client->addResponse($response);
+        $this->addSuccessResponse(202);
 
         $result = $this->whatsapp->send($params);
 
-        $request = $this->client->getLastRequest();
-        $request_body = json_decode((string) $request->getBody(), true);
+        $request_body = $this->assertRequest('POST', '/v1/whatsapp/send');
 
-        self::assertEquals('POST', $request->getMethod());
-        self::assertEquals('/v1/whatsapp/send', $request->getUri()->getPath());
         self::assertEquals(202, $result['status_code']);
-
         self::assertEquals($params->getFrom(), Arr::get($request_body, 'from'));
         self::assertEquals($params->getTo(), Arr::get($request_body, 'to'));
         self::assertEquals($params->getTemplateId(), Arr::get($request_body, 'template_id'));
-        self::assertCount(count($params->getPersonalization()), Arr::get($request_body, 'personalization') ?? []);
+    }
+
+    public function test_send_whatsapp_with_personalization(): void
+    {
+        $this->addSuccessResponse(202);
+
+        $params = (new WhatsappParams())
+            ->setFrom('12345678901')
+            ->setTo(['19191234567', '19199876543'])
+            ->setTemplateId('template_id_123')
+            ->setPersonalization([
+                (new WhatsappPersonalization('19191234567'))
+                    ->setHeader(['John'])
+                    ->setBody(['order #1234', 'tomorrow'])
+                    ->setButtons(['https://example.com/track/1234']),
+                (new WhatsappPersonalization('19199876543'))
+                    ->setHeader(['Jane'])
+                    ->setBody(['order #5678', 'Friday']),
+            ]);
+
+        $this->whatsapp->send($params);
+
+        $request_body = $this->assertRequest('POST', '/v1/whatsapp/send');
+
+        self::assertSame([
+            [
+                'to' => '19191234567',
+                'data' => [
+                    'header' => ['John'],
+                    'body' => ['order #1234', 'tomorrow'],
+                    'buttons' => ['https://example.com/track/1234'],
+                ],
+            ],
+            [
+                'to' => '19199876543',
+                'data' => [
+                    'header' => ['Jane'],
+                    'body' => ['order #5678', 'Friday'],
+                ],
+            ],
+        ], Arr::get($request_body, 'personalization'));
+    }
+
+    public function test_send_whatsapp_omits_personalization_when_not_set(): void
+    {
+        $this->addSuccessResponse(202);
+
+        $params = (new WhatsappParams())
+            ->setFrom('12345678901')
+            ->setTo(['19191234567'])
+            ->setTemplateId('template_id_123');
+
+        $this->whatsapp->send($params);
+
+        $request_body = $this->assertRequest('POST', '/v1/whatsapp/send');
+
+        $this->assertBodyExcludes(['personalization'], $request_body);
     }
 
     /**
      * @dataProvider invalidWhatsappParamsProvider
      * @param WhatsappParams $params
+     * @param string $expectedMessage
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
     #[DataProvider('invalidWhatsappParamsProvider')]
-    public function test_send_whatsapp_with_errors(WhatsappParams $params): void
+    public function test_send_whatsapp_rejects_invalid_params(WhatsappParams $params, string $expectedMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage($expectedMessage);
 
-        $httpLayer = $this->createStub(HttpLayer::class);
-        $httpLayer->method('post')
-            ->withAnyParameters()
-            ->willReturn([]);
-
-        (new Whatsapp($httpLayer, self::OPTIONS))->send($params);
+        $this->whatsapp->send($params);
     }
 
     public static function validWhatsappParamsProvider(): array
@@ -96,21 +142,6 @@ class WhatsappTest extends TestCase
                     ->addRecipient('19199876543')
                     ->setTemplateId('template_id_123'),
             ],
-            'with personalization' => [
-                (new WhatsappParams())
-                    ->setFrom('12345678901')
-                    ->setTo(['19191234567', '19199876543'])
-                    ->setTemplateId('template_id_123')
-                    ->setPersonalization([
-                        (new WhatsappPersonalization('19191234567'))
-                            ->setHeader(['John'])
-                            ->setBody(['order #1234', 'tomorrow'])
-                            ->setButtons(['https://example.com/track/1234']),
-                        (new WhatsappPersonalization('19199876543'))
-                            ->setHeader(['Jane'])
-                            ->setBody(['order #5678', 'Friday']),
-                    ]),
-            ],
         ];
     }
 
@@ -121,23 +152,27 @@ class WhatsappTest extends TestCase
                 (new WhatsappParams())
                     ->setTo(['19191234567'])
                     ->setTemplateId('template_id_123'),
+                'From phone number is required',
             ],
             'at least one recipient' => [
                 (new WhatsappParams())
                     ->setFrom('12345678901')
                     ->setTo([])
                     ->setTemplateId('template_id_123'),
+                'At least one recipient is required',
             ],
             'template_id is required' => [
                 (new WhatsappParams())
                     ->setFrom('12345678901')
                     ->setTo(['19191234567']),
+                'Template ID is required',
             ],
             'max 10 recipients' => [
                 (new WhatsappParams())
                     ->setFrom('12345678901')
                     ->setTo(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'])
                     ->setTemplateId('template_id_123'),
+                'Maximum 10 recipients allowed',
             ],
         ];
     }

@@ -28,13 +28,16 @@ class WebhookParams implements Arrayable, \JsonSerializable
     public const ACTIVITY_CLICKED_UNIQUE = 'activity.clicked_unique';
     public const ACTIVITY_UNSUBSCRIBED = 'activity.unsubscribed';
     public const ACTIVITY_SPAM_COMPLAINT = 'activity.spam_complaint';
+    public const ACTIVITY_SUPPRESSED = 'activity.suppressed';
     public const ACTIVITY_SURVEY_OPENED = 'activity.survey_opened';
     public const ACTIVITY_SURVEY_SUBMITTED = 'activity.survey_submitted';
     public const ACTIVITY_IDENTITY_VERIFIED = 'sender_identity.verified';
     public const ACTIVITY_MAINTENANCE_START = 'maintenance.start';
     public const ACTIVITY_MAINTENANCE_END = 'maintenance.end';
     public const ACTIVITY_INBOUND_FORWARD_FAILED = 'inbound_forward.failed';
+    public const ACTIVITY_INBOUND_MESSAGE_REJECTED = 'inbound_message.rejected';
     public const ACTIVITY_EMAIL_SINGLE_VERIFIED = 'email_single.verified';
+    public const ACTIVITY_EMAIL_LIST_CREATED = 'email_list.created';
     public const ACTIVITY_EMAIL_LIST_VERIFIED = 'email_list.verified';
     public const ACTIVITY_BULK_EMAIL_COMPLETED = 'bulk_email.completed';
     public const ACTIVITY_RECIPIENT_ON_HOLD_ADDED = 'recipient.on_hold_added';
@@ -45,11 +48,12 @@ class WebhookParams implements Arrayable, \JsonSerializable
         self::ACTIVITY_SOFT_BOUNCED, self::ACTIVITY_HARD_BOUNCED, self::ACTIVITY_DEFERRED,
         self::ACTIVITY_OPENED, self::ACTIVITY_OPENED_UNIQUE,
         self::ACTIVITY_CLICKED, self::ACTIVITY_CLICKED_UNIQUE,
-        self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT,
+        self::ACTIVITY_UNSUBSCRIBED, self::ACTIVITY_SPAM_COMPLAINT, self::ACTIVITY_SUPPRESSED,
         self::ACTIVITY_SURVEY_OPENED, self::ACTIVITY_SURVEY_SUBMITTED,
         self::ACTIVITY_IDENTITY_VERIFIED, self::ACTIVITY_MAINTENANCE_START,
         self::ACTIVITY_MAINTENANCE_END, self::ACTIVITY_INBOUND_FORWARD_FAILED,
-        self::ACTIVITY_EMAIL_SINGLE_VERIFIED, self::ACTIVITY_EMAIL_LIST_VERIFIED,
+        self::ACTIVITY_INBOUND_MESSAGE_REJECTED, self::ACTIVITY_EMAIL_SINGLE_VERIFIED,
+        self::ACTIVITY_EMAIL_LIST_CREATED, self::ACTIVITY_EMAIL_LIST_VERIFIED,
         self::ACTIVITY_BULK_EMAIL_COMPLETED, self::ACTIVITY_RECIPIENT_ON_HOLD_ADDED,
         self::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED,
     ];

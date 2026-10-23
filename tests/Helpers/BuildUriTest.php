@@ -67,6 +67,69 @@ class BuildUriTest extends TestCase
                 ],
                 'https://api.mailersend.com/v1/endpoint?ids=aaa,bbb,ccc',
             ],
+            'reserved characters in a value are percent-encoded' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'query' => 'john+1@example.com',
+                ],
+                'https://api.mailersend.com/v1/endpoint?query=john%2B1%40example.com',
+            ],
+            'ampersand, equals sign and space stay inside their value' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'query' => 'a&b=c d',
+                    'page' => 2,
+                ],
+                'https://api.mailersend.com/v1/endpoint?query=a%26b%3Dc%20d&page=2',
+            ],
+            'array query param items are encoded before joining' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'ids' => ['a b', 'c&d'],
+                ],
+                'https://api.mailersend.com/v1/endpoint?ids=a%20b,c%26d',
+            ],
+            'boolean query params are sent as 1 and 0' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'detailed' => true,
+                    'verified' => false,
+                ],
+                'https://api.mailersend.com/v1/endpoint?detailed=1&verified=0',
+            ],
+            'null query params are omitted' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'page' => null,
+                    'limit' => 25,
+                ],
+                'https://api.mailersend.com/v1/endpoint?limit=25',
+            ],
         ];
     }
 }

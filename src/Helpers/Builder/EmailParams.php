@@ -77,7 +77,7 @@ class EmailParams
 
     public function getRecipients(): array
     {
-        return $this->recipients;
+        return $this->recipients ?? [];
     }
 
     public function setRecipients(array $recipients): EmailParams

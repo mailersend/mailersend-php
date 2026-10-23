@@ -174,10 +174,11 @@ class DomainTest extends TestCase
 
         $body = $this->assertRequest('POST', '/v1/domains');
 
-        // DomainParams::toArray() always emits these keys but they should be null when unset
-        self::assertNull($body['return_path_subdomain']);
-        self::assertNull($body['custom_tracking_subdomain']);
-        self::assertNull($body['inbound_routing_subdomain']);
+        $this->assertBodyExcludes([
+            'return_path_subdomain',
+            'custom_tracking_subdomain',
+            'inbound_routing_subdomain',
+        ], $body);
     }
 
     public function test_create_with_return_path_subdomain(): void
@@ -350,7 +351,7 @@ class DomainTest extends TestCase
      * @dataProvider domainSettingsDataProvider
      */
     #[DataProvider('domainSettingsDataProvider')]
-    public function test_domain_settings(DomainSettingsParams $domainSettingsParams): void
+    public function test_domain_settings(DomainSettingsParams $domainSettingsParams, array $expectedBody): void
     {
         $this->addSuccessResponse();
 
@@ -361,20 +362,7 @@ class DomainTest extends TestCase
         $body = $this->assertRequest('PUT', "/v1/domains/$domain_id/settings");
 
         self::assertEquals(200, $response['status_code']);
-
-        self::assertEquals($domainSettingsParams->getSendPaused(), $body['send_paused'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackClicks(), $body['track_clicks'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackOpens(), $body['track_opens'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackUnsubscribe(), $body['track_unsubscribe'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackContent(), $body['track_content'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackUnsubscribeHtml(), $body['track_unsubscribe_html'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackUnsubscribeHtmlEnabled(), $body['track_unsubscribe_html_enabled'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackUnsubscribePlain(), $body['track_unsubscribe_plain'] ?? null);
-        self::assertEquals($domainSettingsParams->getTrackUnsubscribePlainEnabled(), $body['track_unsubscribe_plain_enabled'] ?? null);
-        self::assertEquals($domainSettingsParams->getCustomTrackingEnabled(), $body['custom_tracking_enabled'] ?? null);
-        self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), $body['custom_tracking_subdomain'] ?? null);
-        self::assertEquals($domainSettingsParams->getPrecedenceBulk(), $body['precedence_bulk'] ?? null);
-        self::assertEquals($domainSettingsParams->getIgnoreDuplicatedRecipients(), $body['ignore_duplicated_recipients'] ?? null);
+        self::assertSame($expectedBody, $body);
     }
 
     public function test_domain_settings_requires_domain_id(): void
@@ -443,58 +431,95 @@ class DomainTest extends TestCase
                     ->setCustomTrackingSubdomain('track')
                     ->setPrecedenceBulk(false)
                     ->setIgnoreDuplicatedRecipients(false),
+                [
+                    'send_paused' => true,
+                    'track_clicks' => true,
+                    'track_opens' => false,
+                    'track_unsubscribe' => false,
+                    'track_content' => true,
+                    'track_unsubscribe_html' => 'html',
+                    'track_unsubscribe_html_enabled' => true,
+                    'track_unsubscribe_plain' => 'plain',
+                    'track_unsubscribe_plain_enabled' => false,
+                    'custom_tracking_enabled' => true,
+                    'custom_tracking_subdomain' => 'track',
+                    'precedence_bulk' => false,
+                    'ignore_duplicated_recipients' => false,
+                ],
+            ],
+            'no settings' => [
+                new DomainSettingsParams(),
+                [],
             ],
             'with send paused' => [
                 (new DomainSettingsParams())
                     ->setSendPaused(true),
+                ['send_paused' => true],
             ],
             'with track clicks' => [
                 (new DomainSettingsParams())
                     ->setTrackClicks(true),
+                ['track_clicks' => true],
             ],
             'with track opens' => [
                 (new DomainSettingsParams())
                     ->setTrackOpens(true),
+                ['track_opens' => true],
             ],
             'with track unsubscribes' => [
                 (new DomainSettingsParams())
                     ->setTrackUnsubscribe(true),
+                ['track_unsubscribe' => true],
             ],
             'with track content' => [
                 (new DomainSettingsParams())
                     ->setTrackContent(true),
+                ['track_content' => true],
+            ],
+            'with track content disabled' => [
+                (new DomainSettingsParams())
+                    ->setTrackContent(false),
+                ['track_content' => false],
             ],
             'with unsubscribe html' => [
                 (new DomainSettingsParams())
                     ->setTrackUnsubscribeHtml('html'),
+                ['track_unsubscribe_html' => 'html'],
             ],
             'with unsubscribe html enabled' => [
                 (new DomainSettingsParams())
                     ->setTrackUnsubscribeHtmlEnabled(true),
+                ['track_unsubscribe_html_enabled' => true],
             ],
             'with unsubscribe plain' => [
                 (new DomainSettingsParams())
                     ->setTrackUnsubscribePlain('plain'),
+                ['track_unsubscribe_plain' => 'plain'],
             ],
             'with unsubscribe plain enabled' => [
                 (new DomainSettingsParams())
                     ->setTrackUnsubscribePlainEnabled(true),
+                ['track_unsubscribe_plain_enabled' => true],
             ],
             'with custom tracking enabled' => [
                 (new DomainSettingsParams())
                     ->setCustomTrackingEnabled(true),
+                ['custom_tracking_enabled' => true],
             ],
             'with custom tracking subdomain' => [
                 (new DomainSettingsParams())
                     ->setCustomTrackingSubdomain('track'),
+                ['custom_tracking_subdomain' => 'track'],
             ],
             'with precedence bulk' => [
                 (new DomainSettingsParams())
                     ->setPrecedenceBulk(true),
+                ['precedence_bulk' => true],
             ],
             'with ignore duplicated recipients' => [
                 (new DomainSettingsParams())
                     ->setIgnoreDuplicatedRecipients(true),
+                ['ignore_duplicated_recipients' => true],
             ],
         ];
     }

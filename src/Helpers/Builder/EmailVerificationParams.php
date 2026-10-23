@@ -22,6 +22,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
     public const DISPOSABLE = 'disposable';
     public const MAILBOX_BLOCKED = 'mailbox_blocked';
     public const FAILED = 'failed';
+    public const QUEUED = 'queued';
 
     public const POSSIBLE_RESULTS = [
         self::VALID,
@@ -35,6 +36,7 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
         self::DISPOSABLE,
         self::MAILBOX_BLOCKED,
         self::FAILED,
+        self::QUEUED,
     ];
 
     public function __construct(string $name = '')
@@ -99,12 +101,15 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
 
     public function toArray(): array
     {
-        return [
-            'name' => $this->getName(),
-            'list_id' => $this->getListId(),
-            'verify' => $this->getVerify(),
-            'emails' => $this->emailAddresses,
-        ];
+        return array_filter(
+            [
+                'name' => $this->getName(),
+                'list_id' => $this->getListId(),
+                'verify' => $this->getVerify(),
+                'emails' => $this->emailAddresses,
+            ],
+            fn ($v) => $v !== null && $v !== ''
+        );
     }
 
     #[\ReturnTypeWillChange]

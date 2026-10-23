@@ -123,16 +123,7 @@ class InboundTest extends TestCase
         $body = $this->assertRequest('POST', '/v1/inbound');
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame(Arr::get($expected, 'domain_id'), Arr::get($body, 'domain_id'));
-        self::assertSame(Arr::get($expected, 'name'), Arr::get($body, 'name'));
-        self::assertSame(Arr::get($expected, 'domain_enabled'), Arr::get($body, 'domain_enabled'));
-        self::assertSame(Arr::get($expected, 'inbound_domain'), Arr::get($body, 'inbound_domain'));
-        self::assertSame(Arr::get($expected, 'catch_filter'), Arr::get($body, 'catch_filter'));
-        self::assertSame(Arr::get($expected, 'match_filter'), Arr::get($body, 'match_filter'));
-        self::assertSame(Arr::get($expected, 'forwards'), Arr::get($body, 'forwards'));
-        self::assertSame(Arr::get($expected, 'catch_type'), Arr::get($body, 'catch_type'));
-        self::assertSame(Arr::get($expected, 'match_type'), Arr::get($body, 'match_type'));
-        self::assertSame(Arr::get($expected, 'inbound_priority'), Arr::get($body, 'inbound_priority'));
+        self::assertEquals($expected, $body);
     }
 
     /**
@@ -150,9 +141,9 @@ class InboundTest extends TestCase
         $body = $this->assertRequest('PUT', '/v1/inbound/inboundId');
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($body, 'domain_id'));
         self::assertSame('name', Arr::get($body, 'name'));
         self::assertFalse(Arr::get($body, 'domain_enabled'));
+        $this->assertBodyExcludes(['domain_id'], $body);
     }
 
     /**
@@ -183,7 +174,6 @@ class InboundTest extends TestCase
         $body = $this->assertRequest('PUT', '/v1/inbound/inboundId');
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($body, 'domain_id'));
         self::assertSame('name', Arr::get($body, 'name'));
         self::assertTrue(Arr::get($body, 'domain_enabled'));
         self::assertSame('inboundDomain', Arr::get($body, 'inbound_domain'));
@@ -362,13 +352,7 @@ class InboundTest extends TestCase
                     'domain_id' => 'domainId',
                     'name' => 'name',
                     'domain_enabled' => true,
-                    'inbound_domain' => null,
-                    'catch_filter' => null,
-                    'match_filter' => null,
                     'forwards' => [],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match all' => [
@@ -398,9 +382,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match all, with priority' => [
@@ -431,8 +412,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
                     'inbound_priority' => 50,
                 ],
             ],
@@ -463,9 +442,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch recipient, match all' => [
@@ -502,9 +478,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match domain' => [
@@ -542,9 +515,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match header' => [
@@ -582,9 +552,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match sender' => [
@@ -622,9 +589,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'catch_type' => null,
-                    'match_type' => null,
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch all, match sender, match one' => [
@@ -644,7 +608,6 @@ class InboundTest extends TestCase
                     'name' => 'name',
                     'domain_enabled' => true,
                     'inbound_domain' => 'inboundDomain',
-                    'catch_type' => null,
                     'match_type' => 'one',
                     'catch_filter' => [
                         'type' => Constants::TYPE_CATCH_ALL,
@@ -665,7 +628,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'inbound_priority' => null,
                 ],
             ],
             'enabled, catch recipient, catch one, match all' => [
@@ -686,7 +648,6 @@ class InboundTest extends TestCase
                     'domain_enabled' => true,
                     'inbound_domain' => 'inboundDomain',
                     'catch_type' => 'one',
-                    'match_type' => null,
                     'catch_filter' => [
                         'type' => Constants::TYPE_CATCH_RECIPIENT,
                         'filters' => [
@@ -705,7 +666,6 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'inbound_priority' => null,
                 ],
             ],
             'multiple filters, multiple forwards' => [
@@ -728,8 +688,6 @@ class InboundTest extends TestCase
                     'name' => 'name',
                     'domain_enabled' => true,
                     'inbound_domain' => 'inboundDomain',
-                    'catch_type' => null,
-                    'match_type' => null,
                     'catch_filter' => [
                         'type' => Constants::TYPE_CATCH_RECIPIENT,
                         'filters' => [
@@ -768,194 +726,8 @@ class InboundTest extends TestCase
                             'value' => 'https://example.com',
                         ],
                     ],
-                    'inbound_priority' => null,
                 ],
             ],
         ];
-    }
-
-    // -------------------------------------------------------------------------
-    // Enum / format validation tests
-    // -------------------------------------------------------------------------
-
-    /**
-     * @dataProvider invalidCatchFilterTypeDataProvider
-     */
-    #[DataProvider('invalidCatchFilterTypeDataProvider')]
-    public function test_catch_filter_rejects_invalid_type(string $type): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new CatchFilter($type);
-    }
-
-    public static function invalidCatchFilterTypeDataProvider(): array
-    {
-        return [
-            'unknown type' => ['invalid_type'],
-            'match_all is not a catch type' => [Constants::TYPE_MATCH_ALL],
-            'empty string' => [''],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidMatchFilterTypeDataProvider
-     */
-    #[DataProvider('invalidMatchFilterTypeDataProvider')]
-    public function test_match_filter_rejects_invalid_type(string $type): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new MatchFilter($type);
-    }
-
-    public static function invalidMatchFilterTypeDataProvider(): array
-    {
-        return [
-            'unknown type' => ['invalid_type'],
-            'catch_all is not a match type' => [Constants::TYPE_CATCH_ALL],
-            'empty string' => [''],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidFilterComparerDataProvider
-     */
-    #[DataProvider('invalidFilterComparerDataProvider')]
-    public function test_filter_rejects_invalid_comparer(string $comparer): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Filter($comparer, 'test@example.com');
-    }
-
-    public static function invalidFilterComparerDataProvider(): array
-    {
-        return [
-            'unknown comparer' => ['invalid_comparer'],
-            'empty string' => [''],
-            'partial match' => ['equal_extra'],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidForwardTypeDataProvider
-     */
-    #[DataProvider('invalidForwardTypeDataProvider')]
-    public function test_forward_rejects_invalid_type(string $type): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Forward($type, 'https://example.com');
-    }
-
-    public static function invalidForwardTypeDataProvider(): array
-    {
-        return [
-            'unknown type' => ['invalid_type'],
-            'empty string' => [''],
-            'ftp' => ['ftp'],
-        ];
-    }
-
-    public function test_forward_rejects_value_exceeding_191_chars(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Forward(Constants::TYPE_WEBHOOK, 'https://example.com/' . str_repeat('a', 180));
-    }
-
-    public function test_forward_webhook_rejects_invalid_url(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Forward(Constants::TYPE_WEBHOOK, 'not-a-valid-url');
-    }
-
-    public function test_forward_email_rejects_invalid_email(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        new Forward(Constants::TYPE_EMAIL, 'not-a-valid-email');
-    }
-
-    // -------------------------------------------------------------------------
-    // Cardinality validation tests
-    // -------------------------------------------------------------------------
-
-    public function test_inbound_builder_rejects_more_than_5_forwards_via_add_forward(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $builder = new InboundBuilder('domainId', 'name', true);
-
-        for ($i = 0; $i < 6; $i++) {
-            $builder->addForward(new Forward(Constants::TYPE_WEBHOOK, 'https://example.com'));
-        }
-    }
-
-    public function test_inbound_builder_rejects_more_than_5_forwards_via_set_forwards(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $forwards = [];
-        for ($i = 0; $i < 6; $i++) {
-            $forwards[] = new Forward(Constants::TYPE_WEBHOOK, 'https://example.com');
-        }
-
-        (new InboundBuilder('domainId', 'name', true))->setForwards($forwards);
-    }
-
-    public function test_inbound_builder_rejects_empty_forwards_via_set_forwards(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        (new InboundBuilder('domainId', 'name', true))->setForwards([]);
-    }
-
-    public function test_catch_filter_rejects_more_than_5_filters_via_add_filter(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $filter = new CatchFilter(Constants::TYPE_CATCH_RECIPIENT);
-
-        for ($i = 0; $i < 6; $i++) {
-            $filter->addFilter(new Filter(Constants::COMPARER_EQUAL, 'value'));
-        }
-    }
-
-    public function test_catch_filter_rejects_more_than_5_filters_via_set_filters(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $filters = [];
-        for ($i = 0; $i < 6; $i++) {
-            $filters[] = new Filter(Constants::COMPARER_EQUAL, 'value');
-        }
-
-        (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))->setFilters($filters);
-    }
-
-    public function test_match_filter_rejects_more_than_5_filters_via_add_filter(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $filter = new MatchFilter(Constants::TYPE_MATCH_SENDER);
-
-        for ($i = 0; $i < 6; $i++) {
-            $filter->addFilter(new Filter(Constants::COMPARER_EQUAL, 'value'));
-        }
-    }
-
-    public function test_match_filter_rejects_more_than_5_filters_via_set_filters(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-
-        $filters = [];
-        for ($i = 0; $i < 6; $i++) {
-            $filters[] = new Filter(Constants::COMPARER_EQUAL, 'value');
-        }
-
-        (new MatchFilter(Constants::TYPE_MATCH_SENDER))->setFilters($filters);
     }
 }

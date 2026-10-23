@@ -42,8 +42,7 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 30);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['limit' => 30], $body);
+        $this->assertQueryParams(['limit' => '30'], $this->lastRequestQuery());
     }
 
     public function test_get_with_page(): void
@@ -52,8 +51,7 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25, 2);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['page' => 2], $body);
+        $this->assertQueryParams(['page' => '2'], $this->lastRequestQuery());
     }
 
     public function test_get_sends_default_limit(): void
@@ -62,8 +60,7 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['limit' => Recipient::DEFAULT_LIMIT], $body);
+        $this->assertQueryParams(['limit' => (string) Recipient::DEFAULT_LIMIT], $this->lastRequestQuery());
     }
 
     public function test_get_with_domain_id(): void
@@ -72,8 +69,16 @@ class RecipientTest extends TestCase
 
         $this->recipients->get('domain_id');
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['domain_id' => 'domain_id'], $body);
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $this->lastRequestQuery());
+    }
+
+    public function test_get_sends_no_params_in_body(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->recipients->get('domain_id', 30, 2);
+
+        self::assertSame([], $this->lastRequestBody());
     }
 
     public function test_get_excludes_domain_id_when_not_set(): void
@@ -82,8 +87,7 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyExcludes(['domain_id'], $body);
+        $this->assertBodyExcludes(['domain_id'], $this->lastRequestQuery());
     }
 
     public function test_get_excludes_page_when_not_set(): void
@@ -92,37 +96,31 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25, null);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyExcludes(['page'], $body);
+        $this->assertBodyExcludes(['page'], $this->lastRequestQuery());
     }
 
     /**
-     * @dataProvider invalidGetLimitProvider
+     * @dataProvider invalidGetParamsProvider
+     * @param string $domainId
      * @param int $limit
      * @param string $exceptionMessage
      */
-    #[DataProvider('invalidGetLimitProvider')]
-    public function test_get_rejects_invalid_limit(int $limit, string $exceptionMessage): void
+    #[DataProvider('invalidGetParamsProvider')]
+    public function test_get_rejects_invalid_params(string $domainId, int $limit, string $exceptionMessage): void
     {
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $this->recipients->get('domain_id', $limit);
+        $this->recipients->get($domainId, $limit);
     }
 
-    public static function invalidGetLimitProvider(): array
+    public static function invalidGetParamsProvider(): array
     {
         return [
-            'limit below minimum' => [9, 'Minimum limit is ' . Recipient::MIN_LIMIT . '.'],
-            'limit above maximum' => [101, 'Maximum limit is ' . Recipient::MAX_LIMIT . '.'],
+            'limit below minimum' => ['domain_id', 9, 'Minimum limit is ' . Recipient::MIN_LIMIT . '.'],
+            'limit above maximum' => ['domain_id', 101, 'Maximum limit is ' . Recipient::MAX_LIMIT . '.'],
+            'empty domain id' => ['', Recipient::DEFAULT_LIMIT, 'Domain id cannot be empty.'],
         ];
-    }
-
-    public function test_get_rejects_empty_domain_id(): void
-    {
-        $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Domain id cannot be empty.');
-        $this->recipients->get('');
     }
 
     public function test_find_sends_correct_method_and_path(): void
@@ -143,5 +141,12 @@ class RecipientTest extends TestCase
 
         $this->assertRequest('DELETE', '/v1/recipients/random_id');
         self::assertEquals(200, $response['status_code']);
+    }
+
+    private function lastRequestQuery(): array
+    {
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        return $query;
     }
 }
