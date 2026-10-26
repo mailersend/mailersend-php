@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [0.45.0] - 2026 10 21
+## [0.45.0] - 2026 10 26
 
 ### Added
 
@@ -28,6 +28,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `whatsappTemplate->getAll(WhatsappTemplateParams)` and `find()`
 - WhatsApp lists accept a `limit` from 1 to 100 and a `page` up to 100, and `date_from` and `date_to`
   as a Unix timestamp or a datetime string
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.44.0] - 2026 09 24
+
+### Added
+
+- `Inbound::setIncludeAttachments()` to drop attachments, including inline (CID) parts, before an inbound
+  message is forwarded. Leaving it unset keeps the route's stored value.
 
 ### Changed
 

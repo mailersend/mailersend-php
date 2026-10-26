@@ -55,17 +55,27 @@ class WhatsappRecipientTest extends TestCase
         ], $query);
     }
 
-    public function test_get_all_accepts_limit_and_page_boundaries(): void
+    /**
+     * @dataProvider limitAndPageBoundariesDataProvider
+     */
+    #[DataProvider('limitAndPageBoundariesDataProvider')]
+    public function test_get_all_accepts_limit_and_page_boundaries(int $boundary): void
     {
         $this->addSuccessResponse();
-        $this->addSuccessResponse();
 
-        $this->whatsappRecipient->getAll((new WhatsappRecipientParams())->setLimit(1)->setPage(1));
-        $this->whatsappRecipient->getAll((new WhatsappRecipientParams())->setLimit(100)->setPage(100));
+        $this->whatsappRecipient->getAll((new WhatsappRecipientParams())->setLimit($boundary)->setPage($boundary));
 
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        $this->assertQueryParams(['limit' => '100', 'page' => '100'], $query);
+        $this->assertQueryParams(['limit' => (string) $boundary, 'page' => (string) $boundary], $query);
+    }
+
+    public static function limitAndPageBoundariesDataProvider(): array
+    {
+        return [
+            'lower bound' => [1],
+            'upper bound' => [100],
+        ];
     }
 
     public function test_get_all_excludes_optional_params_when_not_set(): void
