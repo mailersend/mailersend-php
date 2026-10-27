@@ -125,6 +125,23 @@ MailerSend PHP SDK
     * [WhatsApp API](#whatsapp-api)
         * [Send a WhatsApp message](#send-whatsapp)
         * [Personalization](#whatsapp-personalization)
+    * [WhatsApp messages API](#whatsapp-messages-api)
+        * [Get a list of WhatsApp messages](#get-a-list-of-whatsapp-messages)
+        * [Get a WhatsApp message](#get-whatsapp-message)
+    * [WhatsApp items API](#whatsapp-items-api)
+        * [Get a list of WhatsApp items](#get-a-list-of-whatsapp-items)
+        * [Get a WhatsApp item](#get-whatsapp-item)
+    * [WhatsApp activities API](#whatsapp-activities-api)
+        * [Get a list of WhatsApp activities](#get-a-list-of-whatsapp-activities)
+    * [WhatsApp inbound messages API](#whatsapp-inbound-messages-api)
+        * [Get a list of WhatsApp inbound messages](#get-a-list-of-whatsapp-inbound-messages)
+        * [Get a WhatsApp inbound message](#get-whatsapp-inbound-message)
+    * [WhatsApp recipients API](#whatsapp-recipients-api)
+        * [Get a list of WhatsApp recipients](#get-a-list-of-whatsapp-recipients)
+        * [Get a WhatsApp recipient](#get-whatsapp-recipient)
+    * [WhatsApp templates API](#whatsapp-templates-api)
+        * [Get a list of WhatsApp templates](#get-a-list-of-whatsapp-templates)
+        * [Get a WhatsApp template](#get-whatsapp-template)
     * [Sender Identities](#sender-identity-routing)
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
@@ -2437,6 +2454,222 @@ use MailerSend\Helpers\Builder\WhatsappPersonalization;
 
 (new WhatsappPersonalization('19191234567'))
     ->setBody(['first_name' => 'John', 'order_date' => 'December 31, 2026']);
+```
+
+<a name="whatsapp-messages-api"></a>
+
+## WhatsApp messages API
+
+<a name="get-a-list-of-whatsapp-messages"></a>
+
+### Get a list of WhatsApp messages
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappMessageParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappMessageParams = (new WhatsappMessageParams())
+    ->setWhatsappAccountId('whatsapp_account_id')
+    ->setFrom('15550001234')
+    ->setTemplateId('template_id')
+    ->setDateFrom('2026-10-14T00:00:00Z')
+    ->setDateTo('2026-10-15T00:00:00Z')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappMessages = $mailersend->whatsappMessage->getAll($whatsappMessageParams);
+```
+
+<a name="get-whatsapp-message"></a>
+
+### Get a WhatsApp message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappMessage = $mailersend->whatsappMessage->find('message_id');
+```
+
+<a name="whatsapp-items-api"></a>
+
+## WhatsApp items API
+
+<a name="get-a-list-of-whatsapp-items"></a>
+
+### Get a list of WhatsApp items
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappItemParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappItemParams = (new WhatsappItemParams())
+    ->setRecipient('48600000002')
+    ->setWhatsappMessageId('whatsapp_message_id')
+    ->setStatus(['delivered', 'read'])
+    ->setWhatsappAccountId('whatsapp_account_id')
+    ->setFrom('15550001234')
+    ->setTemplateId('template_id')
+    ->setDateFrom('2026-10-14T00:00:00Z')
+    ->setDateTo('2026-10-15T00:00:00Z')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappItems = $mailersend->whatsappItem->getAll($whatsappItemParams);
+```
+
+<a name="get-whatsapp-item"></a>
+
+### Get a WhatsApp item
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappItem = $mailersend->whatsappItem->find('item_id');
+```
+
+<a name="whatsapp-activities-api"></a>
+
+## WhatsApp activities API
+
+<a name="get-a-list-of-whatsapp-activities"></a>
+
+### Get a list of WhatsApp activities
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappActivityParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappActivityParams = (new WhatsappActivityParams())
+    ->setWhatsappItemId('whatsapp_item_id')
+    ->setWhatsappMessageId('whatsapp_message_id')
+    ->setRecipient('48600000002')
+    ->setType(['delivered', 'failed'])
+    ->setDateFrom('2026-10-14T00:00:00Z')
+    ->setDateTo('2026-10-15T00:00:00Z')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappActivities = $mailersend->whatsappActivity->getAll($whatsappActivityParams);
+```
+
+<a name="whatsapp-inbound-messages-api"></a>
+
+## WhatsApp inbound messages API
+
+<a name="get-a-list-of-whatsapp-inbound-messages"></a>
+
+### Get a list of WhatsApp inbound messages
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappInboundMessageParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappInboundMessageParams = (new WhatsappInboundMessageParams())
+    ->setWhatsappAccountId('whatsapp_account_id')
+    ->setFrom('48600000001')
+    ->setType(['text', 'image'])
+    ->setDateFrom('2026-10-14T00:00:00Z')
+    ->setDateTo('2026-10-15T00:00:00Z')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappInboundMessages = $mailersend->whatsappInboundMessage->getAll($whatsappInboundMessageParams);
+```
+
+<a name="get-whatsapp-inbound-message"></a>
+
+### Get a WhatsApp inbound message
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappInboundMessage = $mailersend->whatsappInboundMessage->find('inbound_message_id');
+```
+
+<a name="whatsapp-recipients-api"></a>
+
+## WhatsApp recipients API
+
+<a name="get-a-list-of-whatsapp-recipients"></a>
+
+### Get a list of WhatsApp recipients
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappRecipientParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappRecipientParams = (new WhatsappRecipientParams())
+    ->setStatus('active')
+    ->setPhoneNumber('48600000001')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappRecipients = $mailersend->whatsappRecipient->getAll($whatsappRecipientParams);
+```
+
+<a name="get-whatsapp-recipient"></a>
+
+### Get a WhatsApp recipient
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappRecipient = $mailersend->whatsappRecipient->find('recipient_id');
+```
+
+<a name="whatsapp-templates-api"></a>
+
+## WhatsApp templates API
+
+<a name="get-a-list-of-whatsapp-templates"></a>
+
+### Get a list of WhatsApp templates
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\WhatsappTemplateParams;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappTemplateParams = (new WhatsappTemplateParams())
+    ->setWhatsappAccountId('whatsapp_account_id')
+    ->setStatus('approved')
+    ->setCategory('UTILITY')
+    ->setLanguage('en_US')
+    ->setPage(1)
+    ->setLimit(25);
+
+$whatsappTemplates = $mailersend->whatsappTemplate->getAll($whatsappTemplateParams);
+```
+
+<a name="get-whatsapp-template"></a>
+
+### Get a WhatsApp template
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_key' => 'key']);
+
+$whatsappTemplate = $mailersend->whatsappTemplate->find('template_id');
 ```
 
 <a name="sender-identity-routing"></a>
