@@ -101,15 +101,12 @@ class EmailVerificationParams implements Arrayable, \JsonSerializable
 
     public function toArray(): array
     {
-        return array_filter(
-            [
-                'name' => $this->getName(),
-                'list_id' => $this->getListId(),
-                'verify' => $this->getVerify(),
-                'emails' => $this->emailAddresses,
-            ],
-            fn ($v) => $v !== null && $v !== ''
-        );
+        return [
+            'name' => $this->getName(),
+            'list_id' => $this->getListId(),
+            'verify' => $this->getVerify(),
+            'emails' => $this->emailAddresses,
+        ];
     }
 
     #[\ReturnTypeWillChange]

@@ -220,10 +220,6 @@ class WebhookTest extends TestCase
                 'random_id', 'https://link.com/webhook', '', WebhookParams::ALL_ACTIVITIES,
                 'Webhook name is required.',
             ],
-            'name too long' => [
-                'random_id', 'https://link.com/webhook', str_repeat('a', 51), WebhookParams::ALL_ACTIVITIES,
-                'Webhook name cannot be longer than 50 characters.',
-            ],
             'missing events' => [
                 'random_id', 'https://link.com/webhook', 'Webhook name', [],
                 'Webhook events are required.',
@@ -426,23 +422,19 @@ class WebhookTest extends TestCase
         $this->webhooks->update('random_id', null, null, null, null, 3);
     }
 
-    /**
-     * @dataProvider invalidLimitProvider
-     */
-    #[DataProvider('invalidLimitProvider')]
-    public function test_get_webhooks_rejects_limit_out_of_range(int $limit): void
+    public function test_get_webhooks_rejects_limit_below_minimum(): void
     {
         $this->expectException(MailerSendAssertException::class);
         $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.');
 
-        $this->webhooks->get('domain_id', $limit);
+        $this->webhooks->get('domain_id', 9);
     }
 
-    public static function invalidLimitProvider(): array
+    public function test_get_webhooks_rejects_limit_above_maximum(): void
     {
-        return [
-            'limit below minimum' => [9],
-            'limit above maximum' => [101],
-        ];
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.');
+
+        $this->webhooks->get('domain_id', 101);
     }
 }

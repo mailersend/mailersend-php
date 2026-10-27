@@ -122,33 +122,27 @@ class SuppressionTest extends TestCase
         self::assertEquals(['recipient@mailersend.com'], Arr::get($body, 'recipients'));
     }
 
-    /**
-     * @dataProvider invalidCreateDataProvider
-     */
-    #[DataProvider('invalidCreateDataProvider')]
-    public function test_create_rejects_invalid_params(SuppressionParams $params, string $errorMessage): void
+    public function test_create_requires_recipients(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($errorMessage);
+        $this->expectExceptionMessage('Recipients is required.');
+
+        $params = (new SuppressionParams())
+            ->setDomainId('domain_id')
+            ->setRecipients([]);
 
         $this->suppression->create($params);
     }
 
-    public static function invalidCreateDataProvider(): array
+    public function test_create_requires_domain_id(): void
     {
-        return [
-            'missing recipients' => [
-                (new SuppressionParams())
-                    ->setDomainId('domain_id')
-                    ->setRecipients([]),
-                'Recipients is required.',
-            ],
-            'missing domain id' => [
-                (new SuppressionParams())
-                    ->setRecipients(['recipient@mailersend.com']),
-                'Domain id is required.',
-            ],
-        ];
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id is required.');
+
+        $params = (new SuppressionParams())
+            ->setRecipients(['recipient@mailersend.com']);
+
+        $this->suppression->create($params);
     }
 
     public function test_delete_by_ids(): void
@@ -177,24 +171,20 @@ class SuppressionTest extends TestCase
         $this->assertBodyExcludes(['ids'], $body);
     }
 
-    /**
-     * @dataProvider invalidDeleteDataProvider
-     */
-    #[DataProvider('invalidDeleteDataProvider')]
-    public function test_delete_rejects_invalid_params(?array $ids, bool $all, string $errorMessage): void
+    public function test_delete_requires_ids_or_all(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($errorMessage);
+        $this->expectExceptionMessage('Either ids or all must be provided.');
 
-        $this->suppression->delete($ids, $all);
+        $this->suppression->delete(null, false);
     }
 
-    public static function invalidDeleteDataProvider(): array
+    public function test_delete_with_empty_ids_requires_all(): void
     {
-        return [
-            'no ids and all false' => [null, false, 'Either ids or all must be provided.'],
-            'empty ids and all false' => [[], false, 'Either ids or all must be provided.'],
-        ];
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Either ids or all must be provided.');
+
+        $this->suppression->delete([], false);
     }
 
     public function test_get_all_forwards_status_code(): void

@@ -344,12 +344,12 @@ class SmsActivityTest extends TestCase
             'limit below minimum' => [
                 (new SmsActivityParams())
                     ->setLimit(9),
-                'Limit is supposed to be between 10 and 100.',
+                'Limit is supposed to be between10 and 100.',
             ],
             'limit above maximum' => [
                 (new SmsActivityParams())
                     ->setLimit(101),
-                'Limit is supposed to be between 10 and 100.',
+                'Limit is supposed to be between10 and 100.',
             ],
             'date_from greater than date_to' => [
                 (new SmsActivityParams())

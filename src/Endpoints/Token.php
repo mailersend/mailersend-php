@@ -87,10 +87,6 @@ class Token extends AbstractEndpoint
             GeneralHelpers::assert(
                 fn () => Assertion::inArray($status, TokenParams::STATUS_ALL)
             );
-        } else {
-            GeneralHelpers::assert(
-                fn () => Assertion::notEmpty($name, 'Token name is required when status is not set.')
-            );
         }
 
         if ($name !== null) {

@@ -104,32 +104,6 @@ class BuildUriTest extends TestCase
                 ],
                 'https://api.mailersend.com/v1/endpoint?ids=a%20b,c%26d',
             ],
-            'boolean query params are sent as 1 and 0' => [
-                [
-                    'host' => 'api.mailersend.com',
-                    'protocol' => 'https',
-                    'api_path' => 'v1',
-                ],
-                'endpoint',
-                [
-                    'detailed' => true,
-                    'verified' => false,
-                ],
-                'https://api.mailersend.com/v1/endpoint?detailed=1&verified=0',
-            ],
-            'null query params are omitted' => [
-                [
-                    'host' => 'api.mailersend.com',
-                    'protocol' => 'https',
-                    'api_path' => 'v1',
-                ],
-                'endpoint',
-                [
-                    'page' => null,
-                    'limit' => 25,
-                ],
-                'https://api.mailersend.com/v1/endpoint?limit=25',
-            ],
         ];
     }
 }

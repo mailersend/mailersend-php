@@ -28,7 +28,7 @@ class DmarcMonitoring extends AbstractEndpoint
         ?string $sortBy = null,
         ?string $order = null
     ): array {
-        if ($limit !== null) {
+        if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
@@ -155,7 +155,7 @@ class DmarcMonitoring extends AbstractEndpoint
             fn () => Assertion::minLength($monitorId, 1, 'Monitor id is required.')
         );
 
-        if ($limit !== null) {
+        if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,
@@ -221,7 +221,7 @@ class DmarcMonitoring extends AbstractEndpoint
             fn () => Assertion::minLength($ip, 1, 'IP address is required.')
         );
 
-        if ($limit !== null) {
+        if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,

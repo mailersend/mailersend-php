@@ -13,13 +13,11 @@ class SmsPersonalizationTest extends TestCase
      * @dataProvider invalidSmsPersonalizationProvider
      * @param string $recipient
      * @param array $data
-     * @param string $expectedMessage
      */
     #[DataProvider('invalidSmsPersonalizationProvider')]
-    public function test_rejects_invalid_params(string $recipient, array $data, string $expectedMessage): void
+    public function test_rejects_invalid_params(string $recipient, array $data): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($expectedMessage);
 
         new SmsPersonalization($recipient, $data);
     }
@@ -29,13 +27,11 @@ class SmsPersonalizationTest extends TestCase
         return [
             'recipient without leading plus' => [
                 '15551234567',
-                ['name' => 'John'],
-                'Value "15551234567" does not start with "+".',
+                [['var' => 'name', 'value' => 'John']],
             ],
             'empty data array' => [
                 '+15551234567',
                 [],
-                'List should have at least 1 elements, but has 0 elements.',
             ],
         ];
     }

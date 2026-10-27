@@ -72,7 +72,7 @@ class SmsRecipient extends AbstractEndpoint
     public function update(string $smsRecipientId, string $status): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::minLength($smsRecipientId, 1, 'SMS recipient id cannot be empty.') &&
+            fn () => Assertion::minLength($smsRecipientId, 1, 'SMS number id cannot be empty.') &&
                 Assertion::inArray($status, Constants::POSSIBLE_SMS_RECIPIENT_STATUSES)
         );
 

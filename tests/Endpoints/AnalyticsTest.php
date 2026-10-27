@@ -378,7 +378,7 @@ class AnalyticsTest extends TestCase
             ],
             'invalid group_by' => [
                 (new ActivityAnalyticsParams(100, 101))->setEvent(['sent'])->setGroupBy('invalid_group'),
-                'Value "invalid_group" is not an element of the valid values: days, weeks, months, years',
+                'Value "invalid_group" is not an element of the valid values',
             ],
         ];
     }

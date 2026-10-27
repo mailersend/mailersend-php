@@ -62,14 +62,6 @@ class User extends AbstractEndpoint
      */
     public function create(UserParams $params): array
     {
-        GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($params->getEmail(), 'Email is required.')
-        );
-
-        GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($params->getRole(), 'Role is required.')
-        );
-
         if ($params->getRole() === Roles::CUSTOM_USER) {
             GeneralHelpers::assert(
                 fn () => Assertion::notEmpty($params->getPermissions(), 'Permissions are required for Custom User role.')
@@ -91,10 +83,6 @@ class User extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($userId, 1, 'User id is required.')
-        );
-
-        GeneralHelpers::assert(
-            fn () => Assertion::notEmpty($params->getRole(), 'Role is required.')
         );
 
         if ($params->getRole() === Roles::CUSTOM_USER) {

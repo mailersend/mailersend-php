@@ -115,7 +115,6 @@ MailerSend PHP SDK
         * [Get a single SMS webhook](#get-sms-webhook)
         * [Create an SMS webhook](#create-sms-webhook)
         * [Update a single SMS webhook](#update-sms-webhook)
-        * [Delete an SMS webhook](#delete-sms-webhook)
     * [SMS inbound routing API](#sms-inbounds-api)
         * [Get a list of SMS inbound routes](#get-a-list-of-sms-inbounds)
         * [Get a single SMS inbound route](#get-sms-inbound)
@@ -146,7 +145,7 @@ MailerSend PHP SDK
         * [Get a list of Sender Identities](#get-a-list-of-sender-identity-routes)
         * [Get a single Sender Identity](#get-a-single-sender-identity-route)
         * [Get a single Sender Identity by email](#get-a-single-sender-identity-by-email-route)
-        * [Add a Sender Identity](#add-a-sender-identity-route)
+        * [Add a Sender_Identity](#add-a-sender-identity-route)
         * [Update a Sender Identity](#update-a-sender-identity-route)
         * [Update a Sender Identity by email](#update-a-sender-identity-by-email-route)
         * [Resend Sender Identity verification email](#resend-sender-identity-route)
@@ -158,7 +157,7 @@ MailerSend PHP SDK
         * [Add SMTP User](#add-smtp-user)
         * [Update SMTP User](#update-smtp-user)
         * [Delete SMTP User](#delete-smtp-user)
-    * [Users](#user-routing)
+    * [Users](#users-routing)
         * [Get a list of Users](#get-a-list-of-users)
         * [Get a single User](#get-a-single-user)
         * [Add a User](#add-a-user)
@@ -258,13 +257,11 @@ $emailParams = (new EmailParams())
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
     ->setText('This is the text content')
-    ->setReplyTo('reply-to@domain.com')
+    ->setReplyTo('reply to')
     ->setReplyToName('reply to name');
 
 $mailersend->email->send($emailParams);
 ```
-
-`setFromName()` is optional; `from.email` is used when it is not set.
 
 HTML content is not required. You still can send an email with Text only.
 
@@ -408,9 +405,9 @@ $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
     ->setRecipients($recipients)
-    ->setSubject('Subject {{var}}')
-    ->setHtml('This is the html version with a {{var}}.')
-    ->setText('This is the text versions with a {{var}}.')
+    ->setSubject('Subject {$var}')
+    ->setHtml('This is the html version with a {$var}.')
+    ->setText('This is the text versions with a {$var}.')
     ->setPersonalization($personalization);
 
 $mailersend->email->send($emailParams);
@@ -482,7 +479,7 @@ $mailersend->email->send($emailParams);
 <a name="send-email-with-references-threading"></a>
 ### Send email with references (threading)
 
-> **Note:** The `references` field is not available on the Sandbox plan.
+> **Note:** The `references` field is available on paid plan accounts only.
 
 ```php
 use MailerSend\MailerSend;
@@ -731,7 +728,7 @@ $mailersend->emails->getAll($emailsParams);
 |--------------------------|---------------------|----------|--------------------------------------------------------------------------------------------------------------------|
 | `setDomainId()`          | `string`            | yes      | A domain that belongs to your account. An unknown domain returns `404`.                                             |
 | `setDateFrom()`          | `int\|string`       | yes      | Unix timestamp (`1623073576`) or datetime (`'2015-10-01 00:00:00'`), assumed `UTC`. Must be lower than `date_to`.    |
-| `setDateTo()`            | `int\|string`       | yes      | Unix timestamp or datetime. Must be higher than `date_from`.                                                         |
+| `setDateTo()`            | `int\|string`       | yes      | Unix timestamp or datetime. Must be higher than `date_from` and must not be in the future.                           |
 | `setPage()`              | `int`               | no       | Min: `1`, Max: `100`, Default: `1`. See [Pagination](#emails-pagination).                                            |
 | `setLimit()`             | `int`               | no       | Min: `10`, Max: `1000`, Default: `25`.                                                                              |
 | `setStatus()`            | `string[]`          | no       | Any of `queued`, `sent`, `rejected`, `delivered`. See `Constants::POSSIBLE_EMAIL_STATUSES`.                          |
@@ -984,8 +981,6 @@ The examples on building the `Inbound` object portrayed in the 'Add an inbound r
 
 Leaving `setIncludeAttachments()` unset keeps the route's stored value; the API does not reset it to `true`. Pass `false` explicitly to drop attachments.
 
-The `domainId` constructor argument is not sent on update; a route cannot move to another domain.
-
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\Inbound;
@@ -1000,7 +995,6 @@ $mailersend->inbound->update(
     'inboundId',
     (new Inbound('domainId', 'name', true))
         ->setInboundDomain('inboundDomain')
-        ->setInboundPriority(50)
         ->setCatchFilter(
             (new CatchFilter(Constants::TYPE_CATCH_ALL))
         )
@@ -1048,7 +1042,7 @@ $mailersend->activity->getAll('domainId', $activityParams);
 
 > **Note:** The `suppressed` event is available on the Starter plan and above, otherwise the API returns error code `MS42240`. Activities of that type also include a `suppression_reason` field, one of `on_hold`, `hard_bounced`, `unsubscribed`, `spam_complained`, `blocklisted`.
 
-<a name="get-a-single-activity"></a>
+<a name="#get-a-single-activity"></a>
 
 ### Get a single activity
 
@@ -1084,8 +1078,6 @@ $activityAnalyticsParams = (new ActivityAnalyticsParams(1790121600, 1792713599))
 
 $mailersend->analytics->activityDataByDate($activityAnalyticsParams);
 ```
-
-`setEvent()` is optional; leave it out to get data for all event types.
 
 <a name="opens-by-country"></a>
 
@@ -1212,7 +1204,7 @@ $mailersend->domain->recipients($domainId = 'domain_id', $page = 1, $limit = 10)
 
 ### Update domain settings
 
-Here you can set as many properties as you need, one or multiple. Only the properties you set are sent; the others keep their current values.
+Here you can set as many properties as you need, one or multiple.
 
 ```php
 use MailerSend\MailerSend;
@@ -1231,9 +1223,7 @@ $domainSettingsParam = (new DomainSettingsParams())
                             ->setTrackUnsubscribePlain('Click here to unsubscribe: {{unsubscribe}}')
                             ->setTrackUnsubscribePlainEnabled(true)
                             ->setCustomTrackingEnabled(true)
-                            ->setCustomTrackingSubdomain('email')
-                            ->setPrecedenceBulk(false)
-                            ->setIgnoreDuplicatedRecipients(false);
+                            ->setCustomTrackingSubdomain('email');
 
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
@@ -1365,6 +1355,8 @@ $mailersend = new MailerSend();
 $mailersend->token->find('token_id'); 
 ```
 
+<a name="delete-token"></a>
+
 <a name="create_a_token"></a>
 
 ### Create a token
@@ -1495,11 +1487,6 @@ $params = (new BlocklistParams())
     ->setPatterns(['pattern_one', 'pattern_two']);
 
 $mailersend->blocklist->create($params);
-
-// Account-wide entry: leave out setDomainId()
-$mailersend->blocklist->create(
-    (new BlocklistParams())->setPatterns(['*@example.com'])
-);
 ```
 
 **Hard Bounces**
@@ -1644,7 +1631,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->blocklist->getAll('domain_id', 1, 15); // domain id, page, limit
+$mailersend->blocklist->getAll('domain_id', 1, 15);
 ```
 
 **Hard Bounces**
@@ -1844,8 +1831,6 @@ $params = (new TemplateParams())
 $mailersend->template->create($params);
 ```
 
-`setText()` is required when creating a template. `setAutoGenerate()` is only sent by `update()`.
-
 <a name="update-a-template"></a>
 
 ### Update a template
@@ -1965,7 +1950,6 @@ $mailersend->emailVerification->getResults(
         $results = [
             EmailVerificationParams::TYPO,
             EmailVerificationParams::CATCH_ALL,
-            EmailVerificationParams::QUEUED,
         ],
     );
 ```
@@ -2168,11 +2152,6 @@ $smsActivityParams = (new SmsActivityParams())
     ->setLimit(15);
 
 $smsActivity = $mailersend->smsActivity->getAll($smsActivityParams);
-
-// Dates can also be ISO 8601 or Y-m-d H:i:s strings
-$smsActivityParams = (new SmsActivityParams())
-    ->setDateFrom('2021-06-07T13:46:16Z')
-    ->setDateTo('2021-06-07 14:09:36');
 ```
 
 <a name="sms-recipients-api"></a>
@@ -2239,9 +2218,6 @@ $smsRecipients = $mailersend->smsWebhook->get('sms_number_id');
 
 // With limit
 $smsRecipients = $mailersend->smsWebhook->get('sms_number_id', $limit = 25);
-
-// With limit and page
-$smsRecipients = $mailersend->smsWebhook->get('sms_number_id', $limit = 25, $page = 2);
 ```
 
 <a name="get-sms-webhook"></a>
@@ -2293,18 +2269,6 @@ $smsWebhookParams = (new SmsWebhookParams())
     ->setEnabled(false);
 
 $smsRecipients = $mailersend->smsWebhook->update('sms_webhook_id', $smsWebhookParams);
-```
-
-<a name="delete-sms-webhook"></a>
-
-### Delete an SMS webhook
-
-```php
-use MailerSend\MailerSend;
-
-$mailersend = new MailerSend();
-
-$smsWebhook = $mailersend->smsWebhook->delete('sms_webhook_id');
 ```
 
 <a name="sms-inbounds-api"></a>
@@ -2438,22 +2402,6 @@ $whatsappParams = (new WhatsappParams())
     ]);
 
 $whatsapp = $mailersend->whatsapp->send($whatsappParams);
-```
-
-For a template with an image, video or document header, pass the file as an associative array. For a template with named variables, key the values by variable name:
-
-```php
-use MailerSend\Helpers\Builder\WhatsappPersonalization;
-
-(new WhatsappPersonalization('19191234567'))
-    ->setHeader([
-        'link' => 'https://www.example.com/invoices/12345.pdf',
-        'filename' => 'invoice-12345.pdf',
-    ])
-    ->setBody(['John', 'December 31, 2026']);
-
-(new WhatsappPersonalization('19191234567'))
-    ->setBody(['first_name' => 'John', 'order_date' => 'December 31, 2026']);
 ```
 
 <a name="whatsapp-messages-api"></a>
@@ -2761,7 +2709,6 @@ $mailersend->senderIdentity->create(
 ### Update a Sender Identity
 
 The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity' also apply in here.
-Reply-to fields you do not set are not sent, so the stored values are kept. `name` is always sent.
 
 ```php
 use MailerSend\MailerSend;
@@ -2782,7 +2729,6 @@ $mailersend->senderIdentity->update(
 ### Update a Sender Identity by email
 
 The examples on building the `Sender Identity` object portrayed in the 'Add a Sender Identity' also apply in here.
-Reply-to fields you do not set are not sent, so the stored values are kept. `name` is always sent.
 
 ```php
 use MailerSend\MailerSend;
@@ -2834,7 +2780,7 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->senderIdentity->deleteByEmail('john@example.com');
 ```
 
-<a name="smtp-users-routing"></a>
+<a name="smtp-user-routing"></a>
 
 ## SMTP Users
 
@@ -2866,6 +2812,7 @@ $mailersend->smtpUser->find('domainId', 'smtpUserId');
 ### Add SMTP User
 ```php
 use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\UserParams;
 use MailerSend\Helpers\Builder\SmtpUserParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
@@ -2881,7 +2828,7 @@ $mailersend->smtpUser->create(
 
 ### Update SMTP User
 
-The examples on building the `SMTP User` object portrayed in the 'Add SMTP User' also apply in here. Both `name` and `enabled` are optional on update; only the fields you set are sent.
+The examples on building the `SMTP User` object portrayed in the 'Add SMTP User' also apply in here.
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmtpUserParams;
@@ -2892,14 +2839,6 @@ $mailersend->smtpUser->update(
     'domainId',
     'smtpUserId',
     (new SmtpUserParams('New name'))
-        ->setEnabled(false)
-);
-
-// Only disable the user, keep its name
-$mailersend->smtpUser->update(
-    'domainId',
-    'smtpUserId',
-    (new SmtpUserParams())
         ->setEnabled(false)
 );
 ```
@@ -2980,8 +2919,6 @@ $mailersend->user->create(
 );
 ```
 
-`Permissions` has a constant for every documented permission, for example `Permissions::MANAGE_WHATSAPP`, `Permissions::READ_DMARC_MONITORING`, `Permissions::READ_BLOCKLIST_MONITORING` and `Permissions::READ_BILLING`.
-
 <a name="update-a-user"></a>
 
 ### Update a User
@@ -3019,7 +2956,7 @@ $mailersend = new MailerSend(['api_key' => 'key']);
 $mailersend->user->delete('userId');
 ```
 
-<a name="get-a-list-of-invites"></a>
+<a name="get-a-list-of-invites></a>
 
 ### Get a list of Invites
 
@@ -3056,7 +2993,7 @@ $mailersend->invite->resend('inviteId');
 ```
 
 
-<a name="cancel-an-invite"></a>
+<a name="cancel-an-invite></a>
 
 ### Cancel an Invite
 

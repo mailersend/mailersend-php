@@ -78,8 +78,6 @@ class BulkEmailTest extends TestCase
                 self::assertEquals($tag, Arr::get($request_body, "$key.tags.$k"));
             }
             self::assertEquals($emailParams->getTemplateId(), Arr::get($request_body, "$key.template_id"));
-            self::assertEquals($emailParams->getLanguage(), Arr::get($request_body, "$key.language"));
-            self::assertEquals($emailParams->getInReplyToHeader(), Arr::get($request_body, "$key.in_reply_to"));
 
             self::assertCount(count($emailParams->getAttachments()), Arr::get($request_body, "$key.attachments") ?? []);
             foreach ($emailParams->getAttachments() as $k => $attachment) {
@@ -420,16 +418,6 @@ class BulkEmailTest extends TestCase
                         ->setInReplyToHeader('test@mailersend.com'),
                 ],
             ],
-            'with language' => [
-                [
-                    (new EmailParams())
-                        ->setRecipients([
-                            new Recipient('recipient@mailersend.com', 'Recipient')
-                        ])
-                        ->setTemplateId('template-id')
-                        ->setLanguage('de'),
-                ],
-            ],
             'with unicode email' => [
                 [
                     (new EmailParams())
@@ -502,7 +490,400 @@ class BulkEmailTest extends TestCase
                         ->setHtml('HTML')
                         ->setText('Text'),
                 ],
-                'From email must be a valid email address.',
+                'was expected to be a valid e-mail address',
+            ],
+            'template id, html and text missing' => [
+                [
+                    (new EmailParams())
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                ],
+                'One of template_id, html or text must be supplied',
+            ],
+            'from is required' => [
+                [
+                    (new EmailParams())
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                ],
+                'was expected to be a valid e-mail address',
+            ],
+            'subject is required' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('sender@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setHtml('HTML')
+                ],
+                'expected to be string, type NULL given',
+            ],
+            'at least one recipient required' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('sender@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                ],
+                'List should have at least 1 elements',
+            ],
+            'wrongly formed cc' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setCc([
+                            [
+                                'wrong cc',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'does not contain the email parameter',
+            ],
+            'too many cc recipients' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setCc([
+                            new Recipient('cc+1@mailersend.com', 'CC 1'),
+                            new Recipient('cc+2@mailersend.com', 'CC 2'),
+                            new Recipient('cc+3@mailersend.com', 'CC 3'),
+                            new Recipient('cc+4@mailersend.com', 'CC 4'),
+                            new Recipient('cc+5@mailersend.com', 'CC 5'),
+                            new Recipient('cc+6@mailersend.com', 'CC 6'),
+                            new Recipient('cc+7@mailersend.com', 'CC 7'),
+                            new Recipient('cc+8@mailersend.com', 'CC 8'),
+                            new Recipient('cc+9@mailersend.com', 'CC 9'),
+                            new Recipient('cc+10@mailersend.com', 'CC 10'),
+                            new Recipient('cc+11@mailersend.com', 'CC 11'),
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'List should have at most 10 elements',
+            ],
+            'cc recipient without email' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setCc([
+                            [
+                                'name' => 'CC'
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'does not contain the email parameter',
+            ],
+            'wrongly formed bcc' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setBcc([
+                            [
+                                'wrong bcc',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'does not contain the email parameter',
+            ],
+            'too many bcc recipients' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setBcc([
+                            new Recipient('bcc+1@mailersend.com', 'BCC 1'),
+                            new Recipient('bcc+2@mailersend.com', 'BCC 2'),
+                            new Recipient('bcc+3@mailersend.com', 'BCC 3'),
+                            new Recipient('bcc+4@mailersend.com', 'BCC 4'),
+                            new Recipient('bcc+5@mailersend.com', 'BCC 5'),
+                            new Recipient('bcc+6@mailersend.com', 'BCC 6'),
+                            new Recipient('bcc+7@mailersend.com', 'BCC 7'),
+                            new Recipient('bcc+8@mailersend.com', 'BCC 8'),
+                            new Recipient('bcc+9@mailersend.com', 'BCC 9'),
+                            new Recipient('bcc+10@mailersend.com', 'BCC 10'),
+                            new Recipient('bcc+11@mailersend.com', 'BCC 11'),
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'List should have at most 10 elements',
+            ],
+            'bcc recipient without email' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            new Recipient('recipient@mailersend.com', 'Recipient')
+                        ])
+                        ->setBcc([
+                            [
+                                'name' => 'BCC'
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'does not contain the email parameter',
+            ],
+            'text missing when no template id' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([
+                            [
+                                'name' => 'Recipient',
+                                'email' => 'recipient@mailersend.com',
+                            ]
+                        ])
+                        ->setSubject('Subject')
+                ],
+                'One of template_id, html or text must be supplied',
+            ],
+            'too many recipients' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients(array_map(
+                            fn ($i) => new Recipient("recipient{$i}@mailersend.com", "Recipient {$i}"),
+                            range(1, 51)
+                        ))
+                        ->setSubject('Subject')
+                        ->setHtml('HTML'),
+                ],
+                'Recipients list should not contain more than 50 items.',
+            ],
+            'subject too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject(str_repeat('a', 999))
+                        ->setHtml('HTML'),
+                ],
+                'Subject may not be greater than 998 characters.',
+            ],
+            'too many tags' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setTags(['tag1', 'tag2', 'tag3', 'tag4', 'tag5', 'tag6']),
+                ],
+                'Tags list should not contain more than 5 items.',
+            ],
+            'tag too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setTags([str_repeat('a', 192)]),
+                ],
+                'Each tag may not be greater than 191 characters.',
+            ],
+            'send_at in the past' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setSendAt(1000000000), // 2001-09-09, always in the past
+                ],
+                'Send at must not be in the past.',
+            ],
+            'send_at more than 72 hours in the future' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setSendAt(9999999999), // 2286-11-20, always > 72h in the future
+                ],
+                'Send at may not be more than 72 hours in the future.',
+            ],
+            'in_reply_to too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setInReplyToHeader(str_repeat('a', 999)),
+                ],
+                'In reply to may not be greater than 998 characters.',
+            ],
+            'list_unsubscribe too long' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setListUnsubscribe(str_repeat('a', 991)),
+                ],
+                'List unsubscribe may not be greater than 990 characters.',
+            ],
+            'in_reply_to with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setInReplyToHeader("legit-123\r\nBcc: attacker@evil.com"),
+                ],
+                'In reply to must not contain CR or LF characters.',
+            ],
+            'in_reply_to with trailing LF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setInReplyToHeader("legit-123\n"),
+                ],
+                'In reply to must not contain CR or LF characters.',
+            ],
+            'list_unsubscribe with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setListUnsubscribe("https://example.com/u\r\nBcc: attacker@evil.com"),
+                ],
+                'List unsubscribe must not contain CR or LF characters.',
+            ],
+            'list_unsubscribe with trailing LF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setListUnsubscribe("https://example.com/u\n"),
+                ],
+                'List unsubscribe must not contain CR or LF characters.',
+            ],
+            'subject with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setHtml('HTML')
+                        ->setSubject("Subject\r\nBcc: attacker@evil.com"),
+                ],
+                'Subject must not contain CR or LF characters.',
+            ],
+            'references with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setReferencesHeader(["<a@example.com>\r\nBcc: attacker@evil.com"]),
+                ],
+                'Each reference must not contain CR or LF characters.',
+            ],
+            'header name with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setHeaders([['name' => "X-Custom\r\nBcc: attacker@evil.com", 'value' => 'value']]),
+                ],
+                'Header name must not contain CR or LF characters.',
+            ],
+            'header value with CRLF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setHeaders([['name' => 'X-Custom', 'value' => "value\r\nBcc: attacker@evil.com"]]),
+                ],
+                'Header value must not contain CR or LF characters.',
+            ],
+            'header value with trailing LF' => [
+                [
+                    (new EmailParams())
+                        ->setFrom('test@mailersend.com')
+                        ->setFromName('Sender')
+                        ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                        ->setSubject('Subject')
+                        ->setHtml('HTML')
+                        ->setHeaders([['name' => 'X-Custom', 'value' => "value\n"]]),
+                ],
+                'Header value must not contain CR or LF characters.',
             ],
         ];
     }
@@ -511,10 +892,9 @@ class BulkEmailTest extends TestCase
     {
         $this->addSuccessResponse();
 
-        $response = $this->bulkEmail->getStatus('bulk-email-id-123');
+        $this->bulkEmail->getStatus('bulk-email-id-123');
 
         $body = $this->assertRequest('GET', '/v1/bulk-email/bulk-email-id-123');
-        self::assertEquals(200, $response['status_code']);
         self::assertEmpty($body);
     }
 
@@ -762,5 +1142,13 @@ class BulkEmailTest extends TestCase
         ]);
 
         self::assertEquals(200, $response['status_code']);
+    }
+
+    public function test_send_requires_at_least_one_email(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Bulk params should contain at least 1 email');
+
+        $this->bulkEmail->send([]);
     }
 }

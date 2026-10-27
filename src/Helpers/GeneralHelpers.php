@@ -52,11 +52,15 @@ class GeneralHelpers
         ], fn ($v) => $v !== null), 'One of template_id, html or text must be supplied'));
 
         if (!$params->getTemplateId()) {
-            self::assert(fn () => Assertion::email($params->getFrom(), 'From email must be a valid email address.'));
-            self::assert(fn () => Assertion::minLength($params->getSubject(), 1, 'Subject is required.'));
+            self::assert(
+                fn () => Assertion::email($params->getFrom()) &&
+                    Assertion::minLength($params->getSubject(), 1) &&
+                    Assertion::minCount($params->getRecipients(), 1)
+            );
+        } else {
+            self::assert(fn () => Assertion::minCount($params->getRecipients(), 1));
         }
 
-        self::assert(fn () => Assertion::minCount($params->getRecipients(), 1, 'At least one recipient is required.'));
         self::assert(fn () => Assertion::maxCount($params->getRecipients(), 50, 'Recipients list should not contain more than 50 items.'));
 
         if ($params->getSubject() !== null) {
@@ -103,7 +107,7 @@ class GeneralHelpers
         }
 
         if (count($params->getCc()) > 0) {
-            self::assert(fn () => Assertion::maxCount($params->getCc(), 10, 'CC list should not contain more than 10 items.'));
+            self::assert(fn () => Assertion::maxCount($params->getCc(), 10));
             foreach ($params->getCc() as $key => $cc) {
                 $cc = !is_array($cc) ? $cc->toArray() : $cc;
                 self::assert(
@@ -113,7 +117,7 @@ class GeneralHelpers
         }
 
         if (count($params->getBcc()) > 0) {
-            self::assert(fn () => Assertion::maxCount($params->getBcc(), 10, 'BCC list should not contain more than 10 items.'));
+            self::assert(fn () => Assertion::maxCount($params->getBcc(), 10));
             foreach ($params->getBcc() as $key => $bcc) {
                 $bcc = !is_array($bcc) ? $bcc->toArray() : $bcc;
                 self::assert(

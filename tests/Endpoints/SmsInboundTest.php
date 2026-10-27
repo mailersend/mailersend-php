@@ -223,15 +223,68 @@ class SmsInboundTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidSmsInboundCreateDataProvider
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    #[DataProvider('invalidSmsInboundCreateDataProvider')]
-    public function test_create_rejects_invalid_params(SmsInboundBuilder $params, string $expectedMessage): void
+    public function test_create_requires_sms_number_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        $this->expectExceptionMessage('SMS number id is required.');
+
+        $params = (new SmsInboundBuilder())
+            ->setName('Test name')
+            ->setForwardUrl('https://mailersend.com/inbound');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_requires_name(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('SMS inbound name is required');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setForwardUrl('https://mailersend.com/inbound');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_requires_valid_forward_url(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid URL.');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Test name')
+            ->setForwardUrl('not-a-valid-url');
+
+        $this->smsInbound->create($params);
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_create_rejects_invalid_filter_comparer(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Invalid filter comparer.');
+
+        $params = (new SmsInboundBuilder())
+            ->setSmsNumberId('hashed_sms_number_id')
+            ->setName('Test name')
+            ->setForwardUrl('https://mailersend.com/inbound')
+            ->setFilter(new SmsInboundFilter('invalid-comparer', 'value'));
 
         $this->smsInbound->create($params);
     }
@@ -405,39 +458,6 @@ class SmsInboundTest extends TestCase
                     'enabled' => true,
                 ],
                 'excluded' => ['filter'],
-            ],
-        ];
-    }
-
-    public static function invalidSmsInboundCreateDataProvider(): array
-    {
-        return [
-            'missing sms number id' => [
-                (new SmsInboundBuilder())
-                    ->setName('Test name')
-                    ->setForwardUrl('https://mailersend.com/inbound'),
-                'SMS number id is required.',
-            ],
-            'missing name' => [
-                (new SmsInboundBuilder())
-                    ->setSmsNumberId('hashed_sms_number_id')
-                    ->setForwardUrl('https://mailersend.com/inbound'),
-                'SMS inbound name is required',
-            ],
-            'invalid forward url' => [
-                (new SmsInboundBuilder())
-                    ->setSmsNumberId('hashed_sms_number_id')
-                    ->setName('Test name')
-                    ->setForwardUrl('not-a-valid-url'),
-                'Invalid URL.',
-            ],
-            'invalid filter comparer' => [
-                (new SmsInboundBuilder())
-                    ->setSmsNumberId('hashed_sms_number_id')
-                    ->setName('Test name')
-                    ->setForwardUrl('https://mailersend.com/inbound')
-                    ->setFilter(new SmsInboundFilter('invalid-comparer', 'value')),
-                'Invalid filter comparer.',
             ],
         ];
     }

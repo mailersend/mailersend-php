@@ -58,23 +58,23 @@ class SmsWebhookTest extends TestCase
 
         $response = $this->smsWebhook->get('hashed_sms_number_id');
 
-        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+        $this->assertRequest('GET', '/v1/sms-webhooks');
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
         self::assertEquals(200, $response['status_code']);
         $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id'], $query);
-        self::assertSame([], $body);
     }
 
     public function test_get_sms_webhooks_with_limit()
     {
         $this->addSuccessResponse();
 
-        $this->smsWebhook->get('hashed_sms_number_id', 10);
+        $response = $this->smsWebhook->get('hashed_sms_number_id', 10);
 
         $this->assertRequest('GET', '/v1/sms-webhooks');
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
+        self::assertEquals(200, $response['status_code']);
         $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id', 'limit' => '10'], $query);
     }
 
@@ -82,11 +82,12 @@ class SmsWebhookTest extends TestCase
     {
         $this->addSuccessResponse();
 
-        $this->smsWebhook->get('hashed_sms_number_id', null, 2);
+        $response = $this->smsWebhook->get('hashed_sms_number_id', null, 2);
 
         $this->assertRequest('GET', '/v1/sms-webhooks');
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
+        self::assertEquals(200, $response['status_code']);
         $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id', 'page' => '2'], $query);
     }
 
@@ -96,10 +97,10 @@ class SmsWebhookTest extends TestCase
 
         $this->smsWebhook->get('hashed_sms_number_id');
 
+        $this->assertRequest('GET', '/v1/sms-webhooks');
         parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        self::assertArrayNotHasKey('limit', $query);
-        self::assertArrayNotHasKey('page', $query);
+        $this->assertBodyExcludes(['limit', 'page'], $query);
     }
 
     public function test_find_webhook(): void

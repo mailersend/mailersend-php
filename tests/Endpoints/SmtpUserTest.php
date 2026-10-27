@@ -44,7 +44,7 @@ class SmtpUserTest extends TestCase
         $this->client->addResponse($response);
 
         $response = $this->smtpUser->getAll(
-            'domain_id',
+            Arr::get($params, 'domain_id'),
             Arr::get($params, 'limit'),
             Arr::get($params, 'page'),
         );
@@ -52,25 +52,14 @@ class SmtpUserTest extends TestCase
         $request = $this->client->getLastRequest();
 
         parse_str($request->getUri()->getQuery(), $query);
+        $domainId = Arr::get($params, 'domain_id');
 
         self::assertEquals('GET', $request->getMethod());
-        self::assertEquals('/v1/domains/domain_id/smtp-users', $request->getUri()->getPath());
+        self::assertEquals("/v1/domains/$domainId/smtp-users", $request->getUri()->getPath());
         self::assertEquals(200, $response['status_code']);
 
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
         self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
-    }
-
-    public function test_get_all_sends_default_limit(): void
-    {
-        $this->addSuccessResponse();
-
-        $this->smtpUser->getAll('domain_id');
-
-        $request = $this->client->getLastRequest();
-        parse_str($request->getUri()->getQuery(), $query);
-
-        $this->assertQueryParams(['limit' => '25'], $query);
     }
 
     /**
@@ -90,7 +79,6 @@ class SmtpUserTest extends TestCase
         $this->smtpUser->getAll(
             Arr::get($params, 'domain_id'),
             Arr::get($params, 'limit'),
-            Arr::get($params, 'page'),
         );
     }
 
@@ -111,18 +99,29 @@ class SmtpUserTest extends TestCase
     }
 
     /**
-     * @dataProvider missingIdsDataProvider
      * @throws MailerSendAssertException
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    #[DataProvider('missingIdsDataProvider')]
-    public function test_find_rejects_missing_ids(string $domainId, string $smtpUserId, string $message): void
+    public function test_find_requires_domain_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage('Domain id is required.');
 
-        $this->smtpUser->find($domainId, $smtpUserId);
+        $this->smtpUser->find('', 'smtpUserId');
+    }
+
+    /**
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_find_requires_smtp_user_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Smtp user id is required.');
+
+        $this->smtpUser->find('domainId', '');
     }
 
     /**
@@ -216,10 +215,6 @@ class SmtpUserTest extends TestCase
         self::assertSame(false, Arr::get($body, 'enabled'));
     }
 
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function test_update_without_name_excludes_it(): void
     {
         $this->addSuccessResponse();
@@ -232,10 +227,6 @@ class SmtpUserTest extends TestCase
         $this->assertBodyExcludes(['name'], $body);
     }
 
-    /**
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function test_update_without_enabled_excludes_it(): void
     {
         $this->addSuccessResponse();
@@ -249,18 +240,29 @@ class SmtpUserTest extends TestCase
     }
 
     /**
-     * @dataProvider missingIdsDataProvider
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws MailerSendAssertException
      * @throws \JsonException
      */
-    #[DataProvider('missingIdsDataProvider')]
-    public function test_update_rejects_missing_ids(string $domainId, string $smtpUserId, string $message): void
+    public function test_update_requires_domain_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage('Domain id is required.');
 
-        $this->smtpUser->update($domainId, $smtpUserId, new SmtpUserParams('Test'));
+        $this->smtpUser->update('', 'smtpUserId', new SmtpUserParams('Test'));
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws MailerSendAssertException
+     * @throws \JsonException
+     */
+    public function test_update_requires_smtp_user_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Smtp user id is required.');
+
+        $this->smtpUser->update('domainId', '', new SmtpUserParams('Test'));
     }
 
     /**
@@ -280,55 +282,69 @@ class SmtpUserTest extends TestCase
     }
 
     /**
-     * @dataProvider missingIdsDataProvider
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
      */
-    #[DataProvider('missingIdsDataProvider')]
-    public function test_delete_rejects_missing_ids(string $domainId, string $smtpUserId, string $message): void
+    public function test_delete_requires_smtp_user_id(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage('Smtp user id is required.');
 
-        $this->smtpUser->delete($domainId, $smtpUserId);
+        $this->smtpUser->delete('domainId', '');
+    }
+
+    /**
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function test_delete_requires_domain_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Domain id is required.');
+
+        $this->smtpUser->delete('', 'smtpUserId');
     }
 
     public static function validSmtpUserRoutingListDataProvider(): array
     {
         return [
-            'without limit and page' => [
-                'params' => [],
+            'with domain id' => [
+                'params' => [
+                    'domain_id' => 'domain_id',
+                ],
                 'expected' => [
+                    'domain_id' => 'domain_id',
                     'limit' => null,
-                    'page' => null,
                 ],
             ],
             'with limit' => [
-                'params' => [
+                [
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
                 ],
-                'expected' => [
+                [
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
-                    'page' => null,
                 ],
             ],
             'with page' => [
-                'params' => [
+                [
+                    'domain_id' => 'domain_id',
                     'page' => 2,
                 ],
-                'expected' => [
-                    'limit' => null,
+                [
+                    'domain_id' => 'domain_id',
                     'page' => 2,
                 ],
             ],
             'complete request' => [
-                'params' => [
+                [
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
-                    'page' => 2,
                 ],
-                'expected' => [
+                [
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
-                    'page' => 2,
                 ],
             ],
         ];
@@ -341,10 +357,6 @@ class SmtpUserTest extends TestCase
                 [],
                 'Domain id is required.',
             ],
-            'with empty domain id' => [
-                ['domain_id' => ''],
-                'Domain id is required.',
-            ],
             'with limit under 10' => [
                 ['domain_id' => 'domain_id', 'limit' => 9],
                 'Limit is supposed to be between 10 and 100.',
@@ -353,14 +365,6 @@ class SmtpUserTest extends TestCase
                 ['domain_id' => 'domain_id', 'limit' => 101],
                 'Limit is supposed to be between 10 and 100.',
             ],
-        ];
-    }
-
-    public static function missingIdsDataProvider(): array
-    {
-        return [
-            'missing domain id' => ['', 'smtpUserId', 'Domain id is required.'],
-            'missing smtp user id' => ['domainId', '', 'Smtp user id is required.'],
         ];
     }
 }

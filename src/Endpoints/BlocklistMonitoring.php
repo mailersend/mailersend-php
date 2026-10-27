@@ -27,7 +27,7 @@ class BlocklistMonitoring extends AbstractEndpoint
         ?string $sortBy = null,
         ?string $order = null
     ): array {
-        if ($limit !== null) {
+        if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
                     $limit,

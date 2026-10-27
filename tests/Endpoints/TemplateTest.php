@@ -123,7 +123,8 @@ class TemplateTest extends TestCase
             ->setText('Hello')
             ->setDomainId('domain-id')
             ->setCategories(['newsletter'])
-            ->setTags(['tag1']);
+            ->setTags(['tag1'])
+            ->setAutoGenerate(true);
 
         $response = $this->template->create($params);
 
@@ -136,71 +137,100 @@ class TemplateTest extends TestCase
         self::assertSame('domain-id', Arr::get($body, 'domain_id'));
         self::assertSame(['newsletter'], Arr::get($body, 'categories'));
         self::assertSame(['tag1'], Arr::get($body, 'tags'));
-    }
-
-    /**
-     * @throws MailerSendAssertException
-     * @throws \JsonException
-     * @throws \Psr\Http\Client\ClientExceptionInterface
-     */
-    public function test_create_excludes_auto_generate_from_request_body(): void
-    {
-        $this->addSuccessResponse();
-
-        $params = (new TemplateParams())
-            ->setHtml('<h1>Hello</h1>')
-            ->setText('Hello')
-            ->setAutoGenerate(true);
-
-        $this->template->create($params);
-
-        $body = $this->assertRequest('POST', '/v1/templates');
-
         $this->assertBodyExcludes(['auto_generate'], $body);
     }
 
     /**
-     * @dataProvider invalidCreateParamsProvider
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    #[DataProvider('invalidCreateParamsProvider')]
-    public function test_create_rejects_invalid_params(TemplateParams $params, string $expectedMessage): void
+    public function test_create_requires_html(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        $this->expectExceptionMessage('HTML is required.');
+
+        $this->template->create(new TemplateParams());
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_name_max_length_is_validated(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Name must be 50 characters or fewer.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setName(str_repeat('a', 51));
 
         $this->template->create($params);
     }
 
-    public static function invalidCreateParamsProvider(): array
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_requires_text_when_auto_generate_is_not_true(): void
     {
-        return [
-            'html missing' => [
-                (new TemplateParams())->setText('Hello'),
-                'HTML is required.',
-            ],
-            'name longer than 50 characters' => [
-                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setName(str_repeat('a', 51)),
-                'Name must be 50 characters or fewer.',
-            ],
-            'text missing' => [
-                (new TemplateParams())->setHtml('<h1>Hello</h1>'),
-                'Text is required.',
-            ],
-            'text missing with auto_generate true' => [
-                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setAutoGenerate(true),
-                'Text is required.',
-            ],
-            'more than 5 tags' => [
-                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setTags(['a', 'b', 'c', 'd', 'e', 'f']),
-                'Tags list should not contain more than 5 items.',
-            ],
-            'tag longer than 191 characters' => [
-                (new TemplateParams())->setHtml('<h1>Hello</h1>')->setText('Hello')->setTags([str_repeat('a', 192)]),
-                'Each tag may not be greater than 191 characters.',
-            ],
-        ];
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Text is required.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>');
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_requires_text_when_auto_generate_is_true(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Text is required.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setAutoGenerate(true);
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_more_than_5_tags(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Tags list should not contain more than 5 items.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setText('Hello')
+            ->setTags(['a', 'b', 'c', 'd', 'e', 'f']);
+
+        $this->template->create($params);
+    }
+
+    /**
+     * @throws \JsonException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function test_create_rejects_tag_exceeding_191_characters(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Each tag may not be greater than 191 characters.');
+
+        $params = (new TemplateParams())
+            ->setHtml('<h1>Hello</h1>')
+            ->setText('Hello')
+            ->setTags([str_repeat('a', 192)]);
+
+        $this->template->create($params);
     }
 
     /**
