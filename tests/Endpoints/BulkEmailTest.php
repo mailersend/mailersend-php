@@ -1019,7 +1019,7 @@ class BulkEmailTest extends TestCase
         self::assertEquals('https://unsubscribe.example.com', $body[0]['list_unsubscribe']);
     }
 
-    public function test_send_excludes_rcpt_to_from_body(): void
+    public function test_send_with_rcpt_to(): void
     {
         $this->addSuccessResponse();
 
@@ -1040,7 +1040,8 @@ class BulkEmailTest extends TestCase
         $this->bulkEmail->send($bulkEmailParams);
 
         $body = $this->assertRequest('POST', '/v1/bulk-email');
-        $this->assertBodyExcludes(['rcptTo'], $body[0]);
+        self::assertNotEmpty($body[0]['rcptTo']);
+        self::assertEquals('rcpt@mailersend.com', $body[0]['rcptTo'][0]['email']);
     }
 
     public function test_send_includes_only_the_tracking_settings_that_were_set(): void

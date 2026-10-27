@@ -21,6 +21,7 @@ MailerSend PHP SDK
         * [Send email with precedence bulk header](#precedence-bulk-header)
         * [Send an email with tracking](#send-an-email-with-tracking)
         * [Send email with custom headers](#custom-headers)
+        * [Send an email with RCPT TO recipients](#send-an-email-with-rcpt-to)
     * [Bulk emails API](#bulk-email-api)
         * [Send bulk email](#send-bulk-email)
         * [Get bulk email status](#get-bulk-email-status)
@@ -640,6 +641,34 @@ $emailParams = (new EmailParams())
     ->setHtml('This is the HTML content')
     ->setText('This is the text content')
     ->setHeaders($headers);
+
+$mailersend->email->send($emailParams);
+```
+
+<a name="send-an-email-with-rcpt-to"></a>
+### Send an email with RCPT TO recipients
+
+`rcptTo` is intended for SMTP source delivery and accepts a list of recipients.
+When `to` is empty and `rcptTo` is provided, the addresses are forwarded as BCC.
+
+```php
+use MailerSend\MailerSend;
+use MailerSend\Helpers\Builder\Recipient;
+use MailerSend\Helpers\Builder\EmailParams;
+
+$mailersend = new MailerSend();
+
+$rcptTo = [
+    new Recipient('rcpt@client.com'),
+];
+
+$emailParams = (new EmailParams())
+    ->setFrom('your@domain.com')
+    ->setFromName('Your Name')
+    ->setSubject('Subject')
+    ->setHtml('This is the HTML content')
+    ->setText('This is the text content')
+    ->setRcptTo($rcptTo);
 
 $mailersend->email->send($emailParams);
 ```

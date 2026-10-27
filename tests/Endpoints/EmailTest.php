@@ -929,9 +929,11 @@ class EmailTest extends TestCase
         ];
     }
 
-    public function test_send_excludes_rcpt_to_from_body(): void
+    public function test_send_includes_rcpt_to_in_body(): void
     {
         $this->addSuccessResponse();
+
+        $rcptTo = [new Recipient('rcpt@mailersend.com', 'Rcpt To')];
 
         $emailParams = (new EmailParams())
             ->setFrom('test@mailersend.com')
@@ -939,13 +941,16 @@ class EmailTest extends TestCase
             ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
             ->setSubject('Subject')
             ->setText('TEXT')
-            ->setRcptTo([new Recipient('rcpt@mailersend.com', 'Rcpt To')]);
+            ->setRcptTo($rcptTo);
 
         $this->email->send($emailParams);
 
         $body = $this->assertRequest('POST', '/v1/email');
 
-        $this->assertBodyExcludes(['rcptTo'], $body);
+        self::assertArrayHasKey('rcptTo', $body);
+        self::assertCount(1, $body['rcptTo']);
+        self::assertEquals('rcpt@mailersend.com', $body['rcptTo'][0]['email']);
+        self::assertEquals('Rcpt To', $body['rcptTo'][0]['name']);
     }
 
     public function test_send_includes_only_the_tracking_settings_that_were_set(): void
