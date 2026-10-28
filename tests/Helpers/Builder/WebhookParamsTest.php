@@ -61,6 +61,8 @@ class WebhookParamsTest extends TestCase
             WebhookParams::ACTIVITY_BULK_EMAIL_COMPLETED,
             WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_ADDED,
             WebhookParams::ACTIVITY_RECIPIENT_ON_HOLD_REMOVED,
+            WebhookParams::ACTIVITY_DOMAIN_REPUTATION_CHANGED,
+            WebhookParams::ACTIVITY_ACCOUNT_REPUTATION_CHANGED,
         ];
 
         foreach ($expected as $event) {
