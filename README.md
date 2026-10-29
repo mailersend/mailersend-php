@@ -500,8 +500,8 @@ $emailParams = (new EmailParams())
     ->setSubject('Re: Subject')
     ->setHtml('This is the HTML content.')
     ->setText('This is the text content.')
-    ->setInReplyTo('<original-message-id@yourdomain.com>')
-    ->setReferences(['<original-message-id@yourdomain.com>', '<another-message-id@yourdomain.com>']);
+    ->setInReplyToHeader('<original-message-id@yourdomain.com>')
+    ->setReferencesHeader(['<original-message-id@yourdomain.com>', '<another-message-id@yourdomain.com>']);
 
 $mailersend->email->send($emailParams);
 ```
@@ -629,7 +629,7 @@ $recipients = [
 ];
 
 $headers = [
-    new Header('Custom-Header-1', 'Value 1')
+    new Header('Custom-Header-1', 'Value 1'),
     new Header('Custom-Header-2', 'Value 2')
 ];
 
@@ -659,12 +659,13 @@ use MailerSend\Helpers\Builder\EmailParams;
 $mailersend = new MailerSend();
 
 $rcptTo = [
-    new Recipient('rcpt@client.com'),
+    new Recipient('rcpt@client.com', null),
 ];
 
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
+    ->setRecipients([new Recipient('your@client.com', 'Your Client')])
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
     ->setText('This is the text content')
@@ -908,12 +909,12 @@ $mailersend->inbound->create(
     (new Inbound('domainId', 'name', true))
         ->setInboundDomain('inboundDomain')
         ->setCatchFilter(
-            (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT)
-                ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'test@mailersend.com'))))
+            (new CatchFilter(Constants::TYPE_CATCH_RECIPIENT))
+                ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'test@mailersend.com')))
         ->setMatchFilter(
             (new MatchFilter(Constants::TYPE_MATCH_SENDER))
                 ->addFilter(new Filter(Constants::COMPARER_EQUAL, 'sender@mailersend.com', 'sender')))
-        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'https://www.mailersend.com/hook'))
         ->setInboundPriority(50)
         ->setIncludeAttachments(false)
 );
@@ -953,7 +954,7 @@ $mailersend->inbound->create(
                     ]
                 ])
         )
-        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'https://www.mailersend.com/hook'))
         ->setInboundPriority(50)
 );
 ```
@@ -995,7 +996,7 @@ $mailersend->inbound->create(
         ->setForwards([
             [
                 'type' => Constants::TYPE_WEBHOOK,
-                'value' => 'value',
+                'value' => 'https://www.mailersend.com/hook',
             ]
         ])
         ->setInboundPriority(50)
@@ -1028,7 +1029,7 @@ $mailersend->inbound->update(
             (new CatchFilter(Constants::TYPE_CATCH_ALL))
         )
         ->setMatchFilter(new MatchFilter(Constants::TYPE_MATCH_ALL))
-        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'value'))
+        ->addForward(new Forward(Constants::TYPE_WEBHOOK, 'https://www.mailersend.com/hook'))
         ->setIncludeAttachments(false)
 );
 ```
@@ -1099,7 +1100,7 @@ use MailerSend\Common\Constants;
 
 $mailersend = new MailerSend();
 
-$activityAnalyticsParams = (new ActivityAnalyticsParams(100, 101))
+$activityAnalyticsParams = (new ActivityAnalyticsParams(1790121600, 1792713599))
                     ->setDomainId('domain_id')
                     ->setGroupBy(Constants::GROUP_BY_DAYS)
                     ->setTags(['tag'])
@@ -1118,7 +1119,7 @@ use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
 $mailersend = new MailerSend();
 
-$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+$opensAnalyticsParams = (new OpensAnalyticsParams(1790121600, 1792713599))
                     ->setDomainId('domain_id')
                     ->setTags(['tag']);
 
@@ -1135,7 +1136,7 @@ use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
 $mailersend = new MailerSend();
 
-$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+$opensAnalyticsParams = (new OpensAnalyticsParams(1790121600, 1792713599))
                     ->setDomainId('domain_id')
                     ->setTags(['tag']);
 
@@ -1152,7 +1153,7 @@ use MailerSend\Helpers\Builder\OpensAnalyticsParams;
 
 $mailersend = new MailerSend();
 
-$opensAnalyticsParams = (new OpensAnalyticsParams(100, 101))
+$opensAnalyticsParams = (new OpensAnalyticsParams(1790121600, 1792713599))
                     ->setDomainId('domain_id')
                     ->setTags(['tag']);
 
@@ -1200,7 +1201,7 @@ $mailersend = new MailerSend();
 $domainParams = (new DomainParams('domainName'))
                     ->setReturnPathSubdomain('returnPath')
                     ->setCustomTrackingSubdomain('customTracking')
-                    ->getInboundRoutingSubdomain('inboundRouting');
+                    ->setInboundRoutingSubdomain('inboundRouting');
 
 $mailersend->domain->create($domainParams);
 
@@ -1247,12 +1248,12 @@ $domainSettingsParam = (new DomainSettingsParams())
                             ->setTrackOpens(false)
                             ->setTrackUnsubscribe(false)
                             ->setTrackContent(true)
-                            ->setTrackUnsubscribeHtml('html')
+                            ->setTrackUnsubscribeHtml('<p>Click here to <a href="{{unsubscribe}}">unsubscribe</a></p>')
                             ->setTrackUnsubscribeHtmlEnabled(true)
-                            ->setTrackUnsubscribePlain('plain')
+                            ->setTrackUnsubscribePlain('Click here to unsubscribe: {{unsubscribe}}')
                             ->setTrackUnsubscribePlainEnabled(true)
                             ->setCustomTrackingEnabled(true)
-                            ->setCustomTrackingSubdomain(false);
+                            ->setCustomTrackingSubdomain('email');
 
 $mailersend->domain->domainSettings($domainId = 'domain_id', $domainSettingsParam);
 ```
@@ -1328,7 +1329,7 @@ $mailersend->scheduleMessages->getAll(
     Constants::STATUS_SCHEDULED,
     $page = 3,
     $limit = 100
-)
+);
 ```
 
 <a name="get-a-single-scheduled-message"></a>
@@ -1512,7 +1513,7 @@ $mailersend = new MailerSend();
 
 $params = (new BlocklistParams())
     ->setDomainId('domain_id')
-    ->setRecipients(['recipient_one', 'recipient_two'])
+    ->setRecipients(['recipient_one@example.com', 'recipient_two@example.com'])
     ->setPatterns(['pattern_one', 'pattern_two']);
 
 $mailersend->blocklist->create($params);
@@ -1528,7 +1529,7 @@ $mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
-    ->setRecipients(['recipient_one', 'recipient_two']);
+    ->setRecipients(['recipient_one@example.com', 'recipient_two@example.com']);
 
 $mailersend->hardBounce->create($params);
 ```
@@ -1543,7 +1544,7 @@ $mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
-    ->setRecipients(['recipient_one', 'recipient_two']);
+    ->setRecipients(['recipient_one@example.com', 'recipient_two@example.com']);
 
 $mailersend->spamComplaint->create($params);
 ```
@@ -1558,7 +1559,7 @@ $mailersend = new MailerSend();
 
 $params = (new SuppressionParams())
     ->setDomainId('domain_id')
-    ->setRecipients(['recipient_one', 'recipient_two']);
+    ->setRecipients(['recipient_one@example.com', 'recipient_two@example.com']);
 
 $mailersend->unsubscribe->create($params);
 ```
@@ -1660,7 +1661,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->blocklist->getAll('domain_id', 15);
+$mailersend->blocklist->getAll('domain_id', 1, 15);
 ```
 
 **Hard Bounces**
@@ -1670,7 +1671,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->hardBounce->getAll('domain_id', 15);
+$mailersend->hardBounce->getAll('domain_id', 1, 15);
 ```
 
 **Spam Complaints**
@@ -1680,7 +1681,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->spamComplaint->getAll('domain_id', 15);
+$mailersend->spamComplaint->getAll('domain_id', 1, 15);
 ```
 
 **Unsubscribes**
@@ -1690,7 +1691,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->unsubscribe->getAll('domain_id', 15);
+$mailersend->unsubscribe->getAll('domain_id', 1, 15);
 ```
 
 **On Hold List**
@@ -1700,7 +1701,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->onHoldList->getAll('domain_id', 15);
+$mailersend->onHoldList->getAll('domain_id', 1, 15);
 ```
 
 <a name="webhooks"></a>
@@ -1779,16 +1780,14 @@ $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name
 // Disable webhook
 $mailersend->webhooks->update('webhook_id', 'https://webhook_url', 'Webhook name', WebhookParams::ALL_ACTIVITIES, false);
 
-// Update version, editable and domain_id
+// Update version
 $mailersend->webhooks->update(
     'webhook_id',
     'https://webhook_url',
     'Webhook name',
     WebhookParams::ALL_ACTIVITIES,
     $enabled = true,
-    $version = 2,
-    $editable = true,
-    $domainId = 'domain_id'
+    $version = 2
 );
 ```
 
@@ -1857,8 +1856,7 @@ $params = (new TemplateParams())
     ->setText('Hello {{name}}')
     ->setDomainId('domain_id')
     ->setCategories(['category1', 'category2'])
-    ->setTags(['tag1', 'tag2'])
-    ->setAutoGenerate(true);
+    ->setTags(['tag1', 'tag2']);
 
 $mailersend->template->create($params);
 ```
@@ -2052,6 +2050,7 @@ $sms = $mailersend->sms->send($smsParams);
 ```php
 use MailerSend\MailerSend;
 use MailerSend\Helpers\Builder\SmsParams;
+use MailerSend\Helpers\Builder\SmsPersonalization;
 
 $mailersend = new MailerSend();
 
@@ -2294,13 +2293,12 @@ use MailerSend\Helpers\Builder\SmsWebhookParams;
 $mailersend = new MailerSend();
 
 $smsWebhookParams = (new SmsWebhookParams())
-    ->setSmsNumberId('sms_number_id')
     ->setName('Name')
     ->setUrl('https://mailersend.com/sms_webhook')
     ->setEvents(['sms.sent', 'sms.delivered', 'sms.failed'])
     ->setEnabled(false);
 
-$smsRecipients = $mailersend->smsWebhook->update($smsWebhookParams);
+$smsRecipients = $mailersend->smsWebhook->update('sms_webhook_id', $smsWebhookParams);
 ```
 
 <a name="sms-inbounds-api"></a>
@@ -2699,7 +2697,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->senderIdentity->findByEmail('email');
+$mailersend->senderIdentity->findByEmail('john@example.com');
 ```
 
 <a name="add-a-sender-identity-route"></a>
@@ -2769,7 +2767,7 @@ use MailerSend\Helpers\Builder\SenderIdentity;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->senderIdentity->updateByEmail(
-    'identityId',
+    'john@example.com',
     (new SenderIdentity('domainId', 'name', 'email'))
         ->setReplyToName("John Doe")
         ->setReplyToEmail("john@test.com")
@@ -2809,7 +2807,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->senderIdentity->deleteByEmail('email');
+$mailersend->senderIdentity->deleteByEmail('john@example.com');
 ```
 
 <a name="smtp-user-routing"></a>
@@ -2825,7 +2823,7 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
-$mailersend->smtpUser->getAll('domainId', 25);
+$mailersend->smtpUser->getAll('domainId', 25, 2); // domain id, limit, page
 ```
 
 <a name="get-a-single-smtp-user"></a>
@@ -2863,7 +2861,7 @@ $mailersend->smtpUser->create(
 The examples on building the `SMTP User` object portrayed in the 'Add SMTP User' also apply in here.
 ```php
 use MailerSend\MailerSend;
-use MailerSend\Helpers\Builder\UserParams;
+use MailerSend\Helpers\Builder\SmtpUserParams;
 
 $mailersend = new MailerSend(['api_key' => 'key']);
 
@@ -2928,7 +2926,7 @@ use MailerSend\Common\Roles;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->user->create(
-    (new UserParams('email', Roles::ADMIN))
+    (new UserParams('newuser@example.com', Roles::ADMIN))
 );
 ```
 
@@ -2943,7 +2941,7 @@ use MailerSend\Common\Permissions;
 $mailersend = new MailerSend(['api_key' => 'key']);
 
 $mailersend->user->create(
-    (new UserParams('email', Roles::CUSTOM_USER))
+    (new UserParams('newuser@example.com', Roles::CUSTOM_USER))
         ->setDomains(['domainId', 'anotherDomainId'])
         ->setTemplates(['templateId', 'anotherTemplateId'])
         ->setPermissions([Permissions::READ_OWN_TEMPLATES])
@@ -3122,8 +3120,8 @@ $mailersend->dmarcMonitoring->getAggregatedReports(
     'monitor-id',
     $page = 1,
     $limit = 25,
-    $dateFrom = '2024-01-01',
-    $dateTo = '2024-01-31',
+    $dateFrom = '2024-01-01 00:00:00',
+    $dateTo = '2024-01-31 23:59:59',
     $search = 'example.com',
     $category = 'dmarc',
     $reportSource = 'google.com',
@@ -3147,8 +3145,8 @@ $mailersend->dmarcMonitoring->getIpReports(
     '1.2.3.4',
     $page = 1,
     $limit = 25,
-    $dateFrom = '2024-01-01',
-    $dateTo = '2024-01-31',
+    $dateFrom = '2024-01-01 00:00:00',
+    $dateTo = '2024-01-31 23:59:59',
     $search = 'example.com',
     $category = 'dmarc',
     $reportSource = 'google.com',
@@ -3164,13 +3162,13 @@ use MailerSend\MailerSend;
 
 $mailersend = new MailerSend();
 
-$mailersend->dmarcMonitoring->getReportSources('monitor-id', '2024-01-01', '2024-01-31');
+$mailersend->dmarcMonitoring->getReportSources('monitor-id', '2024-01-01 00:00:00', '2024-01-31 23:59:59');
 
 // With optional status filter
 $mailersend->dmarcMonitoring->getReportSources(
     'monitor-id',
-    $dateFrom = '2024-01-01',
-    $dateTo = '2024-01-31',
+    $dateFrom = '2024-01-01 00:00:00',
+    $dateTo = '2024-01-31 23:59:59',
     $status = 'accepted', // accepted, rejected, quarantined
 );
 ```

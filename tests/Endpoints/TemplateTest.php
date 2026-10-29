@@ -137,7 +137,7 @@ class TemplateTest extends TestCase
         self::assertSame('domain-id', Arr::get($body, 'domain_id'));
         self::assertSame(['newsletter'], Arr::get($body, 'categories'));
         self::assertSame(['tag1'], Arr::get($body, 'tags'));
-        self::assertTrue(Arr::get($body, 'auto_generate'));
+        $this->assertBodyExcludes(['auto_generate'], $body);
     }
 
     /**
@@ -175,7 +175,7 @@ class TemplateTest extends TestCase
     public function test_create_requires_text_when_auto_generate_is_not_true(): void
     {
         $this->expectException(MailerSendAssertException::class);
-        $this->expectExceptionMessage('Text is required when auto_generate is not true.');
+        $this->expectExceptionMessage('Text is required.');
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>');
@@ -187,17 +187,16 @@ class TemplateTest extends TestCase
      * @throws \JsonException
      * @throws \Psr\Http\Client\ClientExceptionInterface
      */
-    public function test_create_does_not_require_text_when_auto_generate_is_true(): void
+    public function test_create_requires_text_when_auto_generate_is_true(): void
     {
-        $this->addSuccessResponse();
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Text is required.');
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
             ->setAutoGenerate(true);
 
-        $response = $this->template->create($params);
-
-        self::assertEquals(200, $response['status_code']);
+        $this->template->create($params);
     }
 
     /**
@@ -211,7 +210,7 @@ class TemplateTest extends TestCase
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true)
+            ->setText('Hello')
             ->setTags(['a', 'b', 'c', 'd', 'e', 'f']);
 
         $this->template->create($params);
@@ -228,7 +227,7 @@ class TemplateTest extends TestCase
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true)
+            ->setText('Hello')
             ->setTags([str_repeat('a', 192)]);
 
         $this->template->create($params);
@@ -275,13 +274,13 @@ class TemplateTest extends TestCase
 
         $params = (new TemplateParams())
             ->setHtml('<h1>Hello</h1>')
-            ->setAutoGenerate(true);
+            ->setText('Hello');
 
         $this->template->create($params);
 
         $body = $this->assertRequest('POST', '/v1/templates');
 
-        $this->assertBodyExcludes(['name', 'text', 'domain_id', 'categories', 'tags'], $body);
+        $this->assertBodyExcludes(['name', 'domain_id', 'categories', 'tags'], $body);
     }
 
     /**

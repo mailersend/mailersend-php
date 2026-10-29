@@ -16,7 +16,7 @@ class UserParams implements Arrayable, \JsonSerializable
     protected array $permissions = [];
     protected array $templates = [];
     protected array $domains = [];
-    protected ?bool $requires_periodic_password_change = false;
+    protected ?bool $requires_periodic_password_change = null;
 
     /**
      * @param string|null $email
@@ -125,7 +125,18 @@ class UserParams implements Arrayable, \JsonSerializable
                 'domains' => $this->getDomains(),
                 'templates' => $this->getTemplates(),
                 'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
-            ]);
+            ], fn ($v) => $v !== null && $v !== []);
+    }
+
+    public function toUpdateArray(): array
+    {
+        return array_filter([
+            'role' => $this->getRole(),
+            'permissions' => $this->getPermissions(),
+            'domains' => $this->getDomains(),
+            'templates' => $this->getTemplates(),
+            'requires_periodic_password_change' => $this->getRequiresPeriodicPasswordChange()
+        ], fn ($v) => $v !== null && $v !== []);
     }
 
     #[\ReturnTypeWillChange]

@@ -31,6 +31,13 @@ class Permissions
     public const MANAGE_SMS_WEBHOOKS = 'manage-sms-webhooks';
     public const VIEW_SMS_INBOUND = 'view-sms-inbound';
     public const MANAGE_SMS_INBOUND = 'manage-sms-inbound';
+    public const VIEW_WHATSAPP = 'view-whatsapp';
+    public const MANAGE_WHATSAPP = 'manage-whatsapp';
+    public const READ_DMARC_MONITORING = 'read-dmarc-monitoring';
+    public const MANAGE_DMARC_MONITORING = 'manage-dmarc-monitoring';
+    public const READ_BLOCKLIST_MONITORING = 'read-blocklist-monitoring';
+    public const MANAGE_BLOCKLIST_MONITORING = 'manage-blocklist-monitoring';
+    public const READ_BILLING = 'read-billing';
     public const UPDATE_PLAN = 'update-plan';
     public const MANAGE_ACCOUNT = 'manage-account';
     public const READ_INVOICE = 'read-invoice';

@@ -383,6 +383,10 @@ class BlocklistMonitoringTest extends TestCase
                 'params' => ['limit' => 25],
                 'expected' => ['limit' => '25'],
             ],
+            'with minimum limit' => [
+                'params' => ['limit' => 1],
+                'expected' => ['limit' => '1'],
+            ],
             'with query' => [
                 'params' => ['query' => 'example.com'],
                 'expected' => ['query' => 'example.com'],
@@ -418,12 +422,12 @@ class BlocklistMonitoringTest extends TestCase
     {
         return [
             'limit below minimum' => [
-                'params' => ['limit' => Constants::MIN_LIMIT - 1],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
+                'params' => ['limit' => -1],
+                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_MONITORING_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
             ],
             'limit above maximum' => [
                 'params' => ['limit' => Constants::MAX_LIMIT + 1],
-                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
+                'errorMessage' => 'Limit is supposed to be between ' . Constants::MIN_MONITORING_LIMIT . ' and ' . Constants::MAX_LIMIT . '.',
             ],
             'invalid sort_by value' => [
                 'params' => ['sort_by' => 'invalid_field'],

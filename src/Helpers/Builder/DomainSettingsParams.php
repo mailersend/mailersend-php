@@ -163,7 +163,7 @@ class DomainSettingsParams
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
              'send_paused' => $this->getSendPaused(),
              'track_clicks' => $this->getTrackClicks(),
              'track_opens' => $this->getTrackOpens(),
@@ -177,6 +177,6 @@ class DomainSettingsParams
              'custom_tracking_subdomain' => $this->getCustomTrackingSubdomain(),
              'precedence_bulk' => $this->getPrecedenceBulk(),
              'ignore_duplicated_recipients' => $this->getIgnoreDuplicatedRecipients(),
-        ];
+        ], fn ($value) => $value !== null);
     }
 }

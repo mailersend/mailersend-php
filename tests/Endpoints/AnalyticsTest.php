@@ -109,6 +109,19 @@ class AnalyticsTest extends TestCase
         $this->assertQueryParams(['tags' => ['tag1', 'tag2']], $query);
     }
 
+    public function test_activity_by_date_without_event_omits_it(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->analytics->activityDataByDate(new ActivityAnalyticsParams(100, 101));
+
+        $request = $this->client->getLastRequest();
+        parse_str($request->getUri()->getQuery(), $query);
+
+        self::assertEquals('/v1/analytics/date', $request->getUri()->getPath());
+        self::assertArrayNotHasKey('event', $query);
+    }
+
     /**
      * @dataProvider invalidActivityByDateParamsProvider
      * @param ActivityAnalyticsParams $params
@@ -351,10 +364,6 @@ class AnalyticsTest extends TestCase
     public static function invalidActivityByDateParamsProvider(): array
     {
         return [
-            'missing event' => [
-                new ActivityAnalyticsParams(100, 101),
-                'The event[] is a required parameter.',
-            ],
             'date_to less than date_from' => [
                 (new ActivityAnalyticsParams(101, 100))->setEvent(['sent']),
                 'The parameter date_to must be greater than date_from.',

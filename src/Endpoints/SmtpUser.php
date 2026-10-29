@@ -16,8 +16,12 @@ class SmtpUser extends AbstractEndpoint
      * @throws \JsonException
      * @throws \MailerSend\Exceptions\MailerSendAssertException
      */
-    public function getAll(?string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT): array
+    public function getAll(?string $domainId = null, ?int $limit = Constants::DEFAULT_LIMIT, ?int $page = null): array
     {
+        GeneralHelpers::assert(
+            fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
         if ($limit) {
             GeneralHelpers::assert(
                 fn () => Assertion::range(
@@ -30,7 +34,10 @@ class SmtpUser extends AbstractEndpoint
         }
 
         return $this->httpLayer->get(
-            $this->buildUri("$this->endpoint/$domainId/smtp-users", ['limit' => $limit])
+            $this->buildUri("$this->endpoint/$domainId/smtp-users", [
+                'limit' => $limit,
+                'page' => $page,
+            ])
         );
     }
 
@@ -62,6 +69,10 @@ class SmtpUser extends AbstractEndpoint
     {
         GeneralHelpers::assert(
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
+        );
+
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($params->getName(), 'Name is required.')
         );
 
         return $this->httpLayer->post(

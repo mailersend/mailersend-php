@@ -135,6 +135,25 @@ class InboundTest extends TestCase
         self::assertSame(Arr::get($expected, 'inbound_priority'), Arr::get($body, 'inbound_priority'));
     }
 
+    public function test_create_omits_optional_fields_that_were_not_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->inboundRouting->create(new InboundBuilder('domainId', 'name', false));
+
+        $body = $this->assertRequest('POST', '/v1/inbound');
+
+        $this->assertBodyExcludes([
+            'inbound_domain',
+            'catch_filter',
+            'match_filter',
+            'catch_type',
+            'match_type',
+            'inbound_priority',
+            'include_attachments',
+        ], $body);
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException
@@ -150,7 +169,7 @@ class InboundTest extends TestCase
         $body = $this->assertRequest('PUT', '/v1/inbound/inboundId');
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($body, 'domain_id'));
+        $this->assertBodyExcludes(['domain_id'], $body);
         self::assertSame('name', Arr::get($body, 'name'));
         self::assertFalse(Arr::get($body, 'domain_enabled'));
     }
@@ -183,7 +202,7 @@ class InboundTest extends TestCase
         $body = $this->assertRequest('PUT', '/v1/inbound/inboundId');
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('domainId', Arr::get($body, 'domain_id'));
+        $this->assertBodyExcludes(['domain_id'], $body);
         self::assertSame('name', Arr::get($body, 'name'));
         self::assertTrue(Arr::get($body, 'domain_enabled'));
         self::assertSame('inboundDomain', Arr::get($body, 'inbound_domain'));

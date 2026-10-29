@@ -46,6 +46,7 @@ class SmtpUserTest extends TestCase
         $response = $this->smtpUser->getAll(
             Arr::get($params, 'domain_id'),
             Arr::get($params, 'limit'),
+            Arr::get($params, 'page'),
         );
 
         $request = $this->client->getLastRequest();
@@ -58,6 +59,7 @@ class SmtpUserTest extends TestCase
         self::assertEquals(200, $response['status_code']);
 
         self::assertEquals(Arr::get($expected, 'limit'), Arr::get($query, 'limit'));
+        self::assertEquals(Arr::get($expected, 'page'), Arr::get($query, 'page'));
     }
 
     /**
@@ -140,7 +142,7 @@ class SmtpUserTest extends TestCase
 
         self::assertEquals(200, $response['status_code']);
         self::assertSame('Test Smtp', Arr::get($body, 'name'));
-        self::assertSame(true, Arr::get($body, 'enabled'));
+        $this->assertBodyExcludes(['enabled'], $body);
     }
 
     /**
@@ -174,6 +176,14 @@ class SmtpUserTest extends TestCase
         $this->expectExceptionMessage('Domain id is required.');
 
         $this->smtpUser->create('', new SmtpUserParams('Test Smtp'));
+    }
+
+    public function test_create_requires_name(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Name is required.');
+
+        $this->smtpUser->create('domainId', new SmtpUserParams());
     }
 
     /**
@@ -211,6 +221,30 @@ class SmtpUserTest extends TestCase
 
         self::assertEquals(200, $response['status_code']);
         self::assertSame(false, Arr::get($body, 'enabled'));
+    }
+
+    public function test_update_without_name_excludes_it(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smtpUser->update('domainId', 'smtpUserId', (new SmtpUserParams())->setEnabled(false));
+
+        $body = $this->assertRequest('PUT', '/v1/domains/domainId/smtp-users/smtpUserId');
+
+        self::assertSame(false, Arr::get($body, 'enabled'));
+        $this->assertBodyExcludes(['name'], $body);
+    }
+
+    public function test_update_without_enabled_excludes_it(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->smtpUser->update('domainId', 'smtpUserId', new SmtpUserParams('Renamed Smtp'));
+
+        $body = $this->assertRequest('PUT', '/v1/domains/domainId/smtp-users/smtpUserId');
+
+        self::assertSame('Renamed Smtp', Arr::get($body, 'name'));
+        $this->assertBodyExcludes(['enabled'], $body);
     }
 
     /**
@@ -282,13 +316,6 @@ class SmtpUserTest extends TestCase
     public static function validSmtpUserRoutingListDataProvider(): array
     {
         return [
-            'empty request' => [
-                'params' => [],
-                'expected' => [
-                    'domain_id' => null,
-                    'limit' => null,
-                ],
-            ],
             'with domain id' => [
                 'params' => [
                     'domain_id' => 'domain_id',
@@ -300,11 +327,22 @@ class SmtpUserTest extends TestCase
             ],
             'with limit' => [
                 [
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
                 ],
                 [
-                    'domain_id' => null,
+                    'domain_id' => 'domain_id',
                     'limit' => 10,
+                ],
+            ],
+            'with page' => [
+                [
+                    'domain_id' => 'domain_id',
+                    'page' => 2,
+                ],
+                [
+                    'domain_id' => 'domain_id',
+                    'page' => 2,
                 ],
             ],
             'complete request' => [
@@ -323,12 +361,16 @@ class SmtpUserTest extends TestCase
     public static function invalidSmtpUserRoutingListDataProvider(): array
     {
         return [
+            'without domain id' => [
+                [],
+                'Domain id is required.',
+            ],
             'with limit under 10' => [
-                ['limit' => 9],
+                ['domain_id' => 'domain_id', 'limit' => 9],
                 'Limit is supposed to be between 10 and 100.',
             ],
             'with limit over 100' => [
-                ['limit' => 101],
+                ['domain_id' => 'domain_id', 'limit' => 101],
                 'Limit is supposed to be between 10 and 100.',
             ],
         ];

@@ -58,10 +58,11 @@ class SmsWebhookTest extends TestCase
 
         $response = $this->smsWebhook->get('hashed_sms_number_id');
 
-        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+        $this->assertRequest('GET', '/v1/sms-webhooks');
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
+        $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id'], $query);
     }
 
     public function test_get_sms_webhooks_with_limit()
@@ -70,11 +71,11 @@ class SmsWebhookTest extends TestCase
 
         $response = $this->smsWebhook->get('hashed_sms_number_id', 10);
 
-        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+        $this->assertRequest('GET', '/v1/sms-webhooks');
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
-        self::assertSame(10, Arr::get($body, 'limit'));
+        $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id', 'limit' => '10'], $query);
     }
 
     public function test_get_sms_webhooks_with_page()
@@ -83,11 +84,11 @@ class SmsWebhookTest extends TestCase
 
         $response = $this->smsWebhook->get('hashed_sms_number_id', null, 2);
 
-        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+        $this->assertRequest('GET', '/v1/sms-webhooks');
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
         self::assertEquals(200, $response['status_code']);
-        self::assertSame('hashed_sms_number_id', Arr::get($body, 'sms_number_id'));
-        self::assertSame(2, Arr::get($body, 'page'));
+        $this->assertQueryParams(['sms_number_id' => 'hashed_sms_number_id', 'page' => '2'], $query);
     }
 
     public function test_get_sms_webhooks_excludes_null_limit_and_page(): void
@@ -96,9 +97,10 @@ class SmsWebhookTest extends TestCase
 
         $this->smsWebhook->get('hashed_sms_number_id');
 
-        $body = $this->assertRequest('GET', '/v1/sms-webhooks');
+        $this->assertRequest('GET', '/v1/sms-webhooks');
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
 
-        $this->assertBodyExcludes(['limit', 'page'], $body);
+        $this->assertBodyExcludes(['limit', 'page'], $query);
     }
 
     public function test_find_webhook(): void

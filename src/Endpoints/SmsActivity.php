@@ -36,7 +36,7 @@ class SmsActivity extends AbstractEndpoint
             );
         }
 
-        if ($smsActivityParams->getDateFrom() && $smsActivityParams->getDateTo()) {
+        if (is_numeric($smsActivityParams->getDateFrom()) && is_numeric($smsActivityParams->getDateTo())) {
             GeneralHelpers::assert(
                 fn () => Assertion::greaterThan($smsActivityParams->getDateTo(), $smsActivityParams->getDateFrom())
             );

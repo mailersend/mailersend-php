@@ -93,7 +93,7 @@ class User extends AbstractEndpoint
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$userId"),
-            $params->toArray(),
+            $params->toUpdateArray(),
         );
     }
 
