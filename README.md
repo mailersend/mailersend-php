@@ -659,12 +659,13 @@ use MailerSend\Helpers\Builder\EmailParams;
 $mailersend = new MailerSend();
 
 $rcptTo = [
-    new Recipient('rcpt@client.com'),
+    new Recipient('rcpt@client.com', null),
 ];
 
 $emailParams = (new EmailParams())
     ->setFrom('your@domain.com')
     ->setFromName('Your Name')
+    ->setRecipients([new Recipient('your@client.com', 'Your Client')])
     ->setSubject('Subject')
     ->setHtml('This is the HTML content')
     ->setText('This is the text content')
