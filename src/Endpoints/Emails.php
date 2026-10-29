@@ -12,6 +12,7 @@ class Emails extends AbstractEndpoint
     protected string $endpoint = 'emails';
 
     public const MAX_LIMIT = 1000;
+    public const MAX_PAGE = 100;
 
     /**
      * Get a list of emails sent from a domain.
@@ -51,6 +52,17 @@ class Emails extends AbstractEndpoint
                     Constants::MIN_LIMIT,
                     self::MAX_LIMIT,
                     'Limit is supposed to be between ' . Constants::MIN_LIMIT . ' and ' . self::MAX_LIMIT . '.'
+                )
+            );
+        }
+
+        if ($emailsParams->getPage() !== null) {
+            GeneralHelpers::assert(
+                fn () => Assertion::range(
+                    $emailsParams->getPage(),
+                    1,
+                    self::MAX_PAGE,
+                    'Page is supposed to be between 1 and ' . self::MAX_PAGE . '.'
                 )
             );
         }

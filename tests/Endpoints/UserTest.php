@@ -142,8 +142,34 @@ class UserTest extends TestCase
         self::assertEquals(200, $response['status_code']);
         self::assertSame('test@user.com', Arr::get($body, 'email'));
         self::assertSame(Roles::ADMIN, Arr::get($body, 'role'));
-        // requires_periodic_password_change defaults to false, which is stripped by array_filter
         $this->assertBodyExcludes(['requires_periodic_password_change'], $body);
+    }
+
+    public function test_create_sends_requires_periodic_password_change_false(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->user->create(
+            (new UserParams('test@user.com', Roles::ADMIN))->setRequiresPeriodicPasswordChange(false)
+        );
+
+        $body = $this->assertRequest('POST', '/v1/users');
+
+        self::assertFalse($body['requires_periodic_password_change']);
+    }
+
+    public function test_update_sends_requires_periodic_password_change_false(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->user->update(
+            'userId',
+            (new UserParams('test@user.com', Roles::ADMIN))->setRequiresPeriodicPasswordChange(false)
+        );
+
+        $body = $this->assertRequest('PUT', '/v1/users/userId');
+
+        self::assertFalse($body['requires_periodic_password_change']);
     }
 
     /**
@@ -185,7 +211,6 @@ class UserTest extends TestCase
 
         $body = $this->assertRequest('POST', '/v1/users');
 
-        // Empty arrays and false are stripped by array_filter in UserParams::toArray()
         $this->assertBodyExcludes(['permissions', 'templates', 'domains', 'requires_periodic_password_change'], $body);
     }
 

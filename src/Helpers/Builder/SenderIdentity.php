@@ -16,6 +16,7 @@ class SenderIdentity implements Arrayable, \JsonSerializable
     protected ?string $replyToName = null;
     protected ?bool $addNote = false;
     protected ?string $personalNote = null;
+    protected array $touched = [];
 
     /**
      * @param string $domainId
@@ -107,6 +108,7 @@ class SenderIdentity implements Arrayable, \JsonSerializable
         }
 
         $this->replyToEmail = $replyToEmail;
+        $this->touched['reply_to_email'] = true;
         return $this;
     }
 
@@ -129,6 +131,7 @@ class SenderIdentity implements Arrayable, \JsonSerializable
         }
 
         $this->replyToName = $replyToName;
+        $this->touched['reply_to_name'] = true;
         return $this;
     }
 
@@ -187,13 +190,12 @@ class SenderIdentity implements Arrayable, \JsonSerializable
      */
     public function toUpdateArray(): array
     {
-        return array_filter(
+        return ['name' => $this->getName()] + array_intersect_key(
             [
-                'name' => $this->getName(),
                 'reply_to_email' => $this->getReplyToEmail(),
                 'reply_to_name' => $this->getReplyToName(),
             ],
-            fn ($v) => $v !== null
+            $this->touched
         );
     }
 

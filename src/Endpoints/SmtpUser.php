@@ -71,6 +71,10 @@ class SmtpUser extends AbstractEndpoint
             fn () => Assertion::minLength($domainId, 1, 'Domain id is required.')
         );
 
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($params->getName(), 'Name is required.')
+        );
+
         return $this->httpLayer->post(
             $this->buildUri("$this->endpoint/$domainId/smtp-users"),
             $params->toArray(),

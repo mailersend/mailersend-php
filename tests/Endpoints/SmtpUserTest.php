@@ -178,6 +178,14 @@ class SmtpUserTest extends TestCase
         $this->smtpUser->create('', new SmtpUserParams('Test Smtp'));
     }
 
+    public function test_create_requires_name(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Name is required.');
+
+        $this->smtpUser->create('domainId', new SmtpUserParams());
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws \JsonException

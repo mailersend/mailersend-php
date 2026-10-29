@@ -397,6 +397,14 @@ class EmailsTest extends TestCase
                 self::validParams()->setLimit(1001),
                 'Limit is supposed to be between 10 and 1000.',
             ],
+            'page below minimum' => [
+                self::validParams()->setPage(0),
+                'Page is supposed to be between 1 and 100.',
+            ],
+            'page above maximum' => [
+                self::validParams()->setPage(101),
+                'Page is supposed to be between 1 and 100.',
+            ],
             'invalid status' => [
                 self::validParams()->setStatus(['invalid_status', 'sent']),
                 'The following statuses are invalid: invalid_status',

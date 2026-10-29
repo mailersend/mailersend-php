@@ -329,6 +329,21 @@ class SenderIdentityTest extends TestCase
         self::assertSame(['name' => 'Test User'], $body);
     }
 
+    public function test_update_sends_explicit_null_reply_to_fields(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'))
+            ->setReplyToEmail(null)
+            ->setReplyToName(null);
+
+        $this->senderIdentityRouting->update('identityId', $params);
+
+        $body = $this->assertRequest('PUT', '/v1/identities/identityId');
+
+        self::assertSame(['name' => 'Test User', 'reply_to_email' => null, 'reply_to_name' => null], $body);
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws MailerSendAssertException
