@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\TemplateParams;
 use MailerSend\Helpers\GeneralHelpers;
 
@@ -71,11 +72,9 @@ class Template extends AbstractEndpoint
             );
         }
 
-        if ($params->getAutoGenerate() !== true) {
-            GeneralHelpers::assert(
-                fn () => Assertion::notEmpty($params->getText(), 'Text is required when auto_generate is not true.')
-            );
-        }
+        GeneralHelpers::assert(
+            fn () => Assertion::notEmpty($params->getText(), 'Text is required.')
+        );
 
         if ($params->getTags() !== null && count($params->getTags()) > 0) {
             GeneralHelpers::assert(
@@ -90,7 +89,7 @@ class Template extends AbstractEndpoint
 
         return $this->httpLayer->post(
             $this->buildUri($this->endpoint),
-            $params->toArray()
+            Arr::except($params->toArray(), 'auto_generate')
         );
     }
 

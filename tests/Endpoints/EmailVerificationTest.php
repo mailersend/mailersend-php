@@ -156,12 +156,14 @@ class EmailVerificationTest extends TestCase
         $response = $this->emailVerification->create(
             (new EmailVerificationParams())
                 ->setListId('list-abc-123')
+                ->setEmailAddresses(['test@mail.com'])
         );
 
         $body = $this->assertRequest('POST', '/v1/email-verification');
 
         self::assertEquals(200, $response['status_code']);
         self::assertSame('list-abc-123', Arr::get($body, 'list_id'));
+        self::assertSame(['test@mail.com'], Arr::get($body, 'emails'));
     }
 
     public function test_create_with_verify_flag(): void
@@ -415,6 +417,14 @@ class EmailVerificationTest extends TestCase
         $this->emailVerification->create(new EmailVerificationParams('file.csv'));
     }
 
+    public function test_create_rejects_empty_emails_array_with_list_id(): void
+    {
+        $this->expectException(MailerSendAssertException::class);
+        $this->expectExceptionMessage('Emails list must contain at least 1 item.');
+
+        $this->emailVerification->create((new EmailVerificationParams())->setListId('list-abc-123'));
+    }
+
     public function test_create_rejects_emails_array_exceeding_max_count(): void
     {
         $this->expectException(MailerSendAssertException::class);
@@ -599,6 +609,16 @@ class EmailVerificationTest extends TestCase
                     'page' => null,
                     'limit' => null,
                     'results' => [EmailVerificationParams::TYPO, EmailVerificationParams::CATCH_ALL],
+                ],
+            ],
+            'with queued result' => [
+                'payload' => [
+                    'results' => [EmailVerificationParams::QUEUED],
+                ],
+                'expected' => [
+                    'page' => null,
+                    'limit' => null,
+                    'results' => [EmailVerificationParams::QUEUED],
                 ],
             ],
             'complete request' => [

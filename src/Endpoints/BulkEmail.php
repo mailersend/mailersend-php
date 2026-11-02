@@ -57,11 +57,11 @@ class BulkEmail extends AbstractEndpoint
                     'send_at' => $params->getSendAt(),
                     'precedence_bulk' => $params->getPrecedenceBulkHeader(),
                     'in_reply_to' => $params->getInReplyToHeader(),
-                    'settings' => [
+                    'settings' => array_filter([
                         'track_clicks' => $params->trackClicks(),
                         'track_opens' => $params->trackOpens(),
                         'track_content' => $params->trackContent(),
-                    ],
+                    ], fn ($v) => $v !== null),
                     'headers' => $params->getHeaders(),
                     'references' => $params->getReferencesHeader(),
                     'list_unsubscribe' => $params->getListUnsubscribe(),

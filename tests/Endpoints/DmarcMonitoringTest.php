@@ -106,6 +106,10 @@ class DmarcMonitoringTest extends TestCase
                 ['limit' => 10],
                 ['page' => null, 'limit' => '10'],
             ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['page' => null, 'limit' => '1'],
+            ],
             'with page and limit' => [
                 ['page' => 2, 'limit' => 25],
                 ['page' => '2', 'limit' => '25'],
@@ -148,8 +152,8 @@ class DmarcMonitoringTest extends TestCase
     public static function invalidGetAllDataProvider(): array
     {
         return [
-            'limit too low'              => [null, 9,   null, null,      null,  'Limit is supposed to be between 10 and 100.'],
-            'limit too high'             => [null, 101, null, null,      null,  'Limit is supposed to be between 10 and 100.'],
+            'limit too low'              => [null, -1,  null, null,      null,  'Limit is supposed to be between 1 and 100.'],
+            'limit too high'             => [null, 101, null, null,      null,  'Limit is supposed to be between 1 and 100.'],
             'invalid sort_by'            => [null, null, null, 'invalid_field', null, 'sort_by must be one of: created_at, updated_at, dmarc_valid, spf_status.'],
             'invalid order'              => [null, null, null, null,      'random', 'order must be asc or desc.'],
             'query exceeds 255 chars'    => [null, null, str_repeat('a', 256), null, null, 'Query may not be greater than 255 characters.'],
@@ -359,6 +363,10 @@ class DmarcMonitoringTest extends TestCase
                 ['limit' => 10],
                 ['limit' => '10'],
             ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['limit' => '1'],
+            ],
             'with date_from' => [
                 ['date_from' => '2024-01-01'],
                 ['date_from' => '2024-01-01'],
@@ -520,6 +528,10 @@ class DmarcMonitoringTest extends TestCase
             'with limit' => [
                 ['limit' => 10],
                 ['limit' => '10'],
+            ],
+            'with minimum limit' => [
+                ['limit' => 1],
+                ['limit' => '1'],
             ],
             'with date_from' => [
                 ['date_from' => '2024-01-01'],
@@ -689,8 +701,8 @@ class DmarcMonitoringTest extends TestCase
     public static function invalidLimitDataProvider(): array
     {
         return [
-            'limit too low'  => [9,   'Limit is supposed to be between 10 and 100.'],
-            'limit too high' => [101, 'Limit is supposed to be between 10 and 100.'],
+            'limit too low'  => [-1,  'Limit is supposed to be between 1 and 100.'],
+            'limit too high' => [101, 'Limit is supposed to be between 1 and 100.'],
         ];
     }
 

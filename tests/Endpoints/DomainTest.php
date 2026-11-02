@@ -174,10 +174,11 @@ class DomainTest extends TestCase
 
         $body = $this->assertRequest('POST', '/v1/domains');
 
-        // DomainParams::toArray() always emits these keys but they should be null when unset
-        self::assertNull($body['return_path_subdomain']);
-        self::assertNull($body['custom_tracking_subdomain']);
-        self::assertNull($body['inbound_routing_subdomain']);
+        $this->assertBodyExcludes([
+            'return_path_subdomain',
+            'custom_tracking_subdomain',
+            'inbound_routing_subdomain',
+        ], $body);
     }
 
     public function test_create_with_return_path_subdomain(): void
@@ -375,6 +376,17 @@ class DomainTest extends TestCase
         self::assertEquals($domainSettingsParams->getCustomTrackingSubdomain(), $body['custom_tracking_subdomain'] ?? null);
         self::assertEquals($domainSettingsParams->getPrecedenceBulk(), $body['precedence_bulk'] ?? null);
         self::assertEquals($domainSettingsParams->getIgnoreDuplicatedRecipients(), $body['ignore_duplicated_recipients'] ?? null);
+    }
+
+    public function test_domain_settings_sends_only_the_settings_that_were_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->domain->domainSettings('domain_id', (new DomainSettingsParams())->setTrackContent(false));
+
+        $body = $this->assertRequest('PUT', '/v1/domains/domain_id/settings');
+
+        self::assertSame(['track_content' => false], $body);
     }
 
     public function test_domain_settings_requires_domain_id(): void

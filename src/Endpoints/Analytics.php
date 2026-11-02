@@ -20,16 +20,6 @@ class Analytics extends AbstractEndpoint
     public function activityDataByDate(ActivityAnalyticsParams $activityAnalyticsParams): array
     {
         GeneralHelpers::assert(
-            fn () => Assertion::notEmpty(
-                array_filter(
-                    [ $activityAnalyticsParams->getEvent()],
-                    fn ($v) => $v !== null && $v !== []
-                ),
-                'The event[] is a required parameter.'
-            )
-        );
-
-        GeneralHelpers::assert(
             fn () => Assertion::greaterThan(
                 $activityAnalyticsParams->getDateTo(),
                 $activityAnalyticsParams->getDateFrom(),

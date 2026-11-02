@@ -542,19 +542,6 @@ class EmailTest extends TestCase
                     ->setHtml('HTML'),
                 'was expected to be a valid e-mail address',
             ],
-            'from name is required' => [
-                (new EmailParams())
-                    ->setFrom('sender@mailersend.com')
-                    ->setRecipients([
-                        [
-                            'name' => 'Recipient',
-                            'email' => 'recipient@mailersend.com',
-                        ]
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML'),
-                'expected to be string, type NULL given',
-            ],
             'subject is required' => [
                 (new EmailParams())
                     ->setFrom('sender@mailersend.com')
@@ -633,34 +620,6 @@ class EmailTest extends TestCase
                     ->setHtml('HTML'),
                 'does not contain the email parameter',
             ],
-            'cc recipient name with comma' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([
-                        new Recipient('recipient@mailersend.com', 'Recipient')
-                    ])
-                    ->setCc([
-                        new Recipient('cc@mailersend.com', 'CC,'),
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML'),
-                'does not equal expected value',
-            ],
-            'cc recipient name with semicolon' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([
-                        new Recipient('recipient@mailersend.com', 'Recipient')
-                    ])
-                    ->setCc([
-                        new Recipient('cc@mailersend.com', 'CC;'),
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML'),
-                'does not equal expected value',
-            ],
             'wrongly formed bcc' => [
                 (new EmailParams())
                     ->setFrom('test@mailersend.com')
@@ -716,34 +675,6 @@ class EmailTest extends TestCase
                     ->setSubject('Subject')
                     ->setHtml('HTML'),
                 'does not contain the email parameter',
-            ],
-            'bcc recipient name with comma' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([
-                        new Recipient('recipient@mailersend.com', 'Recipient')
-                    ])
-                    ->setBcc([
-                        new Recipient('bcc@mailersend.com', 'BCC,'),
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML'),
-                'does not equal expected value',
-            ],
-            'bcc recipient name with semicolon' => [
-                (new EmailParams())
-                    ->setFrom('test@mailersend.com')
-                    ->setFromName('Sender')
-                    ->setRecipients([
-                        new Recipient('recipient@mailersend.com', 'Recipient')
-                    ])
-                    ->setBcc([
-                        new Recipient('bcc@mailersend.com', 'BCC;'),
-                    ])
-                    ->setSubject('Subject')
-                    ->setHtml('HTML'),
-                'does not equal expected value',
             ],
             'text missing when no template id' => [
                 (new EmailParams())
@@ -957,9 +888,44 @@ class EmailTest extends TestCase
             ->setBcc($bcc);
 
         return [
-            'bcc name with semicolon' => [$base([new Recipient('bcc@mailersend.com', 'BCC;')])],
-            'bcc name with comma'     => [$base([new Recipient('bcc@mailersend.com', 'BCC,')])],
             'bcc without email'       => [$base([['name' => 'BCC without email']])],
+        ];
+    }
+
+    /**
+     * @dataProvider acceptedEmailParamsProvider
+     */
+    #[DataProvider('acceptedEmailParamsProvider')]
+    public function test_send_accepts_params_the_api_accepts(EmailParams $emailParams): void
+    {
+        $this->addSuccessResponse();
+
+        $this->email->send($emailParams);
+
+        $this->assertRequest('POST', '/v1/email');
+    }
+
+    public static function acceptedEmailParamsProvider(): array
+    {
+        $base = static fn () => (new EmailParams())
+            ->setFrom('sender@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+            ->setSubject('Subject')
+            ->setHtml('HTML');
+
+        return [
+            'from name not set' => [
+                (new EmailParams())
+                    ->setFrom('sender@mailersend.com')
+                    ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+                    ->setSubject('Subject')
+                    ->setHtml('HTML'),
+            ],
+            'cc name with comma' => [$base()->setCc([new Recipient('cc@mailersend.com', 'Doe, John')])],
+            'cc name with semicolon' => [$base()->setCc([new Recipient('cc@mailersend.com', 'Doe; John')])],
+            'bcc name with comma' => [$base()->setBcc([new Recipient('bcc@mailersend.com', 'Doe, John')])],
+            'bcc name with semicolon' => [$base()->setBcc([new Recipient('bcc@mailersend.com', 'Doe; John')])],
         ];
     }
 
@@ -985,6 +951,25 @@ class EmailTest extends TestCase
         self::assertCount(1, $body['rcptTo']);
         self::assertEquals('rcpt@mailersend.com', $body['rcptTo'][0]['email']);
         self::assertEquals('Rcpt To', $body['rcptTo'][0]['name']);
+    }
+
+    public function test_send_includes_only_the_tracking_settings_that_were_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $emailParams = (new EmailParams())
+            ->setFrom('test@mailersend.com')
+            ->setFromName('Sender')
+            ->setRecipients([new Recipient('recipient@mailersend.com', 'Recipient')])
+            ->setSubject('Subject')
+            ->setText('TEXT')
+            ->setTrackClicks(false);
+
+        $this->email->send($emailParams);
+
+        $body = $this->assertRequest('POST', '/v1/email');
+
+        self::assertSame(['track_clicks' => false], $body['settings']);
     }
 
     public function test_send_includes_references_in_body(): void

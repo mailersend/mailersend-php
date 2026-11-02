@@ -516,21 +516,6 @@ class BulkEmailTest extends TestCase
                 ],
                 'was expected to be a valid e-mail address',
             ],
-            'from name is required' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('sender@mailersend.com')
-                        ->setRecipients([
-                            [
-                                'name' => 'Recipient',
-                                'email' => 'recipient@mailersend.com',
-                            ]
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML')
-                ],
-                'expected to be string, type NULL given',
-            ],
             'subject is required' => [
                 [
                     (new EmailParams())
@@ -619,38 +604,6 @@ class BulkEmailTest extends TestCase
                 ],
                 'does not contain the email parameter',
             ],
-            'cc recipient name with comma' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('test@mailersend.com')
-                        ->setFromName('Sender')
-                        ->setRecipients([
-                            new Recipient('recipient@mailersend.com', 'Recipient')
-                        ])
-                        ->setCc([
-                            new Recipient('cc@mailersend.com', 'CC,'),
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML'),
-                ],
-                'does not equal expected value',
-            ],
-            'cc recipient name with semicolon' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('test@mailersend.com')
-                        ->setFromName('Sender')
-                        ->setRecipients([
-                            new Recipient('recipient@mailersend.com', 'Recipient')
-                        ])
-                        ->setCc([
-                            new Recipient('cc@mailersend.com', 'CC;'),
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML'),
-                ],
-                'does not equal expected value',
-            ],
             'wrongly formed bcc' => [
                 [
                     (new EmailParams())
@@ -712,38 +665,6 @@ class BulkEmailTest extends TestCase
                         ->setHtml('HTML'),
                 ],
                 'does not contain the email parameter',
-            ],
-            'bcc recipient name with comma' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('test@mailersend.com')
-                        ->setFromName('Sender')
-                        ->setRecipients([
-                            new Recipient('recipient@mailersend.com', 'Recipient')
-                        ])
-                        ->setBcc([
-                            new Recipient('bcc@mailersend.com', 'BCC,'),
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML'),
-                ],
-                'does not equal expected value',
-            ],
-            'bcc recipient name with semicolon' => [
-                [
-                    (new EmailParams())
-                        ->setFrom('test@mailersend.com')
-                        ->setFromName('Sender')
-                        ->setRecipients([
-                            new Recipient('recipient@mailersend.com', 'Recipient')
-                        ])
-                        ->setBcc([
-                            new Recipient('bcc@mailersend.com', 'BCC;'),
-                        ])
-                        ->setSubject('Subject')
-                        ->setHtml('HTML'),
-                ],
-                'does not equal expected value',
             ],
             'text missing when no template id' => [
                 [
@@ -1121,6 +1042,28 @@ class BulkEmailTest extends TestCase
         $body = $this->assertRequest('POST', '/v1/bulk-email');
         self::assertNotEmpty($body[0]['rcptTo']);
         self::assertEquals('rcpt@mailersend.com', $body[0]['rcptTo'][0]['email']);
+    }
+
+    public function test_send_includes_only_the_tracking_settings_that_were_set(): void
+    {
+        $this->addSuccessResponse();
+
+        $bulkEmailParams = [
+            (new EmailParams())
+                ->setFrom('test@mailersend.com')
+                ->setFromName('Sender')
+                ->setRecipients([
+                    new Recipient('recipient@mailersend.com', 'Recipient')
+                ])
+                ->setSubject('Subject')
+                ->setText('Text')
+                ->setTrackOpens(false),
+        ];
+
+        $this->bulkEmail->send($bulkEmailParams);
+
+        $body = $this->assertRequest('POST', '/v1/bulk-email');
+        self::assertSame(['track_opens' => false], $body[0]['settings']);
     }
 
     public function test_send_at_accepts_string_value(): void

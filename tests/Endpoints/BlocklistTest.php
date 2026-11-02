@@ -140,7 +140,7 @@ class BlocklistTest extends TestCase
 
         self::assertEquals(200, $response['status_code']);
         self::assertSame(['recipient@example.com'], $body['recipients']);
-        self::assertNull(Arr::get($body, 'domain_id'));
+        $this->assertBodyExcludes(['domain_id'], $body);
         self::assertSame([], $body['patterns']);
     }
 
@@ -157,7 +157,7 @@ class BlocklistTest extends TestCase
 
         self::assertEquals(200, $response['status_code']);
         self::assertSame(['*.spam.com'], $body['patterns']);
-        self::assertNull(Arr::get($body, 'domain_id'));
+        $this->assertBodyExcludes(['domain_id'], $body);
         self::assertSame([], $body['recipients']);
     }
 

@@ -67,6 +67,43 @@ class BuildUriTest extends TestCase
                 ],
                 'https://api.mailersend.com/v1/endpoint?ids=aaa,bbb,ccc',
             ],
+            'reserved characters in a value are percent-encoded' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'query' => 'john+1@example.com',
+                ],
+                'https://api.mailersend.com/v1/endpoint?query=john%2B1%40example.com',
+            ],
+            'ampersand, equals sign and space stay inside their value' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'query' => 'a&b=c d',
+                    'page' => 2,
+                ],
+                'https://api.mailersend.com/v1/endpoint?query=a%26b%3Dc%20d&page=2',
+            ],
+            'array query param items are encoded before joining' => [
+                [
+                    'host' => 'api.mailersend.com',
+                    'protocol' => 'https',
+                    'api_path' => 'v1',
+                ],
+                'endpoint',
+                [
+                    'ids' => ['a b', 'c&d'],
+                ],
+                'https://api.mailersend.com/v1/endpoint?ids=a%20b,c%26d',
+            ],
         ];
     }
 }

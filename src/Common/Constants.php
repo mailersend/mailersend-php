@@ -8,6 +8,7 @@ class Constants
     public const DEFAULT_LIMIT = 25;
     public const MIN_LIMIT = 10;
     public const MAX_LIMIT = 100;
+    public const MIN_MONITORING_LIMIT = 1;
     public const WHATSAPP_MIN_LIMIT = 1;
     public const WHATSAPP_MAX_PAGE = 100;
     public const POSSIBLE_EVENT_TYPES = ['queued', 'sent', 'delivered', 'soft_bounced', 'hard_bounced', 'junk', 'opened', 'clicked', 'unsubscribed', 'spam_complaints', 'opened_unique', 'clicked_unique', 'survey_opened', 'survey_submitted', 'deferred', 'suppressed'];

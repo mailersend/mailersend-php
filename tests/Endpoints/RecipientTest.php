@@ -42,8 +42,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 30);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['limit' => 30], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertQueryParams(['limit' => '30'], $this->lastRequestQuery());
     }
 
     public function test_get_with_page(): void
@@ -52,8 +52,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25, 2);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['page' => 2], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertQueryParams(['page' => '2'], $this->lastRequestQuery());
     }
 
     public function test_get_sends_default_limit(): void
@@ -62,8 +62,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['limit' => Recipient::DEFAULT_LIMIT], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertQueryParams(['limit' => (string) Recipient::DEFAULT_LIMIT], $this->lastRequestQuery());
     }
 
     public function test_get_with_domain_id(): void
@@ -72,8 +72,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get('domain_id');
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyContains(['domain_id' => 'domain_id'], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertQueryParams(['domain_id' => 'domain_id'], $this->lastRequestQuery());
     }
 
     public function test_get_excludes_domain_id_when_not_set(): void
@@ -82,8 +82,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyExcludes(['domain_id'], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyExcludes(['domain_id'], $this->lastRequestQuery());
     }
 
     public function test_get_excludes_page_when_not_set(): void
@@ -92,8 +92,8 @@ class RecipientTest extends TestCase
 
         $this->recipients->get(null, 25, null);
 
-        $body = $this->assertRequest('GET', '/v1/recipients');
-        $this->assertBodyExcludes(['page'], $body);
+        $this->assertRequest('GET', '/v1/recipients');
+        $this->assertBodyExcludes(['page'], $this->lastRequestQuery());
     }
 
     /**
@@ -143,5 +143,12 @@ class RecipientTest extends TestCase
 
         $this->assertRequest('DELETE', '/v1/recipients/random_id');
         self::assertEquals(200, $response['status_code']);
+    }
+
+    private function lastRequestQuery(): array
+    {
+        parse_str($this->client->getLastRequest()->getUri()->getQuery(), $query);
+
+        return $query;
     }
 }

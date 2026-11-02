@@ -318,6 +318,32 @@ class SenderIdentityTest extends TestCase
         $this->assertBodyExcludes(['domain_id', 'email', 'add_note', 'personal_note'], $body);
     }
 
+    public function test_update_excludes_unset_reply_to_fields(): void
+    {
+        $this->addSuccessResponse();
+
+        $this->senderIdentityRouting->update('identityId', new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'));
+
+        $body = $this->assertRequest('PUT', '/v1/identities/identityId');
+
+        self::assertSame(['name' => 'Test User'], $body);
+    }
+
+    public function test_update_sends_explicit_null_reply_to_fields(): void
+    {
+        $this->addSuccessResponse();
+
+        $params = (new SenderIdentityBuilder('domainId', 'Test User', 'test@test.com'))
+            ->setReplyToEmail(null)
+            ->setReplyToName(null);
+
+        $this->senderIdentityRouting->update('identityId', $params);
+
+        $body = $this->assertRequest('PUT', '/v1/identities/identityId');
+
+        self::assertSame(['name' => 'Test User', 'reply_to_email' => null, 'reply_to_name' => null], $body);
+    }
+
     /**
      * @throws \Psr\Http\Client\ClientExceptionInterface
      * @throws MailerSendAssertException

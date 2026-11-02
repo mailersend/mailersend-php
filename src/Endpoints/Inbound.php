@@ -4,6 +4,7 @@ namespace MailerSend\Endpoints;
 
 use Assert\Assertion;
 use MailerSend\Common\Constants;
+use MailerSend\Helpers\Arr;
 use MailerSend\Helpers\Builder\Inbound as InboundBuilder;
 use MailerSend\Helpers\GeneralHelpers;
 
@@ -79,7 +80,7 @@ class Inbound extends AbstractEndpoint
 
         return $this->httpLayer->put(
             $this->buildUri("$this->endpoint/$inboundId"),
-            $params->toArray(),
+            Arr::except($params->toArray(), 'domain_id'),
         );
     }
 

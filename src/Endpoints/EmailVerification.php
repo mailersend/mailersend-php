@@ -75,16 +75,10 @@ class EmailVerification extends AbstractEndpoint
             );
         }
 
-        if (!$params->getListId()) {
-            GeneralHelpers::assert(
-                fn () => Assertion::minCount($params->getEmailAddresses(), 1, 'Emails list must contain at least 1 item.') &&
-                    Assertion::maxCount($params->getEmailAddresses(), 10000, 'Emails list may not contain more than 10000 items.')
-            );
-        } elseif (!empty($params->getEmailAddresses())) {
-            GeneralHelpers::assert(
-                fn () => Assertion::maxCount($params->getEmailAddresses(), 10000, 'Emails list may not contain more than 10000 items.')
-            );
-        }
+        GeneralHelpers::assert(
+            fn () => Assertion::minCount($params->getEmailAddresses(), 1, 'Emails list must contain at least 1 item.') &&
+                Assertion::maxCount($params->getEmailAddresses(), 10000, 'Emails list may not contain more than 10000 items.')
+        );
 
         foreach ($params->getEmailAddresses() as $emailAddress) {
             GeneralHelpers::assert(

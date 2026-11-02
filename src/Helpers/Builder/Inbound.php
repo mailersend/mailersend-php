@@ -196,7 +196,7 @@ class Inbound implements Arrayable, \JsonSerializable
 
     public function toArray(): array
     {
-        $data = [
+        return array_filter([
             'domain_id' => $this->getDomainId(),
             'name' => $this->getName(),
             'domain_enabled' => $this->isDomainEnabled(),
@@ -206,14 +206,9 @@ class Inbound implements Arrayable, \JsonSerializable
             'forwards' => $this->getForwards(),
             'catch_type' => $this->getCatchType(),
             'match_type' => $this->getMatchType(),
-            'inbound_priority' => $this->getInboundPriority()
-        ];
-
-        if ($this->isIncludeAttachments() !== null) {
-            $data['include_attachments'] = $this->isIncludeAttachments();
-        }
-
-        return $data;
+            'inbound_priority' => $this->getInboundPriority(),
+            'include_attachments' => $this->isIncludeAttachments(),
+        ], fn ($value) => $value !== null);
     }
 
     #[\ReturnTypeWillChange]

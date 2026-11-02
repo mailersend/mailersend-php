@@ -19,9 +19,11 @@ class BuildUri
             if (is_null($value)) {
                 continue;
             } elseif (is_array($value)) {
-                $value = implode(',', $value);
+                $value = implode(',', array_map(fn ($item) => rawurlencode((string) $item), $value));
             } elseif (is_bool($value)) {
                 $value = $value ? '1' : '0';
+            } else {
+                $value = rawurlencode((string) $value);
             }
 
             $paramsArray[] = $key.'='.$value;

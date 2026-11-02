@@ -9,9 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `Permissions` constants for the documented permissions: `VIEW_WHATSAPP`, `MANAGE_WHATSAPP`,
+  `READ_DMARC_MONITORING`, `MANAGE_DMARC_MONITORING`, `READ_BLOCKLIST_MONITORING`,
+  `MANAGE_BLOCKLIST_MONITORING` and `READ_BILLING`
+- Webhook events `activity.suppressed`, `inbound_message.rejected` and `email_list.created`
+  (`WebhookParams::ACTIVITY_SUPPRESSED`, `ACTIVITY_INBOUND_MESSAGE_REJECTED`, `ACTIVITY_EMAIL_LIST_CREATED`)
+- `EmailVerificationParams::QUEUED` results filter
+- `smtpUser->getAll()` takes a `$page` argument
+
 ### Changed
 
+- Optional fields that are not set are left out of the request instead of being sent as `null`. This covers email
+  and bulk email `settings`, inbound routes, domains, domain settings, blocklist, SMTP users, users and sender
+  identity updates. An explicit `null` is no longer sent either, except `reply_to_email` and `reply_to_name` on a
+  sender identity update, where `null` removes the reply-to.
+- `UserParams::$requires_periodic_password_change` defaults to `null` and is only sent when set; `false` is now sent
+- Query values are URL-encoded
+- `recipients->get()` and `smsWebhook->get()` send their filters as query parameters instead of a request body
+- `template->create()` always requires `text` and no longer sends `auto_generate`
+- `emailVerification->create()` requires at least one email, also when `list_id` is set
+- `smtpUser->getAll()` requires a domain id and `smtpUser->create()` requires a name. `SmtpUserParams` name is
+  optional and `enabled` defaults to `null`, so an update no longer re-enables a disabled user.
+- `emails->getAll()` accepts a `limit` up to 1000 and checks that `page` is between 1 and 100
+- DMARC and blocklist monitoring lists accept a `limit` from 1
+- `SmsActivityParams` date setters accept a Unix timestamp or a datetime string. Their parameters are no longer
+  typed `?int`, so a subclass that overrides them must drop that type.
+- `user->update()` no longer sends `email`, and `inbound->update()` no longer sends `domain_id`
+
 ### Fixed
+
+- Email and bulk email: `from.name` is optional, and `;` and `,` are allowed in cc and bcc names
+- `analytics->activityDataByDate()` no longer requires `event[]`
+
+### Deprecated
+
+- `onHoldList->create()`: the API has no endpoint to add to the on-hold list
 
 ### Removed
 

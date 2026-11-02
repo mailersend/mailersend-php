@@ -54,7 +54,6 @@ class GeneralHelpers
         if (!$params->getTemplateId()) {
             self::assert(
                 fn () => Assertion::email($params->getFrom()) &&
-                    Assertion::minLength($params->getFromName(), 1) &&
                     Assertion::minLength($params->getSubject(), 1) &&
                     Assertion::minCount($params->getRecipients(), 1)
             );
@@ -114,10 +113,6 @@ class GeneralHelpers
                 self::assert(
                     fn () => Assertion::keyExists($cc, 'email', "The element with index $key in CC array does not contain the email parameter.")
                 );
-                if (isset($cc['name'])) {
-                    self::assert(fn () => Assertion::eq(1, count(explode(';', $cc['name']))));
-                    self::assert(fn () => Assertion::eq(1, count(explode(',', $cc['name']))));
-                }
             }
         }
 
@@ -128,10 +123,6 @@ class GeneralHelpers
                 self::assert(
                     fn () => Assertion::keyExists($bcc, 'email', "The element with index $key in BCC array does not contain the email parameter.")
                 );
-                if (isset($bcc['name'])) {
-                    self::assert(fn () => Assertion::eq(1, count(explode(';', $bcc['name']))));
-                    self::assert(fn () => Assertion::eq(1, count(explode(',', $bcc['name']))));
-                }
             }
         }
     }
