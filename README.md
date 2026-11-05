@@ -228,6 +228,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend(['api_key' => 'your_api_key']);
 ```
 
+### API version
+
+The SDK sends requests to API version `2026-10` by default, which returns the same responses as `v1`. To pin a version, or to stay on `v1`, set `api_version`:
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend(['api_version' => '2026-10']);
+```
+
+See the [API changelog](https://developers.mailersend.com/api/changelog) for what changes between versions.
+
 <a name="usage"></a>
 
 # Usage

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `api_version` option, defaulting to `2026-10`. It also accepts `v1` or any other dated version. A custom
+  `api_path` still sets the whole path
 - `Permissions` constants for the documented permissions: `VIEW_WHATSAPP`, `MANAGE_WHATSAPP`,
   `READ_DMARC_MONITORING`, `MANAGE_DMARC_MONITORING`, `READ_BLOCKLIST_MONITORING`,
   `MANAGE_BLOCKLIST_MONITORING` and `READ_BILLING`

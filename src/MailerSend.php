@@ -3,6 +3,7 @@
 namespace MailerSend;
 
 use MailerSend\Helpers\Arr;
+use MailerSend\Common\Constants;
 use MailerSend\Common\HttpLayer;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
@@ -58,7 +59,8 @@ class MailerSend
     protected static array $defaultOptions = [
         'host' => 'api.mailersend.com',
         'protocol' => 'https',
-        'api_path' => 'v1',
+        'api_version' => Constants::DEFAULT_API_VERSION,
+        'api_path' => null,
         'api_key' => '',
         'debug' => false,
     ];
@@ -175,10 +177,19 @@ class MailerSend
         $this->options = self::$defaultOptions;
 
         foreach ($options as $option => $value) {
-            if (array_key_exists($option, $this->options)) {
+            if (array_key_exists($option, $this->options) && $value !== null) {
                 $this->options[$option] = $value;
             }
         }
+
+        $apiVersion = $this->options['api_version'];
+
+        if (!is_string($apiVersion) || preg_match(Constants::API_VERSION_PATTERN, $apiVersion) !== 1) {
+            throw new MailerSendException('The "api_version" option must be "v1" or a dated version such as "2026-10".');
+        }
+
+        // api_path predates api_version and sets the whole path, so a custom one wins.
+        $this->options['api_path'] ??= $apiVersion;
 
         if (empty(Arr::get($this->options, 'api_key'))) {
             Arr::set($this->options, 'api_key', getenv('MAILERSEND_API_KEY'));
