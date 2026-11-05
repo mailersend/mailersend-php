@@ -186,6 +186,7 @@ MailerSend PHP SDK
         * [Delete a blocklist monitor](#delete-a-blocklist-monitor)
     * [Other endpoints](#other-endpoints)
         * [Get API quota](#get-api-quota)
+        * [Get account](#get-account)
 * [Debugging validation errors](#debugging-validation-errors)
 * [Testing](#testing)
 * [Support and Feedback](#support-and-feedback)
@@ -3299,6 +3300,18 @@ use MailerSend\MailerSend;
 $mailersend = new MailerSend();
 
 $mailersend->apiQuota->get();
+```
+
+<a name="get-account"></a>
+
+### Get account
+
+```php
+use MailerSend\MailerSend;
+
+$mailersend = new MailerSend();
+
+$mailersend->account->get();
 ```
 
 <a name="debugging-validation-errors"></a>
