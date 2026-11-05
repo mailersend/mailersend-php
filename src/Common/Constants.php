@@ -5,6 +5,8 @@ namespace MailerSend\Common;
 class Constants
 {
     public const SDK_VERSION = 'v0.45.0';
+    public const DEFAULT_API_VERSION = '2026-10';
+    public const API_VERSION_PATTERN = '/^(v1|\d{4}-(0[1-9]|1[0-2]))$/';
     public const DEFAULT_LIMIT = 25;
     public const MIN_LIMIT = 10;
     public const MAX_LIMIT = 100;
