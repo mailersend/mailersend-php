@@ -240,6 +240,8 @@ $mailersend = new MailerSend(['api_version' => '2026-10']);
 
 See the [API changelog](https://developers.mailersend.com/api/changelog) for what changes between versions.
 
+Later releases of the SDK only change this default in a major version. Set `api_version` to choose when you move.
+
 <a name="usage"></a>
 
 # Usage
