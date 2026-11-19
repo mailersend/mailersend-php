@@ -2,6 +2,7 @@
 
 namespace MailerSend\Tests\Common;
 
+use Composer\InstalledVersions;
 use Http\Mock\Client;
 use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
@@ -21,6 +22,16 @@ class HttpLayerTest extends TestCase
         $this->httpLayer = new HttpLayer([
             'api_key' => 'test'
         ], $this->client);
+    }
+
+    public function test_user_agent_has_the_installed_sdk_version(): void
+    {
+        $this->httpLayer->get('endpoint');
+
+        $installedVersion = InstalledVersions::getPrettyVersion('mailersend/mailersend');
+
+        self::assertNotEmpty($installedVersion);
+        self::assertEquals('mailersend-php/'.$installedVersion, $this->client->getLastRequest()->getHeaderLine('User-Agent'));
     }
 
     public function test_call_get(): void
