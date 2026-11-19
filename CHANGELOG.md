@@ -9,8 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `api_version` option, defaulting to `2026-10`. It also accepts `v1` or any other dated version. A custom
-  `api_path` still sets the whole path
+- `account->get()` for `GET /v1/account`, which returns the account behind the API token
+
+## [0.47.0] - 2026 11 02
+
+### Added
+
 - `Permissions` constants for the documented permissions: `VIEW_WHATSAPP`, `MANAGE_WHATSAPP`,
   `READ_DMARC_MONITORING`, `MANAGE_DMARC_MONITORING`, `READ_BLOCKLIST_MONITORING`,
   `MANAGE_BLOCKLIST_MONITORING` and `READ_BILLING`
@@ -47,7 +51,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `onHoldList->create()`: the API has no endpoint to add to the on-hold list
 
-### Removed
+## [0.46.0] - 2026 10 28
+
+### Added
+
+- Webhook events `domain.reputation_changed` and `account.reputation_changed`
+  (`WebhookParams::ACTIVITY_DOMAIN_REPUTATION_CHANGED`, `ACTIVITY_ACCOUNT_REPUTATION_CHANGED`), also in `ALL_ACTIVITIES`
 
 ## [0.45.0] - 2026 10 26
 
