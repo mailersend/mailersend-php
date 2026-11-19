@@ -4,6 +4,7 @@ namespace MailerSend;
 
 use MailerSend\Helpers\Arr;
 use MailerSend\Common\HttpLayer;
+use MailerSend\Endpoints\Account;
 use MailerSend\Endpoints\Activity;
 use MailerSend\Endpoints\Analytics;
 use MailerSend\Endpoints\ApiQuota;
@@ -99,6 +100,7 @@ class MailerSend
     public WhatsappTemplate $whatsappTemplate;
     public SenderIdentity $senderIdentity;
     public ApiQuota $apiQuota;
+    public Account $account;
     public OnHoldList $onHoldList;
     public SmtpUser $smtpUser;
     public User $user;
@@ -154,6 +156,7 @@ class MailerSend
         $this->whatsappTemplate = new WhatsappTemplate($this->httpLayer, $this->options);
         $this->senderIdentity = new SenderIdentity($this->httpLayer, $this->options);
         $this->apiQuota = new ApiQuota($this->httpLayer, $this->options);
+        $this->account = new Account($this->httpLayer, $this->options);
         $this->onHoldList = new OnHoldList($this->httpLayer, $this->options);
         $this->smtpUser = new SmtpUser($this->httpLayer, $this->options);
         $this->user = new User($this->httpLayer, $this->options);

@@ -1,0 +1,609 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- `account->get()` for `GET /v1/account`, which returns the account behind the API token
+
+## [0.47.0] - 2026 11 02
+
+### Added
+
+- `Permissions` constants for the documented permissions: `VIEW_WHATSAPP`, `MANAGE_WHATSAPP`,
+  `READ_DMARC_MONITORING`, `MANAGE_DMARC_MONITORING`, `READ_BLOCKLIST_MONITORING`,
+  `MANAGE_BLOCKLIST_MONITORING` and `READ_BILLING`
+- Webhook events `activity.suppressed`, `inbound_message.rejected` and `email_list.created`
+  (`WebhookParams::ACTIVITY_SUPPRESSED`, `ACTIVITY_INBOUND_MESSAGE_REJECTED`, `ACTIVITY_EMAIL_LIST_CREATED`)
+- `EmailVerificationParams::QUEUED` results filter
+- `smtpUser->getAll()` takes a `$page` argument
+
+### Changed
+
+- Optional fields that are not set are left out of the request instead of being sent as `null`. This covers email
+  and bulk email `settings`, inbound routes, domains, domain settings, blocklist, SMTP users, users and sender
+  identity updates. An explicit `null` is no longer sent either, except `reply_to_email` and `reply_to_name` on a
+  sender identity update, where `null` removes the reply-to.
+- `UserParams::$requires_periodic_password_change` defaults to `null` and is only sent when set; `false` is now sent
+- Query values are URL-encoded
+- `recipients->get()` and `smsWebhook->get()` send their filters as query parameters instead of a request body
+- `template->create()` always requires `text` and no longer sends `auto_generate`
+- `emailVerification->create()` requires at least one email, also when `list_id` is set
+- `smtpUser->getAll()` requires a domain id and `smtpUser->create()` requires a name. `SmtpUserParams` name is
+  optional and `enabled` defaults to `null`, so an update no longer re-enables a disabled user.
+- `emails->getAll()` accepts a `limit` up to 1000 and checks that `page` is between 1 and 100
+- DMARC and blocklist monitoring lists accept a `limit` from 1
+- `SmsActivityParams` date setters accept a Unix timestamp or a datetime string. Their parameters are no longer
+  typed `?int`, so a subclass that overrides them must drop that type.
+- `user->update()` no longer sends `email`, and `inbound->update()` no longer sends `domain_id`
+
+### Fixed
+
+- Email and bulk email: `from.name` is optional, and `;` and `,` are allowed in cc and bcc names
+- `analytics->activityDataByDate()` no longer requires `event[]`
+
+### Deprecated
+
+- `onHoldList->create()`: the API has no endpoint to add to the on-hold list
+
+## [0.46.0] - 2026 10 28
+
+### Added
+
+- Webhook events `domain.reputation_changed` and `account.reputation_changed`
+  (`WebhookParams::ACTIVITY_DOMAIN_REPUTATION_CHANGED`, `ACTIVITY_ACCOUNT_REPUTATION_CHANGED`), also in `ALL_ACTIVITIES`
+
+## [0.45.0] - 2026 10 26
+
+### Added
+
+- WhatsApp read endpoints, each with a params builder for its filters:
+  - `whatsappMessage->getAll(WhatsappMessageParams)` and `find()`
+  - `whatsappItem->getAll(WhatsappItemParams)` and `find()`
+  - `whatsappActivity->getAll(WhatsappActivityParams)`
+  - `whatsappInboundMessage->getAll(WhatsappInboundMessageParams)` and `find()`
+  - `whatsappRecipient->getAll(WhatsappRecipientParams)` and `find()`
+  - `whatsappTemplate->getAll(WhatsappTemplateParams)` and `find()`
+- WhatsApp lists accept a `limit` from 1 to 100 and a `page` up to 100, and `date_from` and `date_to`
+  as a Unix timestamp or a datetime string
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.44.0] - 2026 09 24
+
+### Added
+
+- `Inbound::setIncludeAttachments()` to drop attachments, including inline (CID) parts, before an inbound
+  message is forwarded. Leaving it unset keeps the route's stored value.
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.43.0] - 2026 09 22
+
+### Added
+
+- Reject CR and LF characters in `subject`, `in_reply_to`, `references`, `list_unsubscribe`
+  and custom header names and values. These are rejected by the API, so they now fail fast
+  in the SDK with a clear message instead of an opaque HTTP error.
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.42.0] - 2026 09 10
+
+### Added
+
+- Add API support for listing emails
+
+## [0.40.0] - 2026 08 10
+
+### Added
+
+- Added suppressed activity
+
+## [0.39.0] - 2026 07 09
+
+### Added
+
+- Add optional language field to email send
+
+## [0.37.0] - 2026 04 06
+
+### Added
+
+- Added DMARC monitoring endpoint
+- Added webhook events: `email_single.verified`, `email_list.verified`, `bulk_email.completed`, `recipient.on_hold_added`, `recipient.on_hold_removed`
+
+## [0.36.0] - 2026 02 02
+
+### Changed
+
+- PHP version 8.5 support
+
+## [0.35.0] - 2025 10 28
+
+### Fixed
+
+- Fix unicode email validation
+
+## [0.34.0] - 2025 06 04
+
+### Changed
+
+- php version 8.4 support
+- PHPUnit 12 support
+
+## [0.33.0] - 2025 06 04
+
+### Added
+
+- Inbound priority support
+
+### Fixed
+
+- Email verification parameters
+
+## [0.32.0] - 2025 04 03
+
+### Changed
+
+- php version 8.3 support
+
+## [0.31.0] - 2025 04 03
+
+### Added
+
+- `list_unsubscribe` support
+
+## [0.28.0] - 2024 11 25
+
+### Added
+
+- Add opened_unique, clicked_unique to analytics event list
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.27.0] - 2024 08 28
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+- Remove simple personalization
+
+## [0.26.0] - 2024 08 26
+
+### Added
+
+- Add email thread references header support
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.25.0] - 2024 05 27
+
+### Added
+
+- Add show all tokens, show single token, and change token name api endpoints
+
+### Changed
+
+### Fixed
+
+### Removed
+
+
+## [0.24.0] - 2024 05 09
+
+### Added
+
+- Add the manage invite endpoints
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.23.0] - 2024 03 26
+
+### Added
+
+### Changed
+
+- Switched deprecated tightenco/collect package to illuminate/collections package
+
+### Fixed
+
+### Removed
+
+
+## [0.22.0] - 2024 03 25
+
+### Added
+
+- Add the manage user endpoints
+- Add the SMTP user endpoints
+- Add the catch_type and match_type paramter to inbound
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.21.0] - 2024 03 20
+
+### Added
+
+### Changed
+
+- Suggest to add token as .env variable instead of explicit declaration
+
+### Fixed
+
+- Fix composer packages cache
+
+### Removed
+
+## [0.20.0] - 2023 12 28
+
+### Added
+
+- Add the inbound_forward.failed as a webhook event 
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.19.0] - 2023 12 19
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+- Remove symfony dependency
+
+## [0.18.0] - 2023 12 13
+
+### Added
+
+- Add an endpoint to fetch a single email activity
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.17.0] - 2023 12 12
+
+### Added
+
+- Allow user to send custom headers
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.16.0] - 2023 11 22
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Fetching analytics and activities with event and tag array does not work
+
+### Removed
+
+## [0.15.0] - 2023 10 03
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Fixed in_reply_to parameter name
+
+### Removed
+
+## [0.14.0] - 2023 09 29
+
+### Added
+
+- Add the On Hold list to the api endpoint
+
+### Changed
+
+- Update to use symfony v6 as a dependency
+
+### Fixed
+
+### Removed
+
+## [0.13.0] - 2023 09 07
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Sending email with only html param should work 
+
+### Removed
+
+## [0.12.0] - 2023 07 28
+
+### Added
+
+- Added new webhook events
+- Added missing domain settings
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.11.0] - 2023 06 07
+
+### Added
+
+- Find Sender Identity by email
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.10.0] - 2023 04 19
+
+### Added
+
+- API Quota endpoint
+
+### Changed
+
+### Fixed
+
+### Removed
+
+- Processed event
+
+## [0.9.1] - 2023 02 07
+
+### Added
+
+### Changed
+
+- Symfony version constraints in `composer.json`
+
+### Fixed
+
+### Removed
+
+## [0.9.0] - 2023 01 11
+
+### Added
+
+- Added manage sender identities endpoints
+
+### Changed
+
+- Upgrade PHPCSFixer to v3
+- Allow overriding tracking domain defaults 
+
+### Fixed
+
+- email->send dont return error content on 422 and 429 errors
+
+### Removed
+
+## [0.8.0] - 2022 10 07
+
+### Added
+
+- Added single email verification endpoint
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.7.0] - 2022 09 28
+
+### Added
+
+- Allow users to add in-reply-to header
+- Added single email verification endpoint
+
+### Changed
+
+### Fixed
+
+- PHP 8.1 Deprecation errors https://github.com/mailersend/mailersend-php/pull/63 https://github.com/mailersend/mailersend-php/pull/64
+
+### Removed
+
+## [0.6.0] - 2022 07 28
+
+### Added
+
+- Email Verification
+- SMS endpoints
+- New URL generator
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.5.0] - 2022 02 01
+
+### Added
+
+- Add schedule messages endpoints
+- Add precedence bulk header
+
+### Changed
+
+- Moving to proper semver, will bump the MINOR version with non hotfix updates
+- Add the `domain_id` to the delete endpoint of suppression lists
+
+### Fixed
+
+### Removed
+
+## [0.4.1] - 2021 12 07
+
+### Added
+
+- Add inbound routes endpoints
+- Add Domain endpoint
+- Get DNS Records endpoint
+
+### Changed
+
+### Fixed
+
+- Add `reply_to` option to README.md
+
+### Removed
+
+## [0.4.0] - 2021 10 13
+
+### Added
+
+- Add template endpoints
+- Add the recipient/suppression lists endpoints
+- Add domain verification endpoint
+- Bulk email endpoints
+
+## [0.3.1] - 2021 06 16
+
+### Changed
+
+- Updated constant to identify SDK version
+
+## [0.3.0] - 2021 06 16
+
+### Added
+
+- Add `GET`, `PUT` and `DELETE` methods to `HttpLayer` class
+- Messages API, listing resources, and showing a specific one.
+- Webhook, get, find, create, update, and delete endpoints.
+- Token create, update, delete endpoints.
+- Activity API: list all activities endpoint.
+- Analytics API: activities data by date, opens by country, opens by user-agent name and opens by reading environment.
+- Domain API: list domains, get a single domain, delete domain, get recipients for a domain and update domain settings.
+- Recipients endpoint, List, Find, and Delete.
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [0.2.1] - 2021 04 23
+
+### Added
+
+- `Debugging validation errors` to GUIDE.md
+
+### Changed
+
+- `master` to `main`
+
+### Fixed
+
+- Some problems with tags and `main`
+- GUIDE.md fixes
+
+## [0.2] - 2021 01 28
+
+### Added
+
+- PHP 8 support
+- Github Actions testing for multiple versions of PHP
+
+### Changed
+
+- Guzzle 6 to Guzzle 7 in `require-dev`.
+- `tightenco/collect` version constraint update.
+- Suggest `php-http/guzzle7-adapter` instead of `php-http/guzzle6-adapter` for install instructions.
+
+## [0.1.1] - 2020 09 01
+
+### Changed
+
+- `collect` helper changed to `Collection` class
+- `from` and `subject` are not mandatory if `template_id` is set
+
+## [0.1.0]
+
+### Added
+
+- PSR-7 and PSR-18 based HTTP adapter
+- `POST email/send` endpoint support
+- Helpers for recipients, variables & attachments
+- PHPUnit tests
+- Documentation
+
+[Unreleased]: https://github.com/mailersend/mailersend-php/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.10.0
+[0.9.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.9.1
+[0.9.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.9.0
+[0.8.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.8.0
+[0.7.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.7.0
+[0.6.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.6.0
+[0.5.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.5.0
+[0.4.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.4.1
+[0.4.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.4.0
+[0.3.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.1
+[0.3.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.3.0
+[0.2.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.2.1
+[0.2]: https://github.com/mailersend/mailersend-php/releases/tag/v0.2
+[0.1.1]: https://github.com/mailersend/mailersend-php/releases/tag/v0.1.1
+[0.1.0]: https://github.com/mailersend/mailersend-php/releases/tag/v0.1.0
